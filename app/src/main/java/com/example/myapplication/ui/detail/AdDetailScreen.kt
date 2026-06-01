@@ -1,0 +1,416 @@
+package com.example.myapplication.ui.detail
+
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.myapplication.model.AdCardType
+import com.example.myapplication.model.AdItem
+
+/**
+ * 广告详情页
+ * 展示广告的完整信息和互动功能
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AdDetailScreen(
+    ad: AdItem,
+    onBack: () -> Unit,
+    onLikeClick: () -> Unit,
+    onFavoriteClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+
+    // 处理系统返回键
+    BackHandler {
+        onBack()
+    }
+
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
+        // 顶部导航栏
+        TopAppBar(
+            title = {
+                Text(
+                    text = "广告详情",
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "返回"
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        )
+
+        // 内容区域
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            // 头图区域（根据卡片类型显示不同样式）
+            AdDetailHeader(ad = ad)
+
+            // 内容信息
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                // 标题
+                Text(
+                    text = ad.title,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // 副标题
+                Text(
+                    text = ad.subtitle,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // 标签
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    ad.tags.forEach { tag ->
+                        SuggestionChip(
+                            onClick = { },
+                            label = {
+                                Text(
+                                    text = tag,
+                                    fontSize = 13.sp
+                                )
+                            }
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // 摘要标题
+                Text(
+                    text = "广告摘要",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // 摘要内容
+                Text(
+                    text = ad.summary,
+                    style = MaterialTheme.typography.bodyLarge,
+                    lineHeight = 28.sp
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // 数据统计
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        StatItem(
+                            count = ad.exposureCount,
+                            label = "曝光"
+                        )
+                        StatItem(
+                            count = ad.clickCount,
+                            label = "点击"
+                        )
+                        StatItem(
+                            count = ad.likeCount,
+                            label = "点赞"
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // 互动按钮
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    // 点赞按钮
+                    Button(
+                        onClick = onLikeClick,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (ad.liked) {
+                                Color.Red
+                            } else {
+                                MaterialTheme.colorScheme.primary
+                            }
+                        ),
+                        modifier = Modifier.weight(1f).padding(end = 8.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (ad.liked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = "点赞",
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = if (ad.liked) "已点赞" else "点赞")
+                    }
+
+                    // 收藏按钮
+                    Button(
+                        onClick = onFavoriteClick,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (ad.favorited) {
+                                Color(0xFFFFB800)
+                            } else {
+                                MaterialTheme.colorScheme.secondary
+                            }
+                        ),
+                        modifier = Modifier.weight(1f).padding(horizontal = 4.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (ad.favorited) Icons.Default.Star else Icons.Default.StarBorder,
+                            contentDescription = "收藏",
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = if (ad.favorited) "已收藏" else "收藏")
+                    }
+
+                    // 分享按钮
+                    OutlinedButton(
+                        onClick = {
+                            Toast.makeText(context, "分享功能开发中", Toast.LENGTH_SHORT).show()
+                        },
+                        modifier = Modifier.weight(1f).padding(start = 8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "分享",
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = "分享")
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+    }
+}
+
+/**
+ * 详情页头图区域
+ * 根据卡片类型显示不同的头图样式
+ */
+@Composable
+private fun AdDetailHeader(
+    ad: AdItem,
+    modifier: Modifier = Modifier
+) {
+    when (ad.cardType) {
+        AdCardType.LARGE_IMAGE -> {
+            // 大图样式
+            Box(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(250.dp)
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color(0xFF6366F1),
+                                Color(0xFF8B5CF6),
+                                Color(0xFFA78BFA)
+                            )
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "🖼️",
+                        fontSize = 48.sp
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "大图广告",
+                        color = Color.White,
+                        fontSize = 16.sp
+                    )
+                }
+            }
+        }
+        AdCardType.SMALL_IMAGE -> {
+            // 小图样式（居中显示）
+            Box(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color(0xFF10B981),
+                                Color(0xFF34D399),
+                                Color(0xFF6EE7B7)
+                            )
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(CircleShape)
+                            .background(Color.White.copy(alpha = 0.3f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Image,
+                            contentDescription = "图片",
+                            tint = Color.White,
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "小图广告",
+                        color = Color.White,
+                        fontSize = 16.sp
+                    )
+                }
+            }
+        }
+        AdCardType.VIDEO -> {
+            // 视频样式
+            Box(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(220.dp)
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color(0xFF1F2937),
+                                Color(0xFF374151),
+                                Color(0xFF4B5563)
+                            )
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // 播放按钮
+                    Box(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .clip(CircleShape)
+                            .background(Color.White.copy(alpha = 0.2f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = "播放",
+                            tint = Color.White,
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "🎬 视频广告",
+                        color = Color.White.copy(alpha = 0.8f),
+                        fontSize = 16.sp
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "时长: 00:30",
+                        color = Color.White.copy(alpha = 0.6f),
+                        fontSize = 13.sp
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * 统计数据项
+ */
+@Composable
+private fun StatItem(
+    count: Int,
+    label: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = formatCount(count),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+/**
+ * 格式化数字显示
+ */
+private fun formatCount(count: Int): String {
+    return when {
+        count >= 10000 -> "${count / 10000}万"
+        count >= 1000 -> "${count / 1000}k"
+        else -> count.toString()
+    }
+}
