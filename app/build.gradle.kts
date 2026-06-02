@@ -50,6 +50,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     // Material Icons Extended - 包含所有 Material 图标
     implementation("androidx.compose.material:material-icons-extended")
+    // ViewModel Compose - 用于 viewModel() 函数
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

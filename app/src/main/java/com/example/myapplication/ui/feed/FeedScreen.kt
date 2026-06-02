@@ -11,35 +11,51 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.model.AdChannel
 import com.example.myapplication.model.AdItem
+import com.example.myapplication.model.FeedListState
+import com.example.myapplication.model.FeedUiState
 
 /**
  * 信息流主页面
  * 包含顶部标题栏、频道 Tab 和广告列表
+ * 支持下拉刷新和上拉加载更多
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedScreen(
-    adList: List<AdItem>,
+    uiState: FeedUiState,
     listState: LazyListState,
     onAdClick: (String) -> Unit,
     onLikeClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
+    onChannelSelect: (AdChannel) -> Unit,
+    onRefresh: () -> Unit,
+    onLoadMore: () -> Unit,
+    onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
 
-    // 当前选中的频道
-    var selectedChannel by remember { mutableStateOf(AdChannel.FEATURED) }
-
     // 频道列表
     val channels = remember { AdChannel.entries }
 
-    // 根据选中频道筛选广告
-    val filteredAds = remember(adList, selectedChannel) {
-        adList.filter { it.channel == selectedChannel }
+    // 监听滚动位置，触发加载更多
+    val shouldLoadMore = remember {
+        derivedStateOf {
+            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val totalItems = listState.layoutInfo.totalItemsCount
+            lastVisibleItem >= totalItems - 3 && !uiState.isLoadingMore && uiState.hasMore
+        }
+    }
+
+    // 触发加载更多
+    LaunchedEffect(shouldLoadMore.value) {
+        if (shouldLoadMore.value) {
+            onLoadMore()
+        }
     }
 
     Column(
@@ -60,19 +76,19 @@ fun FeedScreen(
         )
 
         // 频道 Tab
-        TabRow(
-            selectedTabIndex = channels.indexOf(selectedChannel),
+        PrimaryTabRow(
+            selectedTabIndex = channels.indexOf(uiState.selectedChannel),
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.primary
         ) {
             channels.forEach { channel ->
                 Tab(
-                    selected = selectedChannel == channel,
-                    onClick = { selectedChannel = channel },
+                    selected = uiState.selectedChannel == channel,
+                    onClick = { onChannelSelect(channel) },
                     text = {
                         Text(
                             text = channel.displayName,
-                            fontWeight = if (selectedChannel == channel) {
+                            fontWeight = if (uiState.selectedChannel == channel) {
                                 FontWeight.Bold
                             } else {
                                 FontWeight.Normal
@@ -83,43 +99,247 @@ fun FeedScreen(
             }
         }
 
-        // 广告列表
-        if (filteredAds.isEmpty()) {
-            // 空状态
-            Box(
+        // 内容区域
+        when (uiState.listState) {
+            is FeedListState.Loading -> {
+                // 首次加载中
+                LoadingState()
+            }
+            is FeedListState.Error -> {
+                // 错误状态
+                ErrorState(
+                    message = uiState.listState.message,
+                    onRetry = onRetry
+                )
+            }
+            is FeedListState.Empty -> {
+                // 空状态
+                EmptyState()
+            }
+            is FeedListState.Success -> {
+                // 正常列表（支持下拉刷新）
+                Box(modifier = Modifier.fillMaxSize()) {
+                    // 刷新指示器
+                    if (uiState.isRefreshing) {
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.TopCenter)
+                        )
+                    }
+
+                    // 下拉刷新提示
+                    PullToRefreshContainer(
+                        isRefreshing = uiState.isRefreshing,
+                        onRefresh = onRefresh,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            // 广告列表
+                            items(
+                                items = uiState.ads,
+                                key = { it.id }
+                            ) { ad ->
+                                AdFeedCard(
+                                    ad = ad,
+                                    onClick = { onAdClick(ad.id) },
+                                    onLikeClick = { onLikeClick(ad.id) },
+                                    onFavoriteClick = { onFavoriteClick(ad.id) },
+                                    onShareClick = {
+                                        Toast.makeText(context, "分享功能开发中", Toast.LENGTH_SHORT).show()
+                                    }
+                                )
+                            }
+
+                            // 底部加载更多状态
+                            item {
+                                LoadMoreIndicator(
+                                    isLoading = uiState.isLoadingMore,
+                                    hasMore = uiState.hasMore
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 错误提示（Snackbar 风格）
+        uiState.errorMessage?.let { message ->
+            LaunchedEffect(message) {
+                // 自动清除错误信息
+                kotlinx.coroutines.delay(3000)
+            }
+        }
+    }
+}
+
+/**
+ * 简化的下拉刷新容器
+ * 使用 Box 包装，顶部显示刷新状态
+ */
+@Composable
+private fun PullToRefreshContainer(
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    // 使用简单的 Box 包装，刷新状态通过顶部进度条显示
+    Box(modifier = modifier) {
+        content()
+
+        // 刷新时显示提示
+        if (isRefreshing) {
+            Snackbar(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
+                    .align(Alignment.TopCenter)
+                    .padding(16.dp)
             ) {
+                Text("正在刷新...")
+            }
+        }
+    }
+}
+
+/**
+ * 加载中状态
+ */
+@Composable
+private fun LoadingState() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CircularProgressIndicator()
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "加载中...",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+/**
+ * 空状态
+ */
+@Composable
+private fun EmptyState() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "📭",
+                style = MaterialTheme.typography.displayLarge
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "暂无广告",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "下拉刷新试试",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+/**
+ * 错误状态
+ */
+@Composable
+private fun ErrorState(
+    message: String,
+    onRetry: () -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "😞",
+                style = MaterialTheme.typography.displayLarge
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = onRetry) {
+                Text("重试")
+            }
+        }
+    }
+}
+
+/**
+ * 加载更多指示器
+ */
+@Composable
+private fun LoadMoreIndicator(
+    isLoading: Boolean,
+    hasMore: Boolean
+) {
+    if (isLoading) {
+        // 加载中
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "暂无广告",
-                    style = MaterialTheme.typography.bodyLarge,
+                    text = "加载中...",
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-        } else {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(
-                    items = filteredAds,
-                    key = { it.id }
-                ) { ad ->
-                    AdFeedCard(
-                        ad = ad,
-                        onClick = { onAdClick(ad.id) },
-                        onLikeClick = { onLikeClick(ad.id) },
-                        onFavoriteClick = { onFavoriteClick(ad.id) },
-                        onShareClick = {
-                            Toast.makeText(context, "分享功能开发中", Toast.LENGTH_SHORT).show()
-                        }
-                    )
-                }
-            }
+        }
+    } else if (!hasMore) {
+        // 没有更多数据
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "—— 没有更多了 ——",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

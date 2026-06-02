@@ -10,10 +10,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import com.example.myapplication.data.MockAdRepository
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.ui.detail.AdDetailScreen
 import com.example.myapplication.ui.feed.FeedScreen
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.myapplication.viewmodel.FeedViewModel
 
 /**
  * 应用主 Activity
@@ -41,9 +42,11 @@ class MainActivity : ComponentActivity() {
  * 管理广告列表状态和页面切换逻辑
  */
 @Composable
-fun AdApp() {
-    // 广告列表状态（从 MockRepository 获取）
-    var adList by remember { mutableStateOf(MockAdRepository.ads) }
+fun AdApp(
+    viewModel: FeedViewModel = viewModel()
+) {
+    // 从 ViewModel 获取 UI 状态
+    val uiState by viewModel.uiState.collectAsState()
 
     // 当前选中的广告 ID（用于详情页展示）
     var selectedAdId by remember { mutableStateOf<String?>(null) }
@@ -52,22 +55,10 @@ fun AdApp() {
     val listState = rememberLazyListState()
 
     // 根据 selectedAdId 获取最新的广告对象
-    val selectedAd = remember(adList, selectedAdId) {
+    val selectedAd = remember(uiState.ads, selectedAdId) {
         selectedAdId?.let { id ->
-            adList.find { it.id == id }
+            uiState.ads.find { it.id == id }
         }
-    }
-
-    // 点赞回调
-    val onLikeClick: (String) -> Unit = { adId ->
-        MockAdRepository.toggleLike(adId)
-        adList = MockAdRepository.ads
-    }
-
-    // 收藏回调
-    val onFavoriteClick: (String) -> Unit = { adId ->
-        MockAdRepository.toggleFavorite(adId)
-        adList = MockAdRepository.ads
     }
 
     // 点击广告卡片回调
@@ -86,17 +77,21 @@ fun AdApp() {
         AdDetailScreen(
             ad = selectedAd,
             onBack = onBack,
-            onLikeClick = { onLikeClick(selectedAd.id) },
-            onFavoriteClick = { onFavoriteClick(selectedAd.id) }
+            onLikeClick = { viewModel.toggleLike(selectedAd.id) },
+            onFavoriteClick = { viewModel.toggleFavorite(selectedAd.id) }
         )
     } else {
         // 显示信息流页面
         FeedScreen(
-            adList = adList,
+            uiState = uiState,
             listState = listState,
             onAdClick = onAdClick,
-            onLikeClick = onLikeClick,
-            onFavoriteClick = onFavoriteClick
+            onLikeClick = { viewModel.toggleLike(it) },
+            onFavoriteClick = { viewModel.toggleFavorite(it) },
+            onChannelSelect = { viewModel.selectChannel(it) },
+            onRefresh = { viewModel.refresh() },
+            onLoadMore = { viewModel.loadMore() },
+            onRetry = { viewModel.retry() }
         )
     }
 }
