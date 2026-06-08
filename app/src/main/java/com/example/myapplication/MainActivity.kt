@@ -11,10 +11,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.model.AdChannel
 import com.example.myapplication.ui.detail.AdDetailScreen
 import com.example.myapplication.ui.feed.FeedScreen
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.viewmodel.FeedViewModel
+import kotlinx.coroutines.launch
 
 /**
  * 应用主 Activity
@@ -51,8 +53,17 @@ fun AdApp(
     // 当前选中的广告 ID（用于详情页展示）
     var selectedAdId by remember { mutableStateOf<String?>(null) }
 
-    // 列表滚动状态（提升到此处，避免返回时丢失）
-    val listState = rememberLazyListState()
+    // 每个频道独立保存滚动状态，避免 Tab 切换后丢失位置
+    val featuredListState = rememberLazyListState()
+    val ecommerceListState = rememberLazyListState()
+    val localListState = rememberLazyListState()
+    val currentListState = when (uiState.selectedChannel) {
+        AdChannel.FEATURED -> featuredListState
+        AdChannel.ECOMMERCE -> ecommerceListState
+        AdChannel.LOCAL -> localListState
+    }
+
+    val coroutineScope = rememberCoroutineScope()
 
     // 根据 selectedAdId 获取最新的广告对象
     val selectedAd = remember(uiState.ads, selectedAdId) {
@@ -82,18 +93,31 @@ fun AdApp(
             onTagClick = { tag ->
                 viewModel.selectTag(tag)
                 selectedAdId = null
+                coroutineScope.launch {
+                    currentListState.animateScrollToItem(0)
+                }
             }
         )
     } else {
         // 显示信息流页面
         FeedScreen(
             uiState = uiState,
-            listState = listState,
+            listState = currentListState,
             onAdClick = onAdClick,
             onLikeClick = { viewModel.toggleLike(it) },
             onFavoriteClick = { viewModel.toggleFavorite(it) },
-            onTagClick = { viewModel.selectTag(it) },
-            onClearTagFilter = { viewModel.clearTagFilter() },
+            onTagClick = {
+                viewModel.selectTag(it)
+                coroutineScope.launch {
+                    currentListState.animateScrollToItem(0)
+                }
+            },
+            onClearTagFilter = {
+                viewModel.clearTagFilter()
+                coroutineScope.launch {
+                    currentListState.animateScrollToItem(0)
+                }
+            },
             onChannelSelect = { viewModel.selectChannel(it) },
             onRefresh = { viewModel.refresh() },
             onLoadMore = { viewModel.loadMore() },

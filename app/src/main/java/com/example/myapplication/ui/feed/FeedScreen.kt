@@ -78,11 +78,6 @@ fun FeedScreen(
         }
     }
 
-    // 切换频道后回到顶部，避免停留在上个频道的中段位置造成误解
-    LaunchedEffect(uiState.selectedChannel) {
-        listState.animateScrollToItem(0)
-    }
-
     Column(
         modifier = modifier.fillMaxSize()
     ) {
