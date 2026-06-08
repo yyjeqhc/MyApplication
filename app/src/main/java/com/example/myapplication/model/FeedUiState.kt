@@ -8,6 +8,9 @@ data class FeedUiState(
     /** 广告列表 */
     val ads: List<AdItem> = emptyList(),
 
+    /** 当前选中的标签筛选条件 */
+    val selectedTag: String? = null,
+
     /** 当前选中的频道 */
     val selectedChannel: AdChannel = AdChannel.FEATURED,
 
@@ -28,7 +31,13 @@ data class FeedUiState(
 
     /** 错误信息（null 表示无错误） */
     val errorMessage: String? = null
-)
+) {
+    /** 当前筛选后实际展示的广告列表 */
+    val filteredAds: List<AdItem>
+        get() = selectedTag?.let { tag ->
+            ads.filter { ad -> tag in ad.tags }
+        } ?: ads
+}
 
 /**
  * 列表状态枚举

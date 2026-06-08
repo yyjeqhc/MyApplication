@@ -78,7 +78,11 @@ fun AdApp(
             ad = selectedAd,
             onBack = onBack,
             onLikeClick = { viewModel.toggleLike(selectedAd.id) },
-            onFavoriteClick = { viewModel.toggleFavorite(selectedAd.id) }
+            onFavoriteClick = { viewModel.toggleFavorite(selectedAd.id) },
+            onTagClick = { tag ->
+                viewModel.selectTag(tag)
+                selectedAdId = null
+            }
         )
     } else {
         // 显示信息流页面
@@ -88,10 +92,13 @@ fun AdApp(
             onAdClick = onAdClick,
             onLikeClick = { viewModel.toggleLike(it) },
             onFavoriteClick = { viewModel.toggleFavorite(it) },
+            onTagClick = { viewModel.selectTag(it) },
+            onClearTagFilter = { viewModel.clearTagFilter() },
             onChannelSelect = { viewModel.selectChannel(it) },
             onRefresh = { viewModel.refresh() },
             onLoadMore = { viewModel.loadMore() },
             onRetry = { viewModel.retry() },
+            onClearError = { viewModel.clearError() },
             onSimulateNormal = { viewModel.simulateNormal() },
             onSimulateEmpty = { viewModel.simulateEmptyState() },
             onSimulateError = { viewModel.simulateErrorState() },

@@ -86,6 +86,7 @@ class FeedViewModel : ViewModel() {
         _uiState.update {
             it.copy(
                 selectedChannel = channel,
+                selectedTag = null,
                 ads = emptyList(),
                 currentPage = 1,
                 hasMore = true,
@@ -95,6 +96,24 @@ class FeedViewModel : ViewModel() {
 
         // 加载新频道数据
         loadInitialData()
+    }
+
+    /**
+     * 按智能标签筛选当前频道广告
+     */
+    fun selectTag(tag: String) {
+        _uiState.update {
+            it.copy(selectedTag = tag)
+        }
+    }
+
+    /**
+     * 清除智能标签筛选
+     */
+    fun clearTagFilter() {
+        _uiState.update {
+            it.copy(selectedTag = null)
+        }
     }
 
     /**
@@ -190,7 +209,7 @@ class FeedViewModel : ViewModel() {
             state.copy(
                 ads = state.ads.map { ad ->
                     if (ad.id == adId) {
-                        MockAdRepository.getAdById(adId) ?: ad
+                        MockAdRepository.getAdById(adId) ?: ad.toggleLikeLocally()
                     } else {
                         ad
                     }
@@ -209,7 +228,7 @@ class FeedViewModel : ViewModel() {
             state.copy(
                 ads = state.ads.map { ad ->
                     if (ad.id == adId) {
-                        MockAdRepository.getAdById(adId) ?: ad
+                        MockAdRepository.getAdById(adId) ?: ad.copy(favorited = !ad.favorited)
                     } else {
                         ad
                     }
@@ -260,6 +279,7 @@ class FeedViewModel : ViewModel() {
         _uiState.update {
             it.copy(
                 ads = emptyList(),
+                selectedTag = null,
                 listState = FeedListState.Empty,
                 currentPage = 1,
                 hasMore = false,
@@ -276,6 +296,7 @@ class FeedViewModel : ViewModel() {
         simulateEmpty = false
         _uiState.update {
             it.copy(
+                selectedTag = null,
                 listState = FeedListState.Error("模拟的加载错误"),
                 errorMessage = "模拟的加载错误"
             )
@@ -307,5 +328,11 @@ class FeedViewModel : ViewModel() {
                 exposureCount = ad.exposureCount + (page * 1000)
             )
         }
+    }
+
+    private fun AdItem.toggleLikeLocally(): AdItem {
+        val newLiked = !liked
+        val newLikeCount = if (newLiked) likeCount + 1 else (likeCount - 1).coerceAtLeast(0)
+        return copy(liked = newLiked, likeCount = newLikeCount)
     }
 }

@@ -16,6 +16,7 @@ fun AdFeedCard(
     onLikeClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     onShareClick: () -> Unit,
+    onTagClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (ad.cardType) {
@@ -26,6 +27,7 @@ fun AdFeedCard(
                 onLikeClick = onLikeClick,
                 onFavoriteClick = onFavoriteClick,
                 onShareClick = onShareClick,
+                onTagClick = onTagClick,
                 modifier = modifier
             )
         }
@@ -36,6 +38,7 @@ fun AdFeedCard(
                 onLikeClick = onLikeClick,
                 onFavoriteClick = onFavoriteClick,
                 onShareClick = onShareClick,
+                onTagClick = onTagClick,
                 modifier = modifier
             )
         }
@@ -46,6 +49,7 @@ fun AdFeedCard(
                 onLikeClick = onLikeClick,
                 onFavoriteClick = onFavoriteClick,
                 onShareClick = onShareClick,
+                onTagClick = onTagClick,
                 modifier = modifier
             )
         }

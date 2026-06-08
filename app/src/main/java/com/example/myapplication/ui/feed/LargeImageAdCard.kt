@@ -14,7 +14,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -34,6 +33,7 @@ fun LargeImageAdCard(
     onLikeClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     onShareClick: () -> Unit,
+    onTagClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -130,34 +130,20 @@ fun LargeImageAdCard(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // 副标题
-                Text(
-                    text = ad.subtitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                // AI 摘要
+                AiSummaryText(
+                    summary = ad.aiSummary.ifBlank { ad.subtitle },
+                    maxLines = 2
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // 标签
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    ad.tags.take(3).forEach { tag ->
-                        SuggestionChip(
-                            onClick = { },
-                            label = {
-                                Text(
-                                    text = tag,
-                                    fontSize = 11.sp
-                                )
-                            },
-                            modifier = Modifier.height(24.dp)
-                        )
-                    }
-                }
+                // 智能标签
+                AdTagRow(
+                    tags = ad.tags,
+                    onTagClick = onTagClick,
+                    maxTags = 3
+                )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -240,16 +226,5 @@ fun LargeImageAdCard(
                 }
             }
         }
-    }
-}
-
-/**
- * 格式化数字显示
- */
-private fun formatCount(count: Int): String {
-    return when {
-        count >= 10000 -> "${count / 10000}万"
-        count >= 1000 -> "${count / 1000}k"
-        else -> count.toString()
     }
 }

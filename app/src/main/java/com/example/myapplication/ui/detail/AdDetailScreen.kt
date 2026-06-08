@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -23,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.model.AdCardType
 import com.example.myapplication.model.AdItem
+import com.example.myapplication.ui.feed.AdTagRow
+import com.example.myapplication.ui.feed.formatCount
 
 /**
  * 广告详情页
@@ -35,6 +38,7 @@ fun AdDetailScreen(
     onBack: () -> Unit,
     onLikeClick: () -> Unit,
     onFavoriteClick: () -> Unit,
+    onTagClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -58,7 +62,7 @@ fun AdDetailScreen(
             navigationIcon = {
                 IconButton(onClick = onBack) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "返回"
                     )
                 }
@@ -133,22 +137,11 @@ fun AdDetailScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // 标签
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    ad.tags.forEach { tag ->
-                        SuggestionChip(
-                            onClick = { },
-                            label = {
-                                Text(
-                                    text = tag,
-                                    fontSize = 13.sp
-                                )
-                            }
-                        )
-                    }
-                }
+                // 智能标签
+                AdTagRow(
+                    tags = ad.tags,
+                    onTagClick = onTagClick
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -164,9 +157,9 @@ fun AdDetailScreen(
                     Spacer(modifier = Modifier.height(24.dp))
                 }
 
-                // 适合人群
-                if (ad.targetAudience.isNotEmpty()) {
-                    TargetAudienceSection(ad = ad)
+                // AI 洞察
+                if (ad.category.isNotEmpty() || ad.scene.isNotEmpty() || ad.targetAudience.isNotEmpty()) {
+                    AiInsightSection(ad = ad)
                     Spacer(modifier = Modifier.height(24.dp))
                 }
 
@@ -357,10 +350,10 @@ private fun RecommendationReasonSection(
 }
 
 /**
- * 适合人群区域
+ * AI 洞察区域
  */
 @Composable
-private fun TargetAudienceSection(
+private fun AiInsightSection(
     ad: AdItem,
     modifier: Modifier = Modifier
 ) {
@@ -385,7 +378,7 @@ private fun TargetAudienceSection(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "适合人群",
+                    text = "AI 洞察",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -394,30 +387,41 @@ private fun TargetAudienceSection(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // 人群标签
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                ad.targetAudience.forEach { audience ->
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = RoundedCornerShape(16.dp)
-                            )
-                            .padding(horizontal = 12.dp, vertical = 6.dp)
-                    ) {
-                        Text(
-                            text = audience,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
-            }
+            InsightRow(label = "品类", value = ad.category)
+            InsightRow(label = "场景", value = ad.scene)
+            InsightRow(label = "受众", value = ad.targetAudience)
         }
+    }
+}
+
+@Composable
+private fun InsightRow(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    if (value.isBlank()) return
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.width(48.dp)
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            lineHeight = 22.sp,
+            modifier = Modifier.weight(1f)
+        )
     }
 }
 
@@ -671,16 +675,5 @@ private fun AdDetailHeader(
                 }
             }
         }
-    }
-}
-
-/**
- * 格式化数字显示
- */
-private fun formatCount(count: Int): String {
-    return when {
-        count >= 10000 -> "${count / 10000}万"
-        count >= 1000 -> "${count / 1000}k"
-        else -> count.toString()
     }
 }

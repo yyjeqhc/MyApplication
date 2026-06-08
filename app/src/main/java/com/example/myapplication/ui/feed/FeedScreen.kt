@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,7 +15,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.model.AdChannel
-import com.example.myapplication.model.AdItem
 import com.example.myapplication.model.FeedListState
 import com.example.myapplication.model.FeedUiState
 
@@ -31,10 +31,13 @@ fun FeedScreen(
     onAdClick: (String) -> Unit,
     onLikeClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
+    onTagClick: (String) -> Unit,
+    onClearTagFilter: () -> Unit,
     onChannelSelect: (AdChannel) -> Unit,
     onRefresh: () -> Unit,
     onLoadMore: () -> Unit,
     onRetry: () -> Unit,
+    onClearError: () -> Unit,
     onSimulateNormal: () -> Unit,
     onSimulateEmpty: () -> Unit,
     onSimulateError: () -> Unit,
@@ -49,12 +52,22 @@ fun FeedScreen(
     // 控制面板显示状态
     var isControlPanelVisible by remember { mutableStateOf(false) }
 
+    val visibleAds = uiState.filteredAds
+
     // 监听滚动位置，触发加载更多
-    val shouldLoadMore = remember {
+    val shouldLoadMore = remember(
+        listState,
+        uiState.isLoadingMore,
+        uiState.hasMore,
+        visibleAds.size
+    ) {
         derivedStateOf {
             val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
             val totalItems = listState.layoutInfo.totalItemsCount
-            lastVisibleItem >= totalItems - 3 && !uiState.isLoadingMore && uiState.hasMore
+            visibleAds.isNotEmpty() &&
+                lastVisibleItem >= totalItems - 3 &&
+                !uiState.isLoadingMore &&
+                uiState.hasMore
         }
     }
 
@@ -135,7 +148,11 @@ fun FeedScreen(
             }
             is FeedListState.Success -> {
                 // 正常列表（支持下拉刷新）
-                Box(modifier = Modifier.fillMaxSize()) {
+                PullToRefreshBox(
+                    isRefreshing = uiState.isRefreshing,
+                    onRefresh = onRefresh,
+                    modifier = Modifier.fillMaxSize()
+                ) {
                     // 刷新指示器
                     if (uiState.isRefreshing) {
                         LinearProgressIndicator(
@@ -152,6 +169,17 @@ fun FeedScreen(
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
+                        // 当前标签筛选条件
+                        uiState.selectedTag?.let { tag ->
+                            item(key = "tag_filter") {
+                                ActiveTagFilterBar(
+                                    tag = tag,
+                                    resultCount = visibleAds.size,
+                                    onClear = onClearTagFilter
+                                )
+                            }
+                        }
+
                         // 刷新提示
                         if (uiState.isRefreshing) {
                             item {
@@ -181,7 +209,7 @@ fun FeedScreen(
 
                         // 广告列表
                         items(
-                            items = uiState.ads,
+                            items = visibleAds,
                             key = { it.id }
                         ) { ad ->
                             AdFeedCard(
@@ -191,8 +219,15 @@ fun FeedScreen(
                                 onFavoriteClick = { onFavoriteClick(ad.id) },
                                 onShareClick = {
                                     Toast.makeText(context, "分享功能开发中", Toast.LENGTH_SHORT).show()
-                                }
+                                },
+                                onTagClick = onTagClick
                             )
+                        }
+
+                        if (uiState.selectedTag != null && visibleAds.isEmpty()) {
+                            item(key = "empty_filter") {
+                                EmptyFilterState(onClear = onClearTagFilter)
+                            }
                         }
 
                         // 底部加载更多状态
@@ -212,7 +247,65 @@ fun FeedScreen(
             LaunchedEffect(message) {
                 // 自动清除错误信息
                 kotlinx.coroutines.delay(3000)
+                onClearError()
             }
+        }
+    }
+}
+
+/**
+ * 当前标签筛选提示
+ */
+@Composable
+private fun ActiveTagFilterBar(
+    tag: String,
+    resultCount: Int,
+    onClear: () -> Unit
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.small,
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "当前筛选：$tag · $resultCount 条",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.weight(1f)
+            )
+            TextButton(onClick = onClear) {
+                Text("清除筛选")
+            }
+        }
+    }
+}
+
+/**
+ * 标签筛选空结果
+ */
+@Composable
+private fun EmptyFilterState(
+    onClear: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "当前标签下暂无广告",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        OutlinedButton(onClick = onClear) {
+            Text("清除筛选")
         }
     }
 }
@@ -233,29 +326,6 @@ private fun SkeletonLoadingState() {
             } else {
                 SmallImageSkeletonCard()
             }
-        }
-    }
-}
-
-/**
- * 加载中状态
- */
-@Composable
-private fun LoadingState() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            CircularProgressIndicator()
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "加载中...",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }

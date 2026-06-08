@@ -26,7 +26,7 @@ data class AdItem(
     /** 视频链接（第一阶段为占位符） */
     val videoUrl: String,
 
-    /** 标签列表 */
+    /** 智能标签列表 */
     val tags: List<String>,
 
     /** 广告摘要/描述 */
@@ -56,11 +56,17 @@ data class AdItem(
     /** AI 摘要 */
     val aiSummary: String = "",
 
+    /** 品类 */
+    val category: String = "",
+
+    /** 使用场景 */
+    val scene: String = "",
+
     /** 推荐理由 */
     val recommendationReason: String = "",
 
-    /** 适合人群 */
-    val targetAudience: List<String> = emptyList(),
+    /** 目标受众 */
+    val targetAudience: String = "",
 
     /** 是否为广告标识 */
     val isAd: Boolean = true

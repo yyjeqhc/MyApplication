@@ -35,6 +35,7 @@ fun SmallImageAdCard(
     onLikeClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     onShareClick: () -> Unit,
+    onTagClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -122,34 +123,20 @@ fun SmallImageAdCard(
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    // 副标题
-                    Text(
-                        text = ad.subtitle,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                    // AI 摘要
+                    AiSummaryText(
+                        summary = ad.aiSummary.ifBlank { ad.subtitle },
+                        maxLines = 2
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // 标签
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        ad.tags.take(2).forEach { tag ->
-                            SuggestionChip(
-                                onClick = { },
-                                label = {
-                                    Text(
-                                        text = tag,
-                                        fontSize = 10.sp
-                                    )
-                                },
-                                modifier = Modifier.height(22.dp)
-                            )
-                        }
-                    }
+                    // 智能标签
+                    AdTagRow(
+                        tags = ad.tags,
+                        onTagClick = onTagClick,
+                        maxTags = 2
+                    )
                 }
             }
 
@@ -233,16 +220,5 @@ fun SmallImageAdCard(
                 }
             }
         }
-    }
-}
-
-/**
- * 格式化数字显示
- */
-private fun formatCount(count: Int): String {
-    return when {
-        count >= 10000 -> "${count / 10000}万"
-        count >= 1000 -> "${count / 1000}k"
-        else -> count.toString()
     }
 }
