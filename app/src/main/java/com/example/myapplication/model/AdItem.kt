@@ -26,6 +26,12 @@ data class AdItem(
     /** 视频链接（第一阶段为占位符） */
     val videoUrl: String,
 
+    /** 图片展示类型（从 assets mock 数据读取，用于后续扩展） */
+    val imageType: String = "",
+
+    /** 视频时长，非视频广告为空 */
+    val videoDuration: String = "",
+
     /** 智能标签列表 */
     val tags: List<String>,
 

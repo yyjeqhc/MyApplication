@@ -1,6 +1,8 @@
 package com.example.myapplication.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.MockAdRepository
 import com.example.myapplication.model.AdChannel
@@ -18,7 +20,13 @@ import kotlinx.coroutines.launch
  * 信息流 ViewModel
  * 管理页面状态、刷新、加载更多等业务逻辑
  */
-class FeedViewModel : ViewModel() {
+class FeedViewModel(
+    application: Application
+) : AndroidViewModel(application) {
+
+    private companion object {
+        const val TAG = "FeedViewModel"
+    }
 
     /** UI 状态 */
     private val _uiState = MutableStateFlow(FeedUiState())
@@ -37,6 +45,14 @@ class FeedViewModel : ViewModel() {
     private val channelCache = mutableMapOf<AdChannel, ChannelFeedCache>()
 
     init {
+        MockAdRepository.initialize(application.applicationContext)
+        Log.i(
+            TAG,
+            "Repository ready. fromAssets=${MockAdRepository.isLoadedFromAssets()}, " +
+                "total=${MockAdRepository.ads.size}, " +
+                AdChannel.entries.joinToString { "${it.name}=${MockAdRepository.getChannelCount(it)}" }
+        )
+
         // 首次加载数据
         loadInitialData()
     }
@@ -64,19 +80,15 @@ class FeedViewModel : ViewModel() {
                 return@launch
             }
 
-            val ads = if (simulateEmpty) {
-                emptyList()
-            } else {
-                MockAdRepository.getAdsByChannel(channel)
-            }
-            saveChannelCache(channel, ads, currentPage = 1, hasMore = ads.size >= pageSize)
+            val page = loadPage(channel, page = 1)
+            saveChannelCache(channel, page.ads, currentPage = page.currentPage, hasMore = page.hasMore)
 
             _uiState.update {
                 it.copy(
-                    ads = ads,
-                    listState = if (ads.isEmpty()) FeedListState.Empty else FeedListState.Success,
-                    currentPage = 1,
-                    hasMore = ads.size >= pageSize,
+                    ads = page.ads,
+                    listState = if (page.ads.isEmpty()) FeedListState.Empty else FeedListState.Success,
+                    currentPage = page.currentPage,
+                    hasMore = page.hasMore,
                     errorMessage = null
                 )
             }
@@ -121,21 +133,17 @@ class FeedViewModel : ViewModel() {
             return
         }
 
-        val ads = if (simulateEmpty) {
-            emptyList()
-        } else {
-            MockAdRepository.getAdsByChannel(channel)
-        }
-        saveChannelCache(channel, ads, currentPage = 1, hasMore = ads.size >= pageSize)
+        val page = loadPage(channel, page = 1)
+        saveChannelCache(channel, page.ads, currentPage = page.currentPage, hasMore = page.hasMore)
 
         _uiState.update {
             it.copy(
                 selectedChannel = channel,
                 selectedTag = null,
-                ads = ads,
-                currentPage = 1,
-                hasMore = ads.size >= pageSize,
-                listState = if (ads.isEmpty()) FeedListState.Empty else FeedListState.Success,
+                ads = page.ads,
+                currentPage = page.currentPage,
+                hasMore = page.hasMore,
+                listState = if (page.ads.isEmpty()) FeedListState.Empty else FeedListState.Success,
                 isRefreshing = false,
                 isLoadingMore = false,
                 errorMessage = null
@@ -186,21 +194,16 @@ class FeedViewModel : ViewModel() {
                 return@launch
             }
 
-            // 刷新时重新打乱数据（模拟新数据）
-            val ads = if (simulateEmpty) {
-                emptyList()
-            } else {
-                MockAdRepository.getAdsByChannel(channel).shuffled()
-            }
-            saveChannelCache(channel, ads, currentPage = 1, hasMore = ads.size >= pageSize)
+            val page = loadPage(channel, page = 1)
+            saveChannelCache(channel, page.ads, currentPage = page.currentPage, hasMore = page.hasMore)
 
             _uiState.update {
                 it.copy(
-                    ads = ads,
+                    ads = page.ads,
                     isRefreshing = false,
-                    currentPage = 1,
-                    hasMore = ads.size >= pageSize,
-                    listState = if (ads.isEmpty()) FeedListState.Empty else FeedListState.Success,
+                    currentPage = page.currentPage,
+                    hasMore = page.hasMore,
+                    listState = if (page.ads.isEmpty()) FeedListState.Empty else FeedListState.Success,
                     errorMessage = null
                 )
             }
@@ -240,15 +243,14 @@ class FeedViewModel : ViewModel() {
             val currentPage = currentState.currentPage
             if (_uiState.value.selectedChannel != channel) return@launch
 
-            // 模拟生成更多数据（实际项目中会请求下一页）
-            val moreAds = generateMoreAds(channel, currentPage + 1)
+            val page = loadPage(channel, currentPage + 1)
 
             _uiState.update {
                 it.copy(
-                    ads = it.ads + moreAds,
+                    ads = mergeAdsById(it.ads, page.ads),
                     isLoadingMore = false,
-                    currentPage = currentPage + 1,
-                    hasMore = moreAds.size >= pageSize && currentPage < 5, // 最多加载5页
+                    currentPage = page.currentPage,
+                    hasMore = page.hasMore,
                     errorMessage = null
                 )
             }
@@ -372,26 +374,35 @@ class FeedViewModel : ViewModel() {
     fun resetPagination() {
         simulateError = false
         simulateEmpty = false
-        MockAdRepository.reset()
+        MockAdRepository.reset(getApplication<Application>().applicationContext)
         channelCache.clear()
         loadInitialData()
     }
 
-    /**
-     * 模拟生成更多广告数据
-     */
-    private fun generateMoreAds(channel: AdChannel, page: Int): List<AdItem> {
-        val baseAds = MockAdRepository.getAdsByChannel(channel)
-
-        // 基于现有数据生成变体
-        return baseAds.take(pageSize).mapIndexed { index, ad ->
-            ad.copy(
-                id = "${channel.name.lowercase()}_page${page}_${index}",
-                title = "${ad.title} (${page})",
-                likeCount = ad.likeCount + (page * 100),
-                exposureCount = ad.exposureCount + (page * 1000)
+    private fun loadPage(channel: AdChannel, page: Int): MockAdRepository.PagedAds {
+        return if (simulateEmpty) {
+            MockAdRepository.PagedAds(
+                ads = emptyList(),
+                currentPage = 1,
+                hasMore = false,
+                totalCount = 0
+            )
+        } else {
+            MockAdRepository.getPagedAds(
+                channel = channel,
+                page = page,
+                pageSize = pageSize
             )
         }
+    }
+
+    private fun mergeAdsById(
+        currentAds: List<AdItem>,
+        nextAds: List<AdItem>
+    ): List<AdItem> {
+        if (nextAds.isEmpty()) return currentAds
+        val existingIds = currentAds.mapTo(mutableSetOf()) { it.id }
+        return currentAds + nextAds.filter { existingIds.add(it.id) }
     }
 
     private fun AdItem.toggleLikeLocally(): AdItem {
