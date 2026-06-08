@@ -33,6 +33,9 @@ class FeedViewModel : ViewModel() {
     /** 每页数据量 */
     private val pageSize = 6
 
+    /** 每个频道当前已加载的数据缓存 */
+    private val channelCache = mutableMapOf<AdChannel, ChannelFeedCache>()
+
     init {
         // 首次加载数据
         loadInitialData()
@@ -43,10 +46,13 @@ class FeedViewModel : ViewModel() {
      */
     private fun loadInitialData() {
         viewModelScope.launch {
+            val channel = _uiState.value.selectedChannel
             _uiState.update { it.copy(listState = FeedListState.Loading) }
 
             // 模拟网络延迟
             delay(800)
+
+            if (_uiState.value.selectedChannel != channel) return@launch
 
             if (simulateError) {
                 _uiState.update {
@@ -58,12 +64,12 @@ class FeedViewModel : ViewModel() {
                 return@launch
             }
 
-            val channel = _uiState.value.selectedChannel
             val ads = if (simulateEmpty) {
                 emptyList()
             } else {
                 MockAdRepository.getAdsByChannel(channel)
             }
+            saveChannelCache(channel, ads, currentPage = 1, hasMore = ads.size >= pageSize)
 
             _uiState.update {
                 it.copy(
@@ -83,19 +89,58 @@ class FeedViewModel : ViewModel() {
     fun selectChannel(channel: AdChannel) {
         if (channel == _uiState.value.selectedChannel) return
 
+        if (simulateError) {
+            _uiState.update {
+                it.copy(
+                    selectedChannel = channel,
+                    selectedTag = null,
+                    listState = FeedListState.Error("加载失败，请重试"),
+                    errorMessage = "加载失败，请重试",
+                    isRefreshing = false,
+                    isLoadingMore = false
+                )
+            }
+            return
+        }
+
+        val cached = channelCache[channel]
+        if (cached != null) {
+            _uiState.update {
+                it.copy(
+                    selectedChannel = channel,
+                    selectedTag = null,
+                    ads = cached.ads,
+                    currentPage = cached.currentPage,
+                    hasMore = cached.hasMore,
+                    listState = if (cached.ads.isEmpty()) FeedListState.Empty else FeedListState.Success,
+                    errorMessage = null,
+                    isRefreshing = false,
+                    isLoadingMore = false
+                )
+            }
+            return
+        }
+
+        val ads = if (simulateEmpty) {
+            emptyList()
+        } else {
+            MockAdRepository.getAdsByChannel(channel)
+        }
+        saveChannelCache(channel, ads, currentPage = 1, hasMore = ads.size >= pageSize)
+
         _uiState.update {
             it.copy(
                 selectedChannel = channel,
                 selectedTag = null,
-                ads = emptyList(),
+                ads = ads,
                 currentPage = 1,
-                hasMore = true,
+                hasMore = ads.size >= pageSize,
+                listState = if (ads.isEmpty()) FeedListState.Empty else FeedListState.Success,
+                isRefreshing = false,
+                isLoadingMore = false,
                 errorMessage = null
             )
         }
-
-        // 加载新频道数据
-        loadInitialData()
     }
 
     /**
@@ -123,10 +168,13 @@ class FeedViewModel : ViewModel() {
         if (_uiState.value.isRefreshing) return
 
         viewModelScope.launch {
+            val channel = _uiState.value.selectedChannel
             _uiState.update { it.copy(isRefreshing = true) }
 
             // 模拟网络延迟
             delay(1000)
+
+            if (_uiState.value.selectedChannel != channel) return@launch
 
             if (simulateError) {
                 _uiState.update {
@@ -138,13 +186,13 @@ class FeedViewModel : ViewModel() {
                 return@launch
             }
 
-            val channel = _uiState.value.selectedChannel
             // 刷新时重新打乱数据（模拟新数据）
             val ads = if (simulateEmpty) {
                 emptyList()
             } else {
                 MockAdRepository.getAdsByChannel(channel).shuffled()
             }
+            saveChannelCache(channel, ads, currentPage = 1, hasMore = ads.size >= pageSize)
 
             _uiState.update {
                 it.copy(
@@ -164,7 +212,13 @@ class FeedViewModel : ViewModel() {
      */
     fun loadMore() {
         val currentState = _uiState.value
-        if (currentState.isLoadingMore || !currentState.hasMore) return
+        if (
+            currentState.isLoadingMore ||
+            !currentState.hasMore ||
+            (currentState.selectedTag != null && currentState.filteredAds.isEmpty())
+        ) {
+            return
+        }
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoadingMore = true) }
@@ -184,6 +238,8 @@ class FeedViewModel : ViewModel() {
 
             val channel = currentState.selectedChannel
             val currentPage = currentState.currentPage
+            if (_uiState.value.selectedChannel != channel) return@launch
+
             // 模拟生成更多数据（实际项目中会请求下一页）
             val moreAds = generateMoreAds(channel, currentPage + 1)
 
@@ -195,6 +251,9 @@ class FeedViewModel : ViewModel() {
                     hasMore = moreAds.size >= pageSize && currentPage < 5, // 最多加载5页
                     errorMessage = null
                 )
+            }
+            _uiState.value.let { state ->
+                saveChannelCache(channel, state.ads, state.currentPage, state.hasMore)
             }
         }
     }
@@ -216,6 +275,7 @@ class FeedViewModel : ViewModel() {
                 }
             )
         }
+        saveCurrentChannelCache()
     }
 
     /**
@@ -235,6 +295,7 @@ class FeedViewModel : ViewModel() {
                 }
             )
         }
+        saveCurrentChannelCache()
     }
 
     /**
@@ -267,6 +328,7 @@ class FeedViewModel : ViewModel() {
     fun simulateNormal() {
         simulateError = false
         simulateEmpty = false
+        channelCache.clear()
         loadInitialData()
     }
 
@@ -286,6 +348,7 @@ class FeedViewModel : ViewModel() {
                 errorMessage = null
             )
         }
+        saveChannelCache(_uiState.value.selectedChannel, emptyList(), currentPage = 1, hasMore = false)
     }
 
     /**
@@ -310,6 +373,7 @@ class FeedViewModel : ViewModel() {
         simulateError = false
         simulateEmpty = false
         MockAdRepository.reset()
+        channelCache.clear()
         loadInitialData()
     }
 
@@ -335,4 +399,28 @@ class FeedViewModel : ViewModel() {
         val newLikeCount = if (newLiked) likeCount + 1 else (likeCount - 1).coerceAtLeast(0)
         return copy(liked = newLiked, likeCount = newLikeCount)
     }
+
+    private fun saveCurrentChannelCache() {
+        val state = _uiState.value
+        saveChannelCache(state.selectedChannel, state.ads, state.currentPage, state.hasMore)
+    }
+
+    private fun saveChannelCache(
+        channel: AdChannel,
+        ads: List<AdItem>,
+        currentPage: Int,
+        hasMore: Boolean
+    ) {
+        channelCache[channel] = ChannelFeedCache(
+            ads = ads,
+            currentPage = currentPage,
+            hasMore = hasMore
+        )
+    }
+
+    private data class ChannelFeedCache(
+        val ads: List<AdItem>,
+        val currentPage: Int,
+        val hasMore: Boolean
+    )
 }

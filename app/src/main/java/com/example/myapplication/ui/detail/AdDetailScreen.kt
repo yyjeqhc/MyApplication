@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.model.AdCardType
@@ -43,46 +44,56 @@ fun AdDetailScreen(
 ) {
     val context = LocalContext.current
 
-    // 处理系统返回键
     BackHandler {
         onBack()
     }
 
-    Column(
-        modifier = modifier.fillMaxSize()
-    ) {
-        // 顶部导航栏
-        TopAppBar(
-            title = {
-                Text(
-                    text = "广告详情",
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            navigationIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "返回"
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "广告详情",
+                        fontWeight = FontWeight.Bold
                     )
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "返回"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             )
-        )
-
-        // 内容区域
+        },
+        bottomBar = {
+            AdDetailBottomBar(
+                ad = ad,
+                onLikeClick = onLikeClick,
+                onFavoriteClick = onFavoriteClick,
+                onShareClick = {
+                    Toast.makeText(context, "分享功能开发中", Toast.LENGTH_SHORT).show()
+                },
+                onCtaClick = {
+                    Toast.makeText(context, "${ad.ctaText}功能开发中", Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
-            // 头图区域（根据卡片类型显示不同样式）
             AdDetailHeader(ad = ad)
 
-            // 内容信息
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
@@ -182,74 +193,95 @@ fun AdDetailScreen(
 
                 // 数据统计区域
                 StatisticsSection(ad = ad)
+            }
+        }
+    }
+}
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // 互动按钮
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    // 点赞按钮
-                    Button(
-                        onClick = onLikeClick,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (ad.liked) {
-                                Color.Red
-                            } else {
-                                MaterialTheme.colorScheme.primary
-                            }
-                        ),
-                        modifier = Modifier.weight(1f).padding(end = 8.dp)
-                    ) {
-                        Icon(
-                            imageVector = if (ad.liked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "点赞",
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = if (ad.liked) "已点赞" else "点赞")
+/**
+ * 详情页固定底部操作栏
+ */
+@Composable
+private fun AdDetailBottomBar(
+    ad: AdItem,
+    onLikeClick: () -> Unit,
+    onFavoriteClick: () -> Unit,
+    onShareClick: () -> Unit,
+    onCtaClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shadowElevation = 8.dp,
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            FilledTonalIconButton(
+                onClick = onLikeClick,
+                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                    containerColor = if (ad.liked) {
+                        MaterialTheme.colorScheme.errorContainer
+                    } else {
+                        MaterialTheme.colorScheme.secondaryContainer
+                    },
+                    contentColor = if (ad.liked) {
+                        MaterialTheme.colorScheme.onErrorContainer
+                    } else {
+                        MaterialTheme.colorScheme.onSecondaryContainer
                     }
+                )
+            ) {
+                Icon(
+                    imageVector = if (ad.liked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = if (ad.liked) "取消点赞" else "点赞"
+                )
+            }
 
-                    // 收藏按钮
-                    Button(
-                        onClick = onFavoriteClick,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (ad.favorited) {
-                                Color(0xFFFFB800)
-                            } else {
-                                MaterialTheme.colorScheme.secondary
-                            }
-                        ),
-                        modifier = Modifier.weight(1f).padding(horizontal = 4.dp)
-                    ) {
-                        Icon(
-                            imageVector = if (ad.favorited) Icons.Default.Star else Icons.Default.StarBorder,
-                            contentDescription = "收藏",
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = if (ad.favorited) "已收藏" else "收藏")
+            FilledTonalIconButton(
+                onClick = onFavoriteClick,
+                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                    containerColor = if (ad.favorited) {
+                        MaterialTheme.colorScheme.tertiaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.secondaryContainer
+                    },
+                    contentColor = if (ad.favorited) {
+                        MaterialTheme.colorScheme.onTertiaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.onSecondaryContainer
                     }
+                )
+            ) {
+                Icon(
+                    imageVector = if (ad.favorited) Icons.Default.Star else Icons.Default.StarBorder,
+                    contentDescription = if (ad.favorited) "取消收藏" else "收藏"
+                )
+            }
 
-                    // 分享按钮
-                    OutlinedButton(
-                        onClick = {
-                            Toast.makeText(context, "分享功能开发中", Toast.LENGTH_SHORT).show()
-                        },
-                        modifier = Modifier.weight(1f).padding(start = 8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Share,
-                            contentDescription = "分享",
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "分享")
-                    }
-                }
+            OutlinedIconButton(onClick = onShareClick) {
+                Icon(
+                    imageVector = Icons.Default.Share,
+                    contentDescription = "分享"
+                )
+            }
 
-                Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = onCtaClick,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = ad.ctaText,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         }
     }
