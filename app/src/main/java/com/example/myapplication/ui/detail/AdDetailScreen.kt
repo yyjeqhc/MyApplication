@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.model.AdCardType
+import com.example.myapplication.model.AdChannel
 import com.example.myapplication.model.AdItem
 import com.example.myapplication.ui.feed.AdTagRow
 import com.example.myapplication.ui.feed.formatCount
@@ -43,6 +44,7 @@ fun AdDetailScreen(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val detailCopy = detailCopyFor(ad)
 
     BackHandler {
         onBack()
@@ -92,7 +94,7 @@ fun AdDetailScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
-            AdDetailHeader(ad = ad)
+            DetailMediaHero(ad = ad)
 
             Column(
                 modifier = Modifier.padding(16.dp)
@@ -158,25 +160,35 @@ fun AdDetailScreen(
 
                 // AI 摘要区域
                 if (ad.aiSummary.isNotEmpty()) {
-                    AiSummarySection(ad = ad)
+                    AiSummarySection(
+                        ad = ad,
+                        title = detailCopy.aiSummaryTitle
+                    )
                     Spacer(modifier = Modifier.height(24.dp))
                 }
 
                 // 推荐理由
                 if (ad.recommendationReason.isNotEmpty()) {
-                    RecommendationReasonSection(ad = ad)
+                    RecommendationReasonSection(
+                        ad = ad,
+                        title = detailCopy.reasonTitle
+                    )
                     Spacer(modifier = Modifier.height(24.dp))
                 }
 
                 // AI 洞察
                 if (ad.category.isNotEmpty() || ad.scene.isNotEmpty() || ad.targetAudience.isNotEmpty()) {
-                    AiInsightSection(ad = ad)
+                    AiInsightSection(
+                        ad = ad,
+                        title = detailCopy.insightTitle,
+                        audienceLabel = detailCopy.audienceLabel
+                    )
                     Spacer(modifier = Modifier.height(24.dp))
                 }
 
                 // 广告摘要
                 Text(
-                    text = "广告摘要",
+                    text = detailCopy.descriptionTitle,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -293,6 +305,7 @@ private fun AdDetailBottomBar(
 @Composable
 private fun AiSummarySection(
     ad: AdItem,
+    title: String,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -316,7 +329,7 @@ private fun AiSummarySection(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "AI 智能摘要",
+                    text = title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.tertiary
@@ -340,6 +353,7 @@ private fun AiSummarySection(
 @Composable
 private fun RecommendationReasonSection(
     ad: AdItem,
+    title: String,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -363,7 +377,7 @@ private fun RecommendationReasonSection(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "推荐理由",
+                    text = title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.secondary
@@ -387,6 +401,8 @@ private fun RecommendationReasonSection(
 @Composable
 private fun AiInsightSection(
     ad: AdItem,
+    title: String,
+    audienceLabel: String,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -410,7 +426,7 @@ private fun AiInsightSection(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "AI 洞察",
+                    text = title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -421,7 +437,7 @@ private fun AiInsightSection(
 
             InsightRow(label = "品类", value = ad.category)
             InsightRow(label = "场景", value = ad.scene)
-            InsightRow(label = "受众", value = ad.targetAudience)
+            InsightRow(label = audienceLabel, value = ad.targetAudience)
         }
     }
 }
@@ -571,141 +587,281 @@ private fun calculateCTR(clicks: Int, impressions: Int): Int {
     }
 }
 
+private data class DetailCopy(
+    val aiSummaryTitle: String,
+    val reasonTitle: String,
+    val insightTitle: String,
+    val audienceLabel: String,
+    val descriptionTitle: String
+)
+
+private fun detailCopyFor(ad: AdItem): DetailCopy {
+    return when {
+        ad.cardType == AdCardType.VIDEO -> DetailCopy(
+            aiSummaryTitle = "视频看点",
+            reasonTitle = "观看理由",
+            insightTitle = "适合人群",
+            audienceLabel = "受众",
+            descriptionTitle = "视频内容摘要"
+        )
+        ad.channel == AdChannel.LOCAL -> DetailCopy(
+            aiSummaryTitle = "服务亮点",
+            reasonTitle = "到店理由",
+            insightTitle = "适合人群",
+            audienceLabel = "人群",
+            descriptionTitle = "服务详情"
+        )
+        else -> DetailCopy(
+            aiSummaryTitle = "商品亮点",
+            reasonTitle = "推荐理由",
+            insightTitle = "适合场景",
+            audienceLabel = "受众",
+            descriptionTitle = "商品详情"
+        )
+    }
+}
+
 /**
- * 详情页头图区域
- * 根据卡片类型显示不同的头图样式
+ * 详情页媒体区，根据广告类型展示不同的视觉重点。
  */
 @Composable
-private fun AdDetailHeader(
+private fun DetailMediaHero(
     ad: AdItem,
     modifier: Modifier = Modifier
 ) {
     when (ad.cardType) {
-        AdCardType.LARGE_IMAGE -> {
-            // 大图样式
+        AdCardType.VIDEO -> VideoDetailHero(ad = ad, modifier = modifier)
+        AdCardType.LARGE_IMAGE -> LargeImageDetailHero(ad = ad, modifier = modifier)
+        AdCardType.SMALL_IMAGE -> SmallImageDetailHero(ad = ad, modifier = modifier)
+    }
+}
+
+@Composable
+private fun VideoDetailHero(
+    ad: AdItem,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(260.dp)
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        Color(0xFF111827),
+                        Color(0xFF263244),
+                        Color(0xFF111827)
+                    )
+                )
+            )
+    ) {
+        DetailHeroBadge(
+            text = "视频广告",
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(16.dp)
+        )
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .size(82.dp)
+                .clip(CircleShape)
+                .background(Color.White.copy(alpha = 0.18f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.PlayArrow,
+                contentDescription = "播放",
+                tint = Color.White,
+                modifier = Modifier.size(48.dp)
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(16.dp)
+                .padding(end = 84.dp)
+        ) {
+            Text(
+                text = ad.title,
+                color = Color.White,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = ad.aiSummary.ifBlank { ad.subtitle },
+                color = Color.White.copy(alpha = 0.76f),
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        DetailHeroBadge(
+            text = "00:30",
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        )
+    }
+}
+
+@Composable
+private fun LargeImageDetailHero(
+    ad: AdItem,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(280.dp)
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        Color(0xFF4F46E5),
+                        Color(0xFF7C3AED),
+                        Color(0xFFDB2777)
+                    )
+                )
+            )
+    ) {
+        DetailHeroBadge(
+            text = "图文广告",
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(16.dp)
+        )
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .size(112.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(Color.White.copy(alpha = 0.2f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Image,
+                contentDescription = "商品图片",
+                tint = Color.White,
+                modifier = Modifier.size(54.dp)
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(16.dp)
+        ) {
+            Text(
+                text = ad.brandName.ifBlank { ad.category },
+                color = Color.White.copy(alpha = 0.78f),
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Medium
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = ad.subtitle,
+                color = Color.White,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+private fun SmallImageDetailHero(
+    ad: AdItem,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(190.dp)
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        Color(0xFF059669),
+                        Color(0xFF14B8A6),
+                        Color(0xFF0EA5E9)
+                    )
+                )
+            )
+            .padding(20.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Box(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .height(250.dp)
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                Color(0xFF6366F1),
-                                Color(0xFF8B5CF6),
-                                Color(0xFFA78BFA)
-                            )
-                        )
-                    ),
+                modifier = Modifier
+                    .size(92.dp)
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(Color.White.copy(alpha = 0.22f)),
                 contentAlignment = Alignment.Center
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "🖼️",
-                        fontSize = 48.sp
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "大图广告",
-                        color = Color.White,
-                        fontSize = 16.sp
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.Image,
+                    contentDescription = "图文图片",
+                    tint = Color.White,
+                    modifier = Modifier.size(46.dp)
+                )
             }
-        }
-        AdCardType.SMALL_IMAGE -> {
-            // 小图样式（居中显示）
-            Box(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                Color(0xFF10B981),
-                                Color(0xFF34D399),
-                                Color(0xFF6EE7B7)
-                            )
-                        )
-                    ),
-                contentAlignment = Alignment.Center
+
+            Spacer(modifier = Modifier.width(18.dp))
+
+            Column(
+                modifier = Modifier.weight(1f)
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.3f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Image,
-                            contentDescription = "图片",
-                            tint = Color.White,
-                            modifier = Modifier.size(40.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "小图广告",
-                        color = Color.White,
-                        fontSize = 16.sp
-                    )
-                }
+                DetailHeroBadge(text = "图文广告")
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = ad.title,
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = ad.aiSummary.ifBlank { ad.subtitle },
+                    color = Color.White.copy(alpha = 0.78f),
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         }
-        AdCardType.VIDEO -> {
-            // 视频样式
-            Box(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .height(220.dp)
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                Color(0xFF1F2937),
-                                Color(0xFF374151),
-                                Color(0xFF4B5563)
-                            )
-                        )
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // 播放按钮
-                    Box(
-                        modifier = Modifier
-                            .size(72.dp)
-                            .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.2f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.PlayArrow,
-                            contentDescription = "播放",
-                            tint = Color.White,
-                            modifier = Modifier.size(40.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "🎬 视频广告",
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 16.sp
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "时长: 00:30",
-                        color = Color.White.copy(alpha = 0.6f),
-                        fontSize = 13.sp
-                    )
-                }
-            }
-        }
+    }
+}
+
+@Composable
+private fun DetailHeroBadge(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .background(
+                color = Color.Black.copy(alpha = 0.42f),
+                shape = RoundedCornerShape(6.dp)
+            )
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = text,
+            color = Color.White,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
