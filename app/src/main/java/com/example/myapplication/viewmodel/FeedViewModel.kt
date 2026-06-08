@@ -27,6 +27,9 @@ class FeedViewModel : ViewModel() {
     /** 模拟错误开关（用于测试错误状态） */
     private var simulateError = false
 
+    /** 模拟空数据开关 */
+    private var simulateEmpty = false
+
     /** 每页数据量 */
     private val pageSize = 6
 
@@ -56,7 +59,11 @@ class FeedViewModel : ViewModel() {
             }
 
             val channel = _uiState.value.selectedChannel
-            val ads = MockAdRepository.getAdsByChannel(channel)
+            val ads = if (simulateEmpty) {
+                emptyList()
+            } else {
+                MockAdRepository.getAdsByChannel(channel)
+            }
 
             _uiState.update {
                 it.copy(
@@ -114,7 +121,11 @@ class FeedViewModel : ViewModel() {
 
             val channel = _uiState.value.selectedChannel
             // 刷新时重新打乱数据（模拟新数据）
-            val ads = MockAdRepository.getAdsByChannel(channel).shuffled()
+            val ads = if (simulateEmpty) {
+                emptyList()
+            } else {
+                MockAdRepository.getAdsByChannel(channel).shuffled()
+            }
 
             _uiState.update {
                 it.copy(
@@ -229,12 +240,63 @@ class FeedViewModel : ViewModel() {
         loadInitialData()
     }
 
+    // ==================== Demo 控制面板方法 ====================
+
+    /**
+     * 模拟正常状态
+     */
+    fun simulateNormal() {
+        simulateError = false
+        simulateEmpty = false
+        loadInitialData()
+    }
+
+    /**
+     * 模拟空状态
+     */
+    fun simulateEmptyState() {
+        simulateError = false
+        simulateEmpty = true
+        _uiState.update {
+            it.copy(
+                ads = emptyList(),
+                listState = FeedListState.Empty,
+                currentPage = 1,
+                hasMore = false,
+                errorMessage = null
+            )
+        }
+    }
+
+    /**
+     * 模拟错误状态
+     */
+    fun simulateErrorState() {
+        simulateError = true
+        simulateEmpty = false
+        _uiState.update {
+            it.copy(
+                listState = FeedListState.Error("模拟的加载错误"),
+                errorMessage = "模拟的加载错误"
+            )
+        }
+    }
+
+    /**
+     * 重置分页数据
+     */
+    fun resetPagination() {
+        simulateError = false
+        simulateEmpty = false
+        MockAdRepository.reset()
+        loadInitialData()
+    }
+
     /**
      * 模拟生成更多广告数据
      */
     private fun generateMoreAds(channel: AdChannel, page: Int): List<AdItem> {
         val baseAds = MockAdRepository.getAdsByChannel(channel)
-        val startIndex = (page - 1) * pageSize
 
         // 基于现有数据生成变体
         return baseAds.take(pageSize).mapIndexed { index, ad ->

@@ -91,6 +91,26 @@ fun VideoAdCard(
                     )
                 }
 
+                // 广告标识
+                if (ad.isAd) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(8.dp)
+                            .background(
+                                color = Color.Black.copy(alpha = 0.5f),
+                                shape = RoundedCornerShape(4.dp)
+                            )
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = "广告",
+                            color = Color.White,
+                            fontSize = 10.sp
+                        )
+                    }
+                }
+
                 // 时长标签
                 Box(
                     modifier = Modifier
@@ -114,6 +134,17 @@ fun VideoAdCard(
             Column(
                 modifier = Modifier.padding(12.dp)
             ) {
+                // 品牌名称
+                if (ad.brandName.isNotEmpty()) {
+                    Text(
+                        text = ad.brandName,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
+
                 // 标题
                 Text(
                     text = ad.title,
@@ -152,6 +183,20 @@ fun VideoAdCard(
                             modifier = Modifier.height(24.dp)
                         )
                     }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // CTA 按钮
+                Button(
+                    onClick = onClick,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = ad.ctaText,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))

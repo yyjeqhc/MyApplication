@@ -45,5 +45,23 @@ data class AdItem(
     val exposureCount: Int,
 
     /** 点击数量 */
-    val clickCount: Int
+    val clickCount: Int,
+
+    /** 品牌名称 */
+    val brandName: String = "",
+
+    /** CTA 按钮文案 */
+    val ctaText: String = "了解更多",
+
+    /** AI 摘要 */
+    val aiSummary: String = "",
+
+    /** 推荐理由 */
+    val recommendationReason: String = "",
+
+    /** 适合人群 */
+    val targetAudience: List<String> = emptyList(),
+
+    /** 是否为广告标识 */
+    val isAd: Boolean = true
 )

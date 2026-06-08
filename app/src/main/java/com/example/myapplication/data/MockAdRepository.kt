@@ -6,7 +6,7 @@ import com.example.myapplication.model.AdItem
 
 /**
  * Mock 广告数据仓库
- * 提供本地模拟数据，用于第一阶段开发测试
+ * 提供本地模拟数据，用于开发测试
  */
 object MockAdRepository {
 
@@ -63,6 +63,16 @@ object MockAdRepository {
         }
     }
 
+    /**
+     * 重置所有数据到初始状态
+     */
+    fun reset() {
+        _ads.clear()
+        _ads.addAll(createFeaturedAds())
+        _ads.addAll(createEcommerceAds())
+        _ads.addAll(createLocalAds())
+    }
+
     // ==================== 精选频道数据 ====================
 
     private fun createFeaturedAds(): List<AdItem> = listOf(
@@ -80,7 +90,13 @@ object MockAdRepository {
             favorited = false,
             likeCount = 1234,
             exposureCount = 56789,
-            clickCount = 2345
+            clickCount = 2345,
+            brandName = "天猫商城",
+            ctaText = "立即抢购",
+            aiSummary = "基于您的购物偏好和历史浏览记录，为您推荐夏季清凉特惠活动。本次活动涵盖多个品类，折扣力度大，适合有换季购物需求的用户。",
+            recommendationReason = "您最近浏览了多款夏季服饰，本次活动有大量相关商品优惠。",
+            targetAudience = listOf("网购爱好者", "追求性价比", "换季购物需求"),
+            isAd = true
         ),
         AdItem(
             id = "featured_002",
@@ -96,7 +112,13 @@ object MockAdRepository {
             favorited = false,
             likeCount = 8901,
             exposureCount = 45678,
-            clickCount = 3456
+            clickCount = 3456,
+            brandName = "小米科技",
+            ctaText = "预约抢购",
+            aiSummary = "根据您对数码产品的关注度，为您推荐这款新发布的旗舰手机。该机型在性能、续航、拍照等方面均有显著提升。",
+            recommendationReason = "您是数码产品爱好者，对新款手机有较高关注度。",
+            targetAudience = listOf("数码发烧友", "游戏玩家", "摄影爱好者"),
+            isAd = true
         ),
         AdItem(
             id = "featured_003",
@@ -112,7 +134,13 @@ object MockAdRepository {
             favorited = true,
             likeCount = 567,
             exposureCount = 23456,
-            clickCount = 1234
+            clickCount = 1234,
+            brandName = "网易云课堂",
+            ctaText = "立即学习",
+            aiSummary = "基于您的学习兴趣和职业发展方向，为您推荐优质在线课程。课程由行业专家授课，实战性强。",
+            recommendationReason = "您对技能提升有需求，这些课程能帮助您职业发展。",
+            targetAudience = listOf("职场人士", "学生党", "终身学习者"),
+            isAd = true
         ),
         AdItem(
             id = "featured_004",
@@ -128,7 +156,13 @@ object MockAdRepository {
             favorited = false,
             likeCount = 678,
             exposureCount = 34567,
-            clickCount = 1890
+            clickCount = 1890,
+            brandName = "京东智能",
+            ctaText = "探索更多",
+            aiSummary = "智能家居正在改变生活方式。根据您的家居环境和使用习惯，为您推荐这几款高性价比的智能产品。",
+            recommendationReason = "您对科技产品有兴趣，智能家居能让生活更便捷。",
+            targetAudience = listOf("科技爱好者", "品质生活追求者", "新房装修"),
+            isAd = true
         ),
         AdItem(
             id = "featured_005",
@@ -144,7 +178,13 @@ object MockAdRepository {
             favorited = false,
             likeCount = 456,
             exposureCount = 12345,
-            clickCount = 890
+            clickCount = 890,
+            brandName = "Keep",
+            ctaText = "开始健康",
+            aiSummary = "健康是最大的财富。基于您的运动数据和健康目标，为您推荐适合的健康产品和运动装备。",
+            recommendationReason = "您有运动健身的习惯，这些产品能提升您的运动体验。",
+            targetAudience = listOf("健身爱好者", "养生达人", "亚健康人群"),
+            isAd = true
         ),
         AdItem(
             id = "featured_006",
@@ -160,7 +200,13 @@ object MockAdRepository {
             favorited = true,
             likeCount = 789,
             exposureCount = 45678,
-            clickCount = 2345
+            clickCount = 2345,
+            brandName = "携程旅行",
+            ctaText = "规划行程",
+            aiSummary = "旅行是最好的放松方式。根据您的出行记录和偏好，为您推荐实用的旅行装备和目的地。",
+            recommendationReason = "您热爱旅行，这些装备能让您的旅途更舒适。",
+            targetAudience = listOf("旅行爱好者", "户外运动者", "商务出差"),
+            isAd = true
         )
     )
 
@@ -181,7 +227,13 @@ object MockAdRepository {
             favorited = false,
             likeCount = 2345,
             exposureCount = 67890,
-            clickCount = 4567
+            clickCount = 4567,
+            brandName = "ZARA",
+            ctaText = "立即选购",
+            aiSummary = "时尚是一种态度。根据您的穿搭风格和浏览记录，为您推荐最新上市的女装系列。",
+            recommendationReason = "您关注时尚穿搭，这些新品符合您的审美。",
+            targetAudience = listOf("时尚女性", "职场白领", "学生党"),
+            isAd = true
         ),
         AdItem(
             id = "ecommerce_002",
@@ -197,7 +249,13 @@ object MockAdRepository {
             favorited = false,
             likeCount = 5678,
             exposureCount = 89012,
-            clickCount = 6789
+            clickCount = 6789,
+            brandName = "丝芙兰",
+            ctaText = "美妆选购",
+            aiSummary = "美丽从护肤开始。基于您的肤质和美妆偏好，为您精选大牌美妆产品，正品保障，价格优惠。",
+            recommendationReason = "您对美妆护肤有需求，这些产品口碑好，性价比高。",
+            targetAudience = listOf("美妆爱好者", "护肤达人", "送礼需求"),
+            isAd = true
         ),
         AdItem(
             id = "ecommerce_003",
@@ -213,7 +271,13 @@ object MockAdRepository {
             favorited = true,
             likeCount = 1234,
             exposureCount = 34567,
-            clickCount = 2345
+            clickCount = 2345,
+            brandName = "耐克",
+            ctaText = "运动选购",
+            aiSummary = "运动让生活更美好。根据您的运动类型和频率，为您推荐专业的运动装备，提升运动表现。",
+            recommendationReason = "您有运动习惯，专业装备能保护身体，提升效果。",
+            targetAudience = listOf("运动爱好者", "健身达人", "户外运动者"),
+            isAd = true
         ),
         AdItem(
             id = "ecommerce_004",
@@ -229,7 +293,13 @@ object MockAdRepository {
             favorited = false,
             likeCount = 3456,
             exposureCount = 56789,
-            clickCount = 3456
+            clickCount = 3456,
+            brandName = "孩子王",
+            ctaText = "母婴选购",
+            aiSummary = "宝宝的健康是父母最大的心愿。根据宝宝年龄和需求，为您推荐安全、优质的母婴产品。",
+            recommendationReason = "您有育儿需求，这些产品安全可靠，口碑好。",
+            targetAudience = listOf("新手爸妈", "准父母", "送礼需求"),
+            isAd = true
         ),
         AdItem(
             id = "ecommerce_005",
@@ -245,7 +315,13 @@ object MockAdRepository {
             favorited = false,
             likeCount = 890,
             exposureCount = 23456,
-            clickCount = 1567
+            clickCount = 1567,
+            brandName = "品胜",
+            ctaText = "配件选购",
+            aiSummary = "好的配件提升使用体验。根据您使用的设备型号，为您推荐兼容、高品质的数码配件。",
+            recommendationReason = "您有数码设备，这些配件能提升使用体验。",
+            targetAudience = listOf("数码用户", "学生党", "办公人士"),
+            isAd = true
         ),
         AdItem(
             id = "ecommerce_006",
@@ -261,7 +337,13 @@ object MockAdRepository {
             favorited = true,
             likeCount = 2345,
             exposureCount = 45678,
-            clickCount = 2890
+            clickCount = 2890,
+            brandName = "MUJI",
+            ctaText = "家居选购",
+            aiSummary = "家是心灵的港湾。根据您的家居风格和需求，为您推荐舒适、美观的家居家纺产品。",
+            recommendationReason = "您注重生活品质，这些产品能提升居家舒适度。",
+            targetAudience = listOf("品质生活追求者", "新房装修", "换季需求"),
+            isAd = true
         )
     )
 
@@ -282,7 +364,13 @@ object MockAdRepository {
             favorited = false,
             likeCount = 4567,
             exposureCount = 78901,
-            clickCount = 5678
+            clickCount = 5678,
+            brandName = "大众点评",
+            ctaText = "查看餐厅",
+            aiSummary = "美食是最好的慰藉。根据您的口味偏好和位置，为您推荐周边高评分餐厅，新用户有专属优惠。",
+            recommendationReason = "您喜欢美食探索，这些餐厅评分高，口碑好。",
+            targetAudience = listOf("美食爱好者", "吃货", "聚餐需求"),
+            isAd = true
         ),
         AdItem(
             id = "local_002",
@@ -298,7 +386,13 @@ object MockAdRepository {
             favorited = false,
             likeCount = 2345,
             exposureCount = 45678,
-            clickCount = 3456
+            clickCount = 3456,
+            brandName = "天鹅到家",
+            ctaText = "预约服务",
+            aiSummary = "专业的事交给专业的人。根据您的家庭需求和服务评价，为您推荐可靠的家政服务人员。",
+            recommendationReason = "您有家政服务需求，这些服务人员经过认证，服务有保障。",
+            targetAudience = listOf("双职工家庭", "老年人家庭", "新生儿家庭"),
+            isAd = true
         ),
         AdItem(
             id = "local_003",
@@ -314,7 +408,13 @@ object MockAdRepository {
             favorited = true,
             likeCount = 1890,
             exposureCount = 34567,
-            clickCount = 2345
+            clickCount = 2345,
+            brandName = "超级猩猩",
+            ctaText = "预约体验",
+            aiSummary = "运动是最好的投资。根据您的健身目标和时间安排，为您推荐适合的瑜伽课程。",
+            recommendationReason = "您有健身需求，瑜伽能帮助您放松身心，塑造体形。",
+            targetAudience = listOf("上班族", "健身爱好者", "减压需求"),
+            isAd = true
         ),
         AdItem(
             id = "local_004",
@@ -330,7 +430,13 @@ object MockAdRepository {
             favorited = false,
             likeCount = 1567,
             exposureCount = 23456,
-            clickCount = 1890
+            clickCount = 1890,
+            brandName = "途虎养车",
+            ctaText = "预约保养",
+            aiSummary = "爱车需要定期保养。根据您的车型和行驶里程，为您推荐适合的保养套餐和维修服务。",
+            recommendationReason = "您有汽车，定期保养能延长车辆寿命，保障行车安全。",
+            targetAudience = listOf("车主", "新手司机", "二手车车主"),
+            isAd = true
         ),
         AdItem(
             id = "local_005",
@@ -346,7 +452,13 @@ object MockAdRepository {
             favorited = false,
             likeCount = 2890,
             exposureCount = 56789,
-            clickCount = 3456
+            clickCount = 3456,
+            brandName = "萌宠之家",
+            ctaText = "宠物服务",
+            aiSummary = "宠物是家人。根据您的宠物种类和需求，为您推荐专业的宠物服务，让毛孩享受最好的照顾。",
+            recommendationReason = "您有宠物，这些服务能让您的毛孩更健康快乐。",
+            targetAudience = listOf("宠物主人", "爱宠人士", "出差寄养需求"),
+            isAd = true
         ),
         AdItem(
             id = "local_006",
@@ -362,7 +474,13 @@ object MockAdRepository {
             favorited = true,
             likeCount = 3456,
             exposureCount = 67890,
-            clickCount = 4567
+            clickCount = 4567,
+            brandName = "花加",
+            ctaText = "送花表达",
+            aiSummary = "鲜花是最好的礼物。根据送花场景和对象，为您推荐合适的花束，快速送达，传递心意。",
+            recommendationReason = "您有送花需求，这些花束设计精美，配送快速。",
+            targetAudience = listOf("情侣", "送礼需求", "节日庆祝"),
+            isAd = true
         )
     )
 }

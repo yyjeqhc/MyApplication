@@ -72,6 +72,26 @@ fun SmallImageAdCard(
                         tint = Color.White.copy(alpha = 0.8f),
                         modifier = Modifier.size(36.dp)
                     )
+
+                    // 广告标识
+                    if (ad.isAd) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .padding(4.dp)
+                                .background(
+                                    color = Color.Black.copy(alpha = 0.5f),
+                                    shape = RoundedCornerShape(3.dp)
+                                )
+                                .padding(horizontal = 4.dp, vertical = 1.dp)
+                        ) {
+                            Text(
+                                text = "广告",
+                                color = Color.White,
+                                fontSize = 8.sp
+                            )
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.width(12.dp))
@@ -80,6 +100,17 @@ fun SmallImageAdCard(
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
+                    // 品牌名称
+                    if (ad.brandName.isNotEmpty()) {
+                        Text(
+                            text = ad.brandName,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                    }
+
                     // 标题
                     Text(
                         text = ad.title,
@@ -123,6 +154,20 @@ fun SmallImageAdCard(
             }
 
             Spacer(modifier = Modifier.height(12.dp))
+
+            // CTA 按钮
+            Button(
+                onClick = onClick,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = ad.ctaText,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             // 互动按钮
             Row(

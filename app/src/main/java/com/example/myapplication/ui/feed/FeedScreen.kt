@@ -20,7 +20,7 @@ import com.example.myapplication.model.FeedUiState
 
 /**
  * 信息流主页面
- * 包含顶部标题栏、频道 Tab 和广告列表
+ * 包含顶部标题栏、频道 Tab、Demo 控制面板和广告列表
  * 支持下拉刷新和上拉加载更多
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,12 +35,19 @@ fun FeedScreen(
     onRefresh: () -> Unit,
     onLoadMore: () -> Unit,
     onRetry: () -> Unit,
+    onSimulateNormal: () -> Unit,
+    onSimulateEmpty: () -> Unit,
+    onSimulateError: () -> Unit,
+    onResetPagination: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
 
     // 频道列表
     val channels = remember { AdChannel.entries }
+
+    // 控制面板显示状态
+    var isControlPanelVisible by remember { mutableStateOf(false) }
 
     // 监听滚动位置，触发加载更多
     val shouldLoadMore = remember {
@@ -99,11 +106,21 @@ fun FeedScreen(
             }
         }
 
+        // Demo 控制面板
+        DemoControlPanel(
+            isVisible = isControlPanelVisible,
+            onToggleVisibility = { isControlPanelVisible = !isControlPanelVisible },
+            onSimulateNormal = onSimulateNormal,
+            onSimulateEmpty = onSimulateEmpty,
+            onSimulateError = onSimulateError,
+            onResetPagination = onResetPagination
+        )
+
         // 内容区域
         when (uiState.listState) {
             is FeedListState.Loading -> {
-                // 首次加载中
-                LoadingState()
+                // 首次加载中 - 显示骨架屏
+                SkeletonLoadingState()
             }
             is FeedListState.Error -> {
                 // 错误状态
@@ -128,41 +145,62 @@ fun FeedScreen(
                         )
                     }
 
-                    // 下拉刷新提示
-                    PullToRefreshContainer(
-                        isRefreshing = uiState.isRefreshing,
-                        onRefresh = onRefresh,
-                        modifier = Modifier.fillMaxSize()
+                    // 列表内容
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        LazyColumn(
-                            state = listState,
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            // 广告列表
-                            items(
-                                items = uiState.ads,
-                                key = { it.id }
-                            ) { ad ->
-                                AdFeedCard(
-                                    ad = ad,
-                                    onClick = { onAdClick(ad.id) },
-                                    onLikeClick = { onLikeClick(ad.id) },
-                                    onFavoriteClick = { onFavoriteClick(ad.id) },
-                                    onShareClick = {
-                                        Toast.makeText(context, "分享功能开发中", Toast.LENGTH_SHORT).show()
-                                    }
-                                )
-                            }
-
-                            // 底部加载更多状态
+                        // 刷新提示
+                        if (uiState.isRefreshing) {
                             item {
-                                LoadMoreIndicator(
-                                    isLoading = uiState.isLoadingMore,
-                                    hasMore = uiState.hasMore
-                                )
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(16.dp),
+                                            strokeWidth = 2.dp
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "正在刷新...",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
                             }
+                        }
+
+                        // 广告列表
+                        items(
+                            items = uiState.ads,
+                            key = { it.id }
+                        ) { ad ->
+                            AdFeedCard(
+                                ad = ad,
+                                onClick = { onAdClick(ad.id) },
+                                onLikeClick = { onLikeClick(ad.id) },
+                                onFavoriteClick = { onFavoriteClick(ad.id) },
+                                onShareClick = {
+                                    Toast.makeText(context, "分享功能开发中", Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        }
+
+                        // 底部加载更多状态
+                        item {
+                            LoadMoreIndicator(
+                                isLoading = uiState.isLoadingMore,
+                                hasMore = uiState.hasMore
+                            )
                         }
                     }
                 }
@@ -180,28 +218,20 @@ fun FeedScreen(
 }
 
 /**
- * 简化的下拉刷新容器
- * 使用 Box 包装，顶部显示刷新状态
+ * 骨架屏加载状态
  */
 @Composable
-private fun PullToRefreshContainer(
-    isRefreshing: Boolean,
-    onRefresh: () -> Unit,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    // 使用简单的 Box 包装，刷新状态通过顶部进度条显示
-    Box(modifier = modifier) {
-        content()
-
-        // 刷新时显示提示
-        if (isRefreshing) {
-            Snackbar(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(16.dp)
-            ) {
-                Text("正在刷新...")
+private fun SkeletonLoadingState() {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(5) { index ->
+            if (index % 2 == 0) {
+                SkeletonCard()
+            } else {
+                SmallImageSkeletonCard()
             }
         }
     }

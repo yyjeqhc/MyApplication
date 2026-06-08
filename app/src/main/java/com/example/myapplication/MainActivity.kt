@@ -91,7 +91,11 @@ fun AdApp(
             onChannelSelect = { viewModel.selectChannel(it) },
             onRefresh = { viewModel.refresh() },
             onLoadMore = { viewModel.loadMore() },
-            onRetry = { viewModel.retry() }
+            onRetry = { viewModel.retry() },
+            onSimulateNormal = { viewModel.simulateNormal() },
+            onSimulateEmpty = { viewModel.simulateEmptyState() },
+            onSimulateError = { viewModel.simulateErrorState() },
+            onResetPagination = { viewModel.resetPagination() }
         )
     }
 }

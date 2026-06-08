@@ -82,6 +82,39 @@ fun AdDetailScreen(
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
+                // 品牌名称和广告标识
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (ad.brandName.isNotEmpty()) {
+                        Text(
+                            text = ad.brandName,
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                    if (ad.isAd) {
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    shape = RoundedCornerShape(4.dp)
+                                )
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = "广告",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 // 标题
                 Text(
                     text = ad.title,
@@ -119,7 +152,25 @@ fun AdDetailScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // 摘要标题
+                // AI 摘要区域
+                if (ad.aiSummary.isNotEmpty()) {
+                    AiSummarySection(ad = ad)
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+
+                // 推荐理由
+                if (ad.recommendationReason.isNotEmpty()) {
+                    RecommendationReasonSection(ad = ad)
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+
+                // 适合人群
+                if (ad.targetAudience.isNotEmpty()) {
+                    TargetAudienceSection(ad = ad)
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+
+                // 广告摘要
                 Text(
                     text = "广告摘要",
                     style = MaterialTheme.typography.titleLarge,
@@ -128,7 +179,6 @@ fun AdDetailScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // 摘要内容
                 Text(
                     text = ad.summary,
                     style = MaterialTheme.typography.bodyLarge,
@@ -137,33 +187,8 @@ fun AdDetailScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // 数据统计
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ) {
-                        StatItem(
-                            count = ad.exposureCount,
-                            label = "曝光"
-                        )
-                        StatItem(
-                            count = ad.clickCount,
-                            label = "点击"
-                        )
-                        StatItem(
-                            count = ad.likeCount,
-                            label = "点赞"
-                        )
-                    }
-                }
+                // 数据统计区域
+                StatisticsSection(ad = ad)
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -234,6 +259,279 @@ fun AdDetailScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
+    }
+}
+
+/**
+ * AI 摘要区域
+ */
+@Composable
+private fun AiSummarySection(
+    ad: AdItem,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.AutoAwesome,
+                    contentDescription = "AI",
+                    tint = MaterialTheme.colorScheme.tertiary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "AI 智能摘要",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = ad.aiSummary,
+                style = MaterialTheme.typography.bodyMedium,
+                lineHeight = 24.sp
+            )
+        }
+    }
+}
+
+/**
+ * 推荐理由区域
+ */
+@Composable
+private fun RecommendationReasonSection(
+    ad: AdItem,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Lightbulb,
+                    contentDescription = "推荐",
+                    tint = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "推荐理由",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = ad.recommendationReason,
+                style = MaterialTheme.typography.bodyMedium,
+                lineHeight = 24.sp
+            )
+        }
+    }
+}
+
+/**
+ * 适合人群区域
+ */
+@Composable
+private fun TargetAudienceSection(
+    ad: AdItem,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.People,
+                    contentDescription = "人群",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "适合人群",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 人群标签
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                ad.targetAudience.forEach { audience ->
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = audience,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * 统计数据区域
+ */
+@Composable
+private fun StatisticsSection(
+    ad: AdItem,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "📊 数据统计",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 第一行：曝光、点击、CTR
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                StatItem(
+                    count = ad.exposureCount,
+                    label = "曝光"
+                )
+                StatItem(
+                    count = ad.clickCount,
+                    label = "点击"
+                )
+                StatItem(
+                    count = calculateCTR(ad.clickCount, ad.exposureCount),
+                    label = "CTR",
+                    isPercentage = true
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 第二行：点赞、收藏
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                StatItem(
+                    count = ad.likeCount,
+                    label = "点赞"
+                )
+                StatItem(
+                    count = if (ad.favorited) 1 else 0,
+                    label = "收藏状态",
+                    isText = true,
+                    textValue = if (ad.favorited) "已收藏" else "未收藏"
+                )
+            }
+        }
+    }
+}
+
+/**
+ * 统计数据项
+ */
+@Composable
+private fun StatItem(
+    count: Int,
+    label: String,
+    isPercentage: Boolean = false,
+    isText: Boolean = false,
+    textValue: String = "",
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = when {
+                isText -> textValue
+                isPercentage -> "${count}%"
+                else -> formatCount(count)
+            },
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+/**
+ * 计算 CTR（点击率）
+ */
+private fun calculateCTR(clicks: Int, impressions: Int): Int {
+    return if (impressions > 0) {
+        ((clicks.toFloat() / impressions.toFloat()) * 100).toInt()
+    } else {
+        0
     }
 }
 
@@ -373,34 +671,6 @@ private fun AdDetailHeader(
                 }
             }
         }
-    }
-}
-
-/**
- * 统计数据项
- */
-@Composable
-private fun StatItem(
-    count: Int,
-    label: String,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = formatCount(count),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
 
