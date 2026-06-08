@@ -140,20 +140,6 @@ fun SmallImageAdCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // CTA 按钮
-            Button(
-                onClick = onClick,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(
-                    text = ad.ctaText,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
             Spacer(modifier = Modifier.height(8.dp))
 
             // 互动按钮
@@ -216,9 +202,23 @@ fun SmallImageAdCard(
                         text = "分享",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                TextButton(
+                    onClick = onClick,
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+                    modifier = Modifier.height(32.dp)
+                ) {
+                    Text(
+                        text = ad.ctaText,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
         }
     }
-}

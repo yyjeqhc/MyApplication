@@ -26,14 +26,24 @@ fun DemoControlPanel(
 ) {
     Column(modifier = modifier) {
         // 切换按钮
-        TextButton(
-            onClick = onToggleVisibility,
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.End
         ) {
-            Text(
-                text = if (isVisible) "▼ 隐藏控制面板" else "▶ 显示控制面板",
-                fontSize = 12.sp
-            )
+            TextButton(
+                onClick = onToggleVisibility,
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            ) {
+                Text(
+                    text = if (isVisible) "隐藏调试" else "调试",
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
         }
 
         // 控制面板内容
@@ -52,7 +62,7 @@ fun DemoControlPanel(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "🎮 Demo 控制面板",
+                        text = "Demo 控制面板",
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
