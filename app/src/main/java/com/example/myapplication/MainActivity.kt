@@ -179,7 +179,13 @@ fun AdApp(
         // 显示信息流页面
         FeedScreen(
             uiState = uiState,
-            listState = currentListState,
+            listStateForChannel = { channel ->
+                when (channel) {
+                    AdChannel.FEATURED -> featuredListState
+                    AdChannel.ECOMMERCE -> ecommerceListState
+                    AdChannel.LOCAL -> localListState
+                }
+            },
             onAdClick = onAdClick,
             onLikeClick = {
                 viewModel.toggleLike(it)

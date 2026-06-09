@@ -2,10 +2,13 @@ package com.example.myapplication.ui.feed
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -23,6 +26,7 @@ import com.example.myapplication.model.FeedListState
 import com.example.myapplication.model.FeedUiState
 import com.example.myapplication.ui.common.showSingleToast
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 
 private const val SHOW_DEBUG_PANEL = false
 
@@ -31,11 +35,11 @@ private const val SHOW_DEBUG_PANEL = false
  * 包含顶部标题栏、频道 Tab、Demo 控制面板和广告列表
  * 支持下拉刷新和上拉加载更多
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun FeedScreen(
     uiState: FeedUiState,
-    listState: LazyListState,
+    listStateForChannel: (AdChannel) -> LazyListState,
     onAdClick: (String) -> Unit,
     onLikeClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
@@ -61,6 +65,15 @@ fun FeedScreen(
 
     // 频道列表
     val channels = remember { AdChannel.entries }
+    val selectedPage = channels.indexOf(uiState.selectedChannel).coerceAtLeast(0)
+    val pagerState = rememberPagerState(
+        initialPage = selectedPage,
+        pageCount = { channels.size }
+    )
+    val coroutineScope = rememberCoroutineScope()
+    val latestSelectedChannel by rememberUpdatedState(uiState.selectedChannel)
+    val latestOnChannelSelect by rememberUpdatedState(onChannelSelect)
+    val selectedListState = listStateForChannel(uiState.selectedChannel)
 
     // 控制面板显示状态
     var isControlPanelVisible by remember { mutableStateOf(false) }
@@ -71,14 +84,14 @@ fun FeedScreen(
 
     // 监听滚动位置，触发加载更多
     val shouldLoadMore = remember(
-        listState,
+        selectedListState,
         uiState.isLoadingMore,
         uiState.hasMore,
         visibleAds.size
     ) {
         derivedStateOf {
-            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            val totalItems = listState.layoutInfo.totalItemsCount
+            val lastVisibleItem = selectedListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val totalItems = selectedListState.layoutInfo.totalItemsCount
             visibleAds.isNotEmpty() &&
                 lastVisibleItem >= totalItems - 3 &&
                 !uiState.isLoadingMore &&
@@ -93,11 +106,29 @@ fun FeedScreen(
         }
     }
 
+    LaunchedEffect(uiState.selectedChannel) {
+        if (pagerState.currentPage != selectedPage) {
+            pagerState.animateScrollToPage(selectedPage)
+        }
+    }
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }
+            .distinctUntilChanged()
+            .collect { page ->
+                channels.getOrNull(page)?.let { channel ->
+                    if (channel != latestSelectedChannel) {
+                        latestOnChannelSelect(channel)
+                    }
+                }
+            }
+    }
+
     // 简化曝光口径：广告 id 第一次进入 LazyColumn 可见范围即计 1 次曝光；
     // 不做 50% 可见和 1 秒停留判断，去重逻辑由 ViewModel/Repository 维护。
-    LaunchedEffect(listState, visibleAdIds) {
+    LaunchedEffect(selectedListState, visibleAdIds) {
         snapshotFlow {
-            listState.layoutInfo.visibleItemsInfo
+            selectedListState.layoutInfo.visibleItemsInfo
                 .mapNotNull { it.key as? String }
                 .filter { it in visibleAdIdSet }
                 .distinct()
@@ -139,18 +170,22 @@ fun FeedScreen(
 
         // 频道 Tab
         PrimaryTabRow(
-            selectedTabIndex = channels.indexOf(uiState.selectedChannel),
+            selectedTabIndex = pagerState.currentPage,
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.primary
         ) {
-            channels.forEach { channel ->
+            channels.forEachIndexed { index, channel ->
                 Tab(
-                    selected = uiState.selectedChannel == channel,
-                    onClick = { onChannelSelect(channel) },
+                    selected = pagerState.currentPage == index,
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
+                    },
                     text = {
                         Text(
                             text = channel.displayName,
-                            fontWeight = if (uiState.selectedChannel == channel) {
+                            fontWeight = if (pagerState.currentPage == index) {
                                 FontWeight.Bold
                             } else {
                                 FontWeight.Normal
@@ -177,122 +212,32 @@ fun FeedScreen(
             )
         }
 
-        // 内容区域
-        when (uiState.listState) {
-            is FeedListState.Loading -> {
-                // 首次加载中 - 显示骨架屏
-                SkeletonLoadingState()
-            }
-            is FeedListState.Error -> {
-                // 错误状态
-                ErrorState(
-                    message = uiState.listState.message,
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) { page ->
+            val pageChannel = channels[page]
+            if (pageChannel == uiState.selectedChannel) {
+                FeedPageContent(
+                    uiState = uiState,
+                    visibleAds = visibleAds,
+                    listState = listStateForChannel(pageChannel),
+                    onAdClick = onAdClick,
+                    onLikeClick = onLikeClick,
+                    onFavoriteClick = onFavoriteClick,
+                    onShareClick = {
+                        onShareClick(it)
+                        showSingleToast(context, "已记录分享")
+                    },
+                    onTagClick = onTagClick,
+                    onClearTagFilter = onClearTagFilter,
+                    onRefresh = onRefresh,
                     onRetry = onRetry
                 )
-            }
-            is FeedListState.Empty -> {
-                // 空状态
-                EmptyState()
-            }
-            is FeedListState.Success -> {
-                // 正常列表（支持下拉刷新）
-                PullToRefreshBox(
-                    isRefreshing = uiState.isRefreshing,
-                    onRefresh = onRefresh,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    // 刷新指示器
-                    if (uiState.isRefreshing) {
-                        LinearProgressIndicator(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.TopCenter)
-                        )
-                    }
-
-                    // 列表内容
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(
-                            start = 14.dp,
-                            top = 12.dp,
-                            end = 14.dp,
-                            bottom = 20.dp
-                        ),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        // 当前标签筛选条件
-                        uiState.selectedTag?.let { tag ->
-                            item(key = "tag_filter") {
-                                ActiveTagFilterBar(
-                                    tag = tag,
-                                    resultCount = visibleAds.size,
-                                    onClear = onClearTagFilter
-                                )
-                            }
-                        }
-
-                        // 刷新提示
-                        if (uiState.isRefreshing) {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 8.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(16.dp),
-                                            strokeWidth = 2.dp
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = "正在刷新...",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        // 广告列表
-                        items(
-                            items = visibleAds,
-                            key = { it.id }
-                        ) { ad ->
-                            AdFeedCard(
-                                ad = ad,
-                                onClick = { onAdClick(ad.id) },
-                                onLikeClick = { onLikeClick(ad.id) },
-                                onFavoriteClick = { onFavoriteClick(ad.id) },
-                                onShareClick = {
-                                    onShareClick(ad.id)
-                                    showSingleToast(context, "已记录分享")
-                                },
-                                onTagClick = onTagClick
-                            )
-                        }
-
-                        if (uiState.selectedTag != null && visibleAds.isEmpty()) {
-                            item(key = "empty_filter") {
-                                EmptyFilterState(onClear = onClearTagFilter)
-                            }
-                        }
-
-                        // 底部加载更多状态
-                        item {
-                            LoadMoreIndicator(
-                                isLoading = uiState.isLoadingMore,
-                                hasMore = uiState.hasMore
-                            )
-                        }
-                    }
-                }
+            } else {
+                SkeletonLoadingState()
             }
         }
 
@@ -302,6 +247,126 @@ fun FeedScreen(
                 // 自动清除错误信息
                 kotlinx.coroutines.delay(3000)
                 onClearError()
+            }
+        }
+    }
+}
+
+@Composable
+private fun FeedPageContent(
+    uiState: FeedUiState,
+    visibleAds: List<com.example.myapplication.model.AdItem>,
+    listState: LazyListState,
+    onAdClick: (String) -> Unit,
+    onLikeClick: (String) -> Unit,
+    onFavoriteClick: (String) -> Unit,
+    onShareClick: (String) -> Unit,
+    onTagClick: (String) -> Unit,
+    onClearTagFilter: () -> Unit,
+    onRefresh: () -> Unit,
+    onRetry: () -> Unit
+) {
+    when (uiState.listState) {
+        is FeedListState.Loading -> {
+            SkeletonLoadingState()
+        }
+        is FeedListState.Error -> {
+            ErrorState(
+                message = uiState.listState.message,
+                onRetry = onRetry
+            )
+        }
+        is FeedListState.Empty -> {
+            EmptyState()
+        }
+        is FeedListState.Success -> {
+            PullToRefreshBox(
+                isRefreshing = uiState.isRefreshing,
+                onRefresh = onRefresh,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                if (uiState.isRefreshing) {
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.TopCenter)
+                    )
+                }
+
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        start = 14.dp,
+                        top = 12.dp,
+                        end = 14.dp,
+                        bottom = 20.dp
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    uiState.selectedTag?.let { tag ->
+                        item(key = "tag_filter") {
+                            ActiveTagFilterBar(
+                                tag = tag,
+                                resultCount = visibleAds.size,
+                                onClear = onClearTagFilter
+                            )
+                        }
+                    }
+
+                    if (uiState.isRefreshing) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(16.dp),
+                                        strokeWidth = 2.dp
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "正在刷新...",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    items(
+                        items = visibleAds,
+                        key = { it.id }
+                    ) { ad ->
+                        AdFeedCard(
+                            ad = ad,
+                            onClick = { onAdClick(ad.id) },
+                            onLikeClick = { onLikeClick(ad.id) },
+                            onFavoriteClick = { onFavoriteClick(ad.id) },
+                            onShareClick = { onShareClick(ad.id) },
+                            onTagClick = onTagClick
+                        )
+                    }
+
+                    if (uiState.selectedTag != null && visibleAds.isEmpty()) {
+                        item(key = "empty_filter") {
+                            EmptyFilterState(onClear = onClearTagFilter)
+                        }
+                    }
+
+                    item {
+                        LoadMoreIndicator(
+                            isLoading = uiState.isLoadingMore,
+                            hasMore = uiState.hasMore
+                        )
+                    }
+                }
             }
         }
     }
