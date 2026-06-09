@@ -135,9 +135,7 @@ fun AdApp(
                 detailRefreshKey++
             },
             onCtaClick = {
-                viewModel.recordClick(selectedAd.id)
-                refreshSearchResults()
-                detailRefreshKey++
+                // CTA 只做用户反馈，不计入列表点击统计，避免污染 CTR。
             },
             onTagClick = { tag ->
                 viewModel.selectTag(tag)

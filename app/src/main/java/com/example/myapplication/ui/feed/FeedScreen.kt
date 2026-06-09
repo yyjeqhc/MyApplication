@@ -1,6 +1,5 @@
 package com.example.myapplication.ui.feed
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.model.AdChannel
 import com.example.myapplication.model.FeedListState
 import com.example.myapplication.model.FeedUiState
+import com.example.myapplication.ui.common.showSingleToast
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 private const val SHOW_DEBUG_PANEL = false
@@ -264,7 +264,7 @@ fun FeedScreen(
                                 onFavoriteClick = { onFavoriteClick(ad.id) },
                                 onShareClick = {
                                     onShareClick(ad.id)
-                                    Toast.makeText(context, "已记录分享", Toast.LENGTH_SHORT).show()
+                                    showSingleToast(context, "已记录分享")
                                 },
                                 onTagClick = onTagClick
                             )
