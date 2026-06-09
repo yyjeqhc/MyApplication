@@ -48,6 +48,7 @@ fun AdDetailScreen(
 ) {
     val context = LocalContext.current
     val detailCopy = detailCopyFor(ad)
+    val reasonText = detailReasonTextFor(ad)
 
     BackHandler {
         onBack()
@@ -173,10 +174,10 @@ fun AdDetailScreen(
                 }
 
                 // 推荐理由
-                if (ad.recommendationReason.isNotEmpty()) {
+                if (reasonText.isNotEmpty()) {
                     RecommendationReasonSection(
-                        ad = ad,
-                        title = detailCopy.reasonTitle
+                        title = detailCopy.reasonTitle,
+                        text = reasonText
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                 }
@@ -362,8 +363,8 @@ private fun AiSummarySection(
  */
 @Composable
 private fun RecommendationReasonSection(
-    ad: AdItem,
     title: String,
+    text: String,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -398,7 +399,7 @@ private fun RecommendationReasonSection(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = ad.recommendationReason,
+                text = text,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 23.sp
@@ -603,6 +604,10 @@ private data class DetailCopy(
     val descriptionTitle: String
 )
 
+private fun detailReasonTextFor(ad: AdItem): String {
+    return ad.subtitle.ifBlank { ad.aiSummary }.trim()
+}
+
 private fun detailCopyFor(ad: AdItem): DetailCopy {
     return when {
         ad.cardType == AdCardType.VIDEO -> DetailCopy(
@@ -617,14 +622,14 @@ private fun detailCopyFor(ad: AdItem): DetailCopy {
             reasonTitle = "到店理由",
             insightTitle = "适合人群",
             audienceLabel = "人群",
-            descriptionTitle = "服务详情"
+            descriptionTitle = "广告摘要"
         )
         else -> DetailCopy(
             aiSummaryTitle = "商品亮点",
             reasonTitle = "推荐理由",
             insightTitle = "适合场景",
             audienceLabel = "受众",
-            descriptionTitle = "商品详情"
+            descriptionTitle = "广告摘要"
         )
     }
 }
