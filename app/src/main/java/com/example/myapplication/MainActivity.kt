@@ -211,6 +211,7 @@ fun AdApp(
             onVisibleAdsChanged = { viewModel.recordExposures(it) },
             onRetry = { viewModel.retry() },
             onClearError = { viewModel.clearError() },
+            onFeedbackShown = { viewModel.clearFeedbackMessage() },
             onSearchClick = { isSearchVisible = true },
             onSimulateNormal = { viewModel.simulateNormal() },
             onSimulateEmpty = { viewModel.simulateEmptyState() },

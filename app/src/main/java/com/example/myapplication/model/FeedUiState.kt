@@ -32,6 +32,9 @@ data class FeedUiState(
     /** 错误信息（null 表示无错误） */
     val errorMessage: String? = null,
 
+    /** 一次性轻量提示信息（null 表示无提示） */
+    val feedbackMessage: String? = null,
+
     /** 全局本地统计总览（调试面板默认隐藏） */
     val statsOverview: AdStatsOverview = AdStatsOverview()
 ) {

@@ -48,6 +48,7 @@ fun FeedScreen(
     onVisibleAdsChanged: (List<String>) -> Unit,
     onRetry: () -> Unit,
     onClearError: () -> Unit,
+    onFeedbackShown: () -> Unit,
     onSearchClick: () -> Unit,
     onSimulateNormal: () -> Unit,
     onSimulateEmpty: () -> Unit,
@@ -107,6 +108,13 @@ fun FeedScreen(
                     onVisibleAdsChanged(visibleIds)
                 }
             }
+    }
+
+    uiState.feedbackMessage?.let { message ->
+        LaunchedEffect(message) {
+            showSingleToast(context, message)
+            onFeedbackShown()
+        }
     }
 
     Column(

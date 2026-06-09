@@ -44,6 +44,9 @@ class FeedViewModel(
     /** 每个频道当前已加载的数据缓存 */
     private val channelCache = mutableMapOf<AdChannel, ChannelFeedCache>()
 
+    /** 每个频道的 mock 刷新轮次，用于让下拉刷新产生稳定但可见的重排效果。 */
+    private val channelRefreshRounds = mutableMapOf<AdChannel, Int>()
+
     init {
         MockAdRepository.initialize(application.applicationContext)
         Log.i(
@@ -200,7 +203,11 @@ class FeedViewModel(
                 return@launch
             }
 
-            val page = loadPage(channel, page = 1)
+            advanceRefreshRound(channel)
+            val page = loadFirstPageForRefresh(
+                channel = channel,
+                selectedTag = _uiState.value.selectedTag
+            )
             saveChannelCache(channel, page.ads, currentPage = page.currentPage, hasMore = page.hasMore)
 
             _uiState.update {
@@ -211,6 +218,7 @@ class FeedViewModel(
                     hasMore = page.hasMore,
                     listState = if (page.ads.isEmpty()) FeedListState.Empty else FeedListState.Success,
                     errorMessage = null,
+                    feedbackMessage = if (page.ads.isEmpty()) null else "已刷新推荐内容",
                     statsOverview = currentStatsOverview()
                 )
             }
@@ -347,6 +355,13 @@ class FeedViewModel(
     }
 
     /**
+     * 清除一次性轻量反馈。
+     */
+    fun clearFeedbackMessage() {
+        _uiState.update { it.copy(feedbackMessage = null) }
+    }
+
+    /**
      * 重试加载（从错误状态恢复）
      */
     fun retry() {
@@ -363,6 +378,7 @@ class FeedViewModel(
         simulateError = false
         simulateEmpty = false
         channelCache.clear()
+        channelRefreshRounds.clear()
         loadInitialData()
     }
 
@@ -409,6 +425,7 @@ class FeedViewModel(
         simulateEmpty = false
         MockAdRepository.reset(getApplication<Application>().applicationContext)
         channelCache.clear()
+        channelRefreshRounds.clear()
         _uiState.update {
             it.copy(statsOverview = currentStatsOverview())
         }
@@ -423,6 +440,7 @@ class FeedViewModel(
         simulateEmpty = false
         MockAdRepository.clearLocalAnalytics(getApplication<Application>().applicationContext)
         channelCache.clear()
+        channelRefreshRounds.clear()
         _uiState.update {
             it.copy(statsOverview = currentStatsOverview())
         }
@@ -438,11 +456,64 @@ class FeedViewModel(
                 totalCount = 0
             )
         } else {
-            MockAdRepository.getPagedAds(
-                channel = channel,
-                page = page,
-                pageSize = pageSize
+            val orderedAds = getOrderedAdsForChannel(channel)
+            val safePage = page.coerceAtLeast(1)
+            val fromIndex = (safePage - 1) * pageSize
+            if (fromIndex >= orderedAds.size) {
+                return MockAdRepository.PagedAds(
+                    ads = emptyList(),
+                    currentPage = safePage,
+                    hasMore = false,
+                    totalCount = orderedAds.size
+                )
+            }
+
+            val toIndex = (fromIndex + pageSize).coerceAtMost(orderedAds.size)
+            MockAdRepository.PagedAds(
+                ads = orderedAds.subList(fromIndex, toIndex),
+                currentPage = safePage,
+                hasMore = toIndex < orderedAds.size,
+                totalCount = orderedAds.size
             )
+        }
+    }
+
+    private fun loadFirstPageForRefresh(
+        channel: AdChannel,
+        selectedTag: String?
+    ): MockAdRepository.PagedAds {
+        var loadedPage = loadPage(channel, page = 1)
+        if (selectedTag.isNullOrBlank() || loadedPage.ads.any { selectedTag in it.tags }) {
+            return loadedPage
+        }
+
+        var loadedAds = loadedPage.ads
+        while (loadedPage.hasMore && loadedAds.none { selectedTag in it.tags }) {
+            loadedPage = loadPage(channel, page = loadedPage.currentPage + 1)
+            loadedAds = mergeAdsById(loadedAds, loadedPage.ads)
+        }
+
+        return loadedPage.copy(ads = loadedAds)
+    }
+
+    private fun advanceRefreshRound(channel: AdChannel) {
+        channelRefreshRounds[channel] = (channelRefreshRounds[channel] ?: 0) + 1
+    }
+
+    private fun getOrderedAdsForChannel(channel: AdChannel): List<AdItem> {
+        val channelAds = MockAdRepository.ads.filter { it.channel == channel }
+        val refreshRound = channelRefreshRounds[channel] ?: 0
+        if (refreshRound <= 0 || channelAds.size <= 1) return channelAds
+
+        val offsetStep = channel.ordinal + 2
+        val rawOffset = refreshRound * offsetStep % channelAds.size
+        val offset = if (rawOffset == 0) offsetStep.coerceAtMost(channelAds.lastIndex) else rawOffset
+        val rotatedAds = channelAds.drop(offset) + channelAds.take(offset)
+
+        return if (refreshRound % 2 == 0) {
+            rotatedAds
+        } else {
+            rotatedAds.chunked(pageSize).flatMap { it.reversed() }
         }
     }
 

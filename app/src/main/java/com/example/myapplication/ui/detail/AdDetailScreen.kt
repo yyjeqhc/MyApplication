@@ -1,6 +1,5 @@
 package com.example.myapplication.ui.detail
 
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -26,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.example.myapplication.model.AdCardType
 import com.example.myapplication.model.AdChannel
 import com.example.myapplication.model.AdItem
+import com.example.myapplication.ui.common.showSingleToast
 import com.example.myapplication.ui.feed.AdTagRow
 import com.example.myapplication.ui.feed.formatCount
 import java.util.Locale
@@ -85,11 +85,11 @@ fun AdDetailScreen(
                 onFavoriteClick = onFavoriteClick,
                 onShareClick = {
                     onShareClick()
-                    Toast.makeText(context, "已记录分享", Toast.LENGTH_SHORT).show()
+                    showSingleToast(context, "已记录分享")
                 },
                 onCtaClick = {
                     onCtaClick()
-                    Toast.makeText(context, "${ad.ctaText}功能开发中", Toast.LENGTH_SHORT).show()
+                    showSingleToast(context, "${ad.ctaText}功能开发中")
                 }
             )
         }
@@ -209,7 +209,7 @@ fun AdDetailScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // 数据统计区域
+                // 互动数据区域
                 StatisticsSection(ad = ad)
             }
         }
@@ -488,7 +488,7 @@ private fun InsightRow(
 }
 
 /**
- * 统计数据区域
+ * 轻量互动数据区域
  */
 @Composable
 private fun StatisticsSection(
@@ -504,53 +504,58 @@ private fun StatisticsSection(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)
         ) {
             Text(
-                text = "数据统计",
+                text = "互动数据",
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-            // 第一行：曝光、点击、CTR
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                StatItem(
+                InteractionStatChip(
+                    label = "曝光",
                     value = formatCount(ad.exposureCount),
-                    label = "曝光"
+                    modifier = Modifier.weight(1f)
                 )
-                StatItem(
+                InteractionStatChip(
+                    label = "点击",
                     value = formatCount(ad.clickCount),
-                    label = "点击"
+                    modifier = Modifier.weight(1f)
                 )
-                StatItem(
+                InteractionStatChip(
+                    label = "CTR",
                     value = formatCTR(ad.clickCount, ad.exposureCount),
-                    label = "CTR"
+                    modifier = Modifier.weight(1f)
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // 第二行：点赞、收藏、分享
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                StatItem(
+                InteractionStatChip(
+                    label = "点赞",
                     value = formatCount(ad.likeCount),
-                    label = "点赞"
+                    modifier = Modifier.weight(1f)
                 )
-                StatItem(
+                InteractionStatChip(
+                    label = "收藏",
                     value = if (ad.favorited) "已收藏" else "未收藏",
-                    label = "收藏"
+                    highlighted = ad.favorited,
+                    modifier = Modifier.weight(1f)
                 )
-                StatItem(
+                InteractionStatChip(
+                    label = "分享",
                     value = formatCount(ad.shareCount),
-                    label = "分享"
+                    modifier = Modifier.weight(1f)
                 )
             }
         }
@@ -558,30 +563,53 @@ private fun StatisticsSection(
 }
 
 /**
- * 统计数据项
+ * 轻量互动指标 chip
  */
 @Composable
-private fun StatItem(
-    value: String,
+private fun InteractionStatChip(
     label: String,
+    value: String,
+    highlighted: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    Surface(
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
+        shape = RoundedCornerShape(14.dp),
+        color = if (highlighted) {
+            MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.72f)
+        } else {
+            MaterialTheme.colorScheme.surface.copy(alpha = 0.72f)
+        },
+        contentColor = if (highlighted) {
+            MaterialTheme.colorScheme.onTertiaryContainer
+        } else {
+            MaterialTheme.colorScheme.onSurface
+        }
     ) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = if (highlighted) {
+                    MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.78f)
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+                maxLines = 1
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = value,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }
 
@@ -589,10 +617,11 @@ private fun StatItem(
  * 格式化 CTR（点击率）
  */
 private fun formatCTR(clicks: Int, impressions: Int): String {
-    return if (impressions > 0) {
-        String.format(Locale.US, "%.1f%%", clicks.toFloat() / impressions.toFloat() * 100f)
-    } else {
-        "0.0%"
+    return when {
+        impressions <= 0 -> "—"
+        clicks < 0 -> "—"
+        clicks > impressions -> "测试中"
+        else -> String.format(Locale.US, "%.1f%%", clicks.toFloat() / impressions.toFloat() * 100f)
     }
 }
 

@@ -1,6 +1,5 @@
 package com.example.myapplication.ui.search
 
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -21,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.model.AdItem
+import com.example.myapplication.ui.common.showSingleToast
 import com.example.myapplication.ui.feed.AdFeedCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -105,7 +105,7 @@ fun SearchScreen(
                     onTagClick = onTagClick,
                     onShareClick = { adId ->
                         onShareClick(adId)
-                        Toast.makeText(context, "已记录分享", Toast.LENGTH_SHORT).show()
+                        showSingleToast(context, "已记录分享")
                     }
                 )
             }
