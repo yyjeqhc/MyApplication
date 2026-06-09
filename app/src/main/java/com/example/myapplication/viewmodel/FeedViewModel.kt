@@ -415,6 +415,20 @@ class FeedViewModel(
         loadInitialData()
     }
 
+    /**
+     * 清空本机持久化统计，并刷新当前 UI 到 JSON 初始统计。
+     */
+    fun clearLocalAnalytics() {
+        simulateError = false
+        simulateEmpty = false
+        MockAdRepository.clearLocalAnalytics(getApplication<Application>().applicationContext)
+        channelCache.clear()
+        _uiState.update {
+            it.copy(statsOverview = currentStatsOverview())
+        }
+        loadInitialData()
+    }
+
     private fun loadPage(channel: AdChannel, page: Int): MockAdRepository.PagedAds {
         return if (simulateEmpty) {
             MockAdRepository.PagedAds(

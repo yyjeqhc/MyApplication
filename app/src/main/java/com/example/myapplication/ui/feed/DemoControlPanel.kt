@@ -25,6 +25,7 @@ fun DemoControlPanel(
     onSimulateEmpty: () -> Unit,
     onSimulateError: () -> Unit,
     onResetPagination: () -> Unit,
+    onClearLocalAnalytics: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -120,9 +121,20 @@ fun DemoControlPanel(
                         Text("重置分页数据", fontSize = 12.sp)
                     }
 
+                    OutlinedButton(
+                        onClick = onClearLocalAnalytics,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(6.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        Text("清空本地统计", fontSize = 12.sp)
+                    }
+
                     // 说明文字
                     Text(
-                        text = "正常：显示广告列表\n空态：无数据状态\n错误：模拟加载失败\n重置：恢复初始数据、分页和会话曝光去重",
+                        text = "正常：显示广告列表\n空态：无数据状态\n错误：模拟加载失败\n重置：重新加载分页并清空本会话曝光去重\n清空本地统计：恢复 JSON 初始统计",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 18.sp

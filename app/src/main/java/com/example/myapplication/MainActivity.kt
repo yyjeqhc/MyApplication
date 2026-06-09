@@ -183,8 +183,14 @@ fun AdApp(
             uiState = uiState,
             listState = currentListState,
             onAdClick = onAdClick,
-            onLikeClick = { viewModel.toggleLike(it) },
-            onFavoriteClick = { viewModel.toggleFavorite(it) },
+            onLikeClick = {
+                viewModel.toggleLike(it)
+                refreshSearchResults()
+            },
+            onFavoriteClick = {
+                viewModel.toggleFavorite(it)
+                refreshSearchResults()
+            },
             onShareClick = {
                 viewModel.recordShare(it)
                 refreshSearchResults()
@@ -211,7 +217,8 @@ fun AdApp(
             onSimulateNormal = { viewModel.simulateNormal() },
             onSimulateEmpty = { viewModel.simulateEmptyState() },
             onSimulateError = { viewModel.simulateErrorState() },
-            onResetPagination = { viewModel.resetPagination() }
+            onResetPagination = { viewModel.resetPagination() },
+            onClearLocalAnalytics = { viewModel.clearLocalAnalytics() }
         )
     }
 }

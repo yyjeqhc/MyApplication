@@ -53,6 +53,7 @@ fun FeedScreen(
     onSimulateEmpty: () -> Unit,
     onSimulateError: () -> Unit,
     onResetPagination: () -> Unit,
+    onClearLocalAnalytics: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -163,7 +164,8 @@ fun FeedScreen(
                 onSimulateNormal = onSimulateNormal,
                 onSimulateEmpty = onSimulateEmpty,
                 onSimulateError = onSimulateError,
-                onResetPagination = onResetPagination
+                onResetPagination = onResetPagination,
+                onClearLocalAnalytics = onClearLocalAnalytics
             )
         }
 

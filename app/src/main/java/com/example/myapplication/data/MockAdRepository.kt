@@ -11,18 +11,21 @@ import org.json.JSONObject
 
 /**
  * Mock 广告数据仓库
- * 从 assets/mock_ads.json 读取本地模拟数据，并在内存中维护运行时互动状态。
+ * 从 assets/mock_ads.json 读取本地模拟数据，并合并本机持久化的互动增量。
  */
 object MockAdRepository {
 
     private const val TAG = "MockAdRepository"
     private const val ASSET_FILE_NAME = "mock_ads.json"
 
-    /** 内部可变广告列表，作为点赞/收藏等运行时状态源。 */
+    /** 内部可变广告列表，作为点赞/收藏等当前状态源。 */
     private val _ads = mutableListOf<AdItem>()
 
     /** 本次 App 进程内已计曝光的广告，避免上下滑动重复累计。 */
     private val sessionExposedAdIds = mutableSetOf<String>()
+
+    /** 本机持久化统计，mock_ads.json 仍保持只读。 */
+    private var analyticsStore: LocalAnalyticsStore? = null
 
     /** 不可变广告列表（外部访问） */
     val ads: List<AdItem> get() = _ads.toList()
@@ -37,6 +40,7 @@ object MockAdRepository {
     fun initialize(context: Context) {
         if (initialized) return
 
+        analyticsStore = LocalAnalyticsStore(context)
         val parsedAds = loadAdsFromAssets(context)
         replaceAds(parsedAds.ifEmpty { defaultAds() }, fromAssets = parsedAds.isNotEmpty())
         initialized = true
@@ -105,10 +109,16 @@ object MockAdRepository {
      */
     fun recordExposure(adId: String): AdItem? {
         ensureInitialized()
-        if (!sessionExposedAdIds.add(adId)) return null
-        return updateAd(adId) { ad ->
+        if (adId in sessionExposedAdIds) return null
+
+        val updatedAd = updateAd(adId) { ad ->
             ad.copy(exposureCount = ad.exposureCount + 1)
         }
+        if (updatedAd != null) {
+            sessionExposedAdIds.add(adId)
+            analyticsStore?.incrementExposure(adId)
+        }
+        return updatedAd
     }
 
     /**
@@ -116,9 +126,13 @@ object MockAdRepository {
      */
     fun recordClick(adId: String): AdItem? {
         ensureInitialized()
-        return updateAd(adId) { ad ->
+        val updatedAd = updateAd(adId) { ad ->
             ad.copy(clickCount = ad.clickCount + 1)
         }
+        if (updatedAd != null) {
+            analyticsStore?.incrementClick(adId)
+        }
+        return updatedAd
     }
 
     /**
@@ -126,9 +140,13 @@ object MockAdRepository {
      */
     fun recordShare(adId: String): AdItem? {
         ensureInitialized()
-        return updateAd(adId) { ad ->
+        val updatedAd = updateAd(adId) { ad ->
             ad.copy(shareCount = ad.shareCount + 1)
         }
+        if (updatedAd != null) {
+            analyticsStore?.incrementShare(adId)
+        }
+        return updatedAd
     }
 
     /**
@@ -136,12 +154,23 @@ object MockAdRepository {
      */
     fun toggleLike(adId: String) {
         ensureInitialized()
-        updateAd(adId) { ad ->
+        var likeDeltaChange = 0
+        val updatedAd = updateAd(adId) { ad ->
             val newLiked = !ad.liked
+            likeDeltaChange = if (newLiked) {
+                1
+            } else if (ad.likeCount > 0) {
+                -1
+            } else {
+                0
+            }
             ad.copy(
                 liked = newLiked,
-                likeCount = if (newLiked) ad.likeCount + 1 else (ad.likeCount - 1).coerceAtLeast(0)
+                likeCount = (ad.likeCount + likeDeltaChange).coerceAtLeast(0)
             )
+        }
+        if (updatedAd != null) {
+            analyticsStore?.updateLike(adId, updatedAd.liked, likeDeltaChange)
         }
     }
 
@@ -150,8 +179,11 @@ object MockAdRepository {
      */
     fun toggleFavorite(adId: String) {
         ensureInitialized()
-        updateAd(adId) { ad ->
+        val updatedAd = updateAd(adId) { ad ->
             ad.copy(favorited = !ad.favorited)
+        }
+        if (updatedAd != null) {
+            analyticsStore?.updateFavorite(adId, updatedAd.favorited)
         }
     }
 
@@ -174,8 +206,24 @@ object MockAdRepository {
      */
     @Synchronized
     fun reset(context: Context? = null) {
+        context?.let { analyticsStore = LocalAnalyticsStore(it) }
         val parsedAds = context?.let { loadAdsFromAssets(it) } ?: emptyList()
         replaceAds(parsedAds.ifEmpty { defaultAds() }, fromAssets = parsedAds.isNotEmpty())
+        initialized = true
+    }
+
+    /**
+     * 清空本机持久化统计，并恢复到 mock_ads.json 的初始统计与状态。
+     */
+    @Synchronized
+    fun clearLocalAnalytics(context: Context) {
+        analyticsStore = LocalAnalyticsStore(context).also { it.clear() }
+        val parsedAds = loadAdsFromAssets(context)
+        replaceAds(
+            newAds = parsedAds.ifEmpty { defaultAds() },
+            fromAssets = parsedAds.isNotEmpty(),
+            mergeLocalStats = false
+        )
         initialized = true
     }
 
@@ -228,9 +276,21 @@ object MockAdRepository {
         }
     }
 
-    private fun replaceAds(newAds: List<AdItem>, fromAssets: Boolean) {
+    private fun replaceAds(
+        newAds: List<AdItem>,
+        fromAssets: Boolean,
+        mergeLocalStats: Boolean = true
+    ) {
+        val adsWithLocalStats = if (mergeLocalStats) {
+            analyticsStore?.let { store ->
+                newAds.map { ad -> store.applyTo(ad) }
+            } ?: newAds
+        } else {
+            newAds
+        }
+
         _ads.clear()
-        _ads.addAll(newAds)
+        _ads.addAll(adsWithLocalStats)
         sessionExposedAdIds.clear()
         loadedFromAssets = fromAssets
 
