@@ -20,11 +20,13 @@
     "ctaText": "立即购买",
     "imageType": "gradient",
     "videoDuration": "00:45",
-    "likeCount": 35432,
-    "exposureCount": 887603,
-    "clickCount": 42693,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_002",
@@ -45,11 +47,13 @@
     "ctaText": "立即选购",
     "imageType": "gradient",
     "videoDuration": "00:15",
-    "likeCount": 21728,
-    "exposureCount": 1634990,
-    "clickCount": 52901,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_003",
@@ -72,11 +76,13 @@
     "ctaText": "立即购买",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 34176,
-    "exposureCount": 856915,
-    "clickCount": 42058,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_004",
@@ -99,11 +105,13 @@
     "ctaText": "探索方案",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 48127,
-    "exposureCount": 1479650,
-    "clickCount": 109848,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_005",
@@ -126,11 +134,13 @@
     "ctaText": "立即预订",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 14738,
-    "exposureCount": 381680,
-    "clickCount": 20109,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_006",
@@ -153,11 +163,13 @@
     "ctaText": "立即选购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 66115,
-    "exposureCount": 1875609,
-    "clickCount": 114909,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_007",
@@ -180,11 +192,13 @@
     "ctaText": "去尝鲜",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 63663,
-    "exposureCount": 1649101,
-    "clickCount": 62793,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_008",
@@ -207,11 +221,13 @@
     "ctaText": "领取优惠",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 10348,
-    "exposureCount": 284603,
-    "clickCount": 21759,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_009",
@@ -233,11 +249,13 @@
     "ctaText": "立即下单",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 21322,
-    "exposureCount": 555144,
-    "clickCount": 41025,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_010",
@@ -258,11 +276,13 @@
     "ctaText": "查看详情",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 57803,
-    "exposureCount": 1761324,
-    "clickCount": 58935,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_011",
@@ -283,11 +303,13 @@
     "ctaText": "探索新品",
     "imageType": "gradient",
     "videoDuration": "00:45",
-    "likeCount": 15652,
-    "exposureCount": 1046739,
-    "clickCount": 80957,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_012",
@@ -310,11 +332,13 @@
     "ctaText": "立即选购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 61581,
-    "exposureCount": 1545162,
-    "clickCount": 70437,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_013",
@@ -337,11 +361,13 @@
     "ctaText": "立即评估",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 3621,
-    "exposureCount": 303764,
-    "clickCount": 12878,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_014",
@@ -362,11 +388,13 @@
     "ctaText": "去点单",
     "imageType": "gradient",
     "videoDuration": "00:45",
-    "likeCount": 15987,
-    "exposureCount": 511829,
-    "clickCount": 15538,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_015",
@@ -387,11 +415,13 @@
     "ctaText": "去领取",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 6848,
-    "exposureCount": 191348,
-    "clickCount": 14402,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_016",
@@ -412,11 +442,13 @@
     "ctaText": "查看详情",
     "imageType": "gradient",
     "videoDuration": "00:30",
-    "likeCount": 38033,
-    "exposureCount": 1452948,
-    "clickCount": 78852,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_017",
@@ -439,11 +471,13 @@
     "ctaText": "了解更多",
     "imageType": "gradient",
     "videoDuration": "00:30",
-    "likeCount": 13375,
-    "exposureCount": 449318,
-    "clickCount": 15598,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_018",
@@ -465,11 +499,13 @@
     "ctaText": "立即选购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 11967,
-    "exposureCount": 1029421,
-    "clickCount": 75345,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_019",
@@ -492,11 +528,13 @@
     "ctaText": "立即选购",
     "imageType": "gradient",
     "videoDuration": "00:45",
-    "likeCount": 10112,
-    "exposureCount": 761569,
-    "clickCount": 53332,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_020",
@@ -517,11 +555,13 @@
     "ctaText": "查看详情",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 26613,
-    "exposureCount": 1174672,
-    "clickCount": 61588,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_021",
@@ -543,11 +583,13 @@
     "ctaText": "立即抢购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 43884,
-    "exposureCount": 1883929,
-    "clickCount": 143486,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_022",
@@ -570,11 +612,13 @@
     "ctaText": "立即购买",
     "imageType": "gradient",
     "videoDuration": "00:15",
-    "likeCount": 34058,
-    "exposureCount": 1992732,
-    "clickCount": 134864,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_023",
@@ -596,11 +640,13 @@
     "ctaText": "立即购买",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 18472,
-    "exposureCount": 498260,
-    "clickCount": 36488,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_024",
@@ -621,11 +667,13 @@
     "ctaText": "立即购买",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 978,
-    "exposureCount": 54520,
-    "clickCount": 4321,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_025",
@@ -647,11 +695,13 @@
     "ctaText": "立即抢购",
     "imageType": "gradient",
     "videoDuration": "00:45",
-    "likeCount": 42196,
-    "exposureCount": 1581980,
-    "clickCount": 126196,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_026",
@@ -674,11 +724,13 @@
     "ctaText": "领红包",
     "imageType": "gradient",
     "videoDuration": "00:15",
-    "likeCount": 4534,
-    "exposureCount": 172648,
-    "clickCount": 10179,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_027",
@@ -701,11 +753,13 @@
     "ctaText": "预约试驾",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 28645,
-    "exposureCount": 1104553,
-    "clickCount": 83912,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_028",
@@ -726,11 +780,13 @@
     "ctaText": "立即抢购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 51117,
-    "exposureCount": 1835394,
-    "clickCount": 72114,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_029",
@@ -753,11 +809,13 @@
     "ctaText": "立即预订",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 36129,
-    "exposureCount": 1264081,
-    "clickCount": 75498,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "featured_030",
@@ -779,11 +837,13 @@
     "ctaText": "了解更多",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 18792,
-    "exposureCount": 596865,
-    "clickCount": 24001,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_001",
@@ -806,11 +866,13 @@
     "ctaText": "立即购买",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 25465,
-    "exposureCount": 1891565,
-    "clickCount": 69447,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_002",
@@ -831,11 +893,13 @@
     "ctaText": "立即购买",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 10136,
-    "exposureCount": 621155,
-    "clickCount": 27385,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_003",
@@ -857,11 +921,13 @@
     "ctaText": "立即购买",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 41244,
-    "exposureCount": 1109919,
-    "clickCount": 60409,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_004",
@@ -882,11 +948,13 @@
     "ctaText": "立即购买",
     "imageType": "gradient",
     "videoDuration": "00:45",
-    "likeCount": 10624,
-    "exposureCount": 938302,
-    "clickCount": 67058,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_005",
@@ -908,11 +976,13 @@
     "ctaText": "立即抢购",
     "imageType": "gradient",
     "videoDuration": "00:15",
-    "likeCount": 50011,
-    "exposureCount": 1604473,
-    "clickCount": 83579,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_006",
@@ -935,11 +1005,13 @@
     "ctaText": "立即抢购",
     "imageType": "gradient",
     "videoDuration": "00:45",
-    "likeCount": 3449,
-    "exposureCount": 125556,
-    "clickCount": 9006,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_007",
@@ -960,11 +1032,13 @@
     "ctaText": "设计你的衣柜",
     "imageType": "gradient",
     "videoDuration": "00:15",
-    "likeCount": 5091,
-    "exposureCount": 137721,
-    "clickCount": 6254,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_008",
@@ -985,11 +1059,13 @@
     "ctaText": "立即选购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 14720,
-    "exposureCount": 490562,
-    "clickCount": 31446,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_009",
@@ -1011,11 +1087,13 @@
     "ctaText": "立即购买",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 51054,
-    "exposureCount": 1351621,
-    "clickCount": 91199,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_010",
@@ -1036,11 +1114,13 @@
     "ctaText": "立即购买",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 62953,
-    "exposureCount": 1727484,
-    "clickCount": 121854,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_011",
@@ -1061,11 +1141,13 @@
     "ctaText": "立即购买",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 53376,
-    "exposureCount": 1594687,
-    "clickCount": 121554,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_012",
@@ -1087,11 +1169,13 @@
     "ctaText": "立即抢购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 18918,
-    "exposureCount": 609532,
-    "clickCount": 23137,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_013",
@@ -1113,11 +1197,13 @@
     "ctaText": "立即选购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 19395,
-    "exposureCount": 516477,
-    "clickCount": 20648,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_014",
@@ -1139,11 +1225,13 @@
     "ctaText": "立即选购",
     "imageType": "gradient",
     "videoDuration": "00:15",
-    "likeCount": 2187,
-    "exposureCount": 99627,
-    "clickCount": 6276,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_015",
@@ -1165,11 +1253,13 @@
     "ctaText": "立即购买",
     "imageType": "gradient",
     "videoDuration": "00:30",
-    "likeCount": 42396,
-    "exposureCount": 1395284,
-    "clickCount": 77396,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_016",
@@ -1192,11 +1282,13 @@
     "ctaText": "立即购买",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 16769,
-    "exposureCount": 424483,
-    "clickCount": 25057,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_017",
@@ -1217,11 +1309,13 @@
     "ctaText": "立即选购",
     "imageType": "gradient",
     "videoDuration": "00:45",
-    "likeCount": 32294,
-    "exposureCount": 961346,
-    "clickCount": 45456,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_018",
@@ -1243,11 +1337,13 @@
     "ctaText": "立即抢购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 13469,
-    "exposureCount": 857813,
-    "clickCount": 64314,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_019",
@@ -1268,11 +1364,13 @@
     "ctaText": "查看详情",
     "imageType": "gradient",
     "videoDuration": "00:15",
-    "likeCount": 29824,
-    "exposureCount": 1140351,
-    "clickCount": 86984,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_020",
@@ -1295,11 +1393,13 @@
     "ctaText": "立即抢购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 7402,
-    "exposureCount": 196745,
-    "clickCount": 15236,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_021",
@@ -1322,11 +1422,13 @@
     "ctaText": "查看详情",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 24777,
-    "exposureCount": 1113512,
-    "clickCount": 50624,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_022",
@@ -1348,11 +1450,13 @@
     "ctaText": "立即选购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 27422,
-    "exposureCount": 1212687,
-    "clickCount": 44098,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_023",
@@ -1374,11 +1478,13 @@
     "ctaText": "立即选购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 29742,
-    "exposureCount": 1340828,
-    "clickCount": 78378,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_024",
@@ -1399,11 +1505,13 @@
     "ctaText": "立即抢购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 21879,
-    "exposureCount": 651701,
-    "clickCount": 26399,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_025",
@@ -1426,11 +1534,13 @@
     "ctaText": "立即购买",
     "imageType": "gradient",
     "videoDuration": "00:30",
-    "likeCount": 35492,
-    "exposureCount": 1466893,
-    "clickCount": 59680,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_026",
@@ -1453,11 +1563,13 @@
     "ctaText": "立即选购",
     "imageType": "gradient",
     "videoDuration": "00:15",
-    "likeCount": 30109,
-    "exposureCount": 1766358,
-    "clickCount": 137069,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_027",
@@ -1479,11 +1591,13 @@
     "ctaText": "立即抢购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 6227,
-    "exposureCount": 359023,
-    "clickCount": 11209,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_028",
@@ -1505,11 +1619,13 @@
     "ctaText": "立即选购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 29039,
-    "exposureCount": 1005076,
-    "clickCount": 50979,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_029",
@@ -1530,11 +1646,13 @@
     "ctaText": "获取灵感",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 15679,
-    "exposureCount": 1086784,
-    "clickCount": 54320,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "ecommerce_030",
@@ -1557,11 +1675,13 @@
     "ctaText": "去逛逛",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 12933,
-    "exposureCount": 418861,
-    "clickCount": 29406,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_001",
@@ -1583,11 +1703,13 @@
     "ctaText": "立即预约",
     "imageType": "gradient",
     "videoDuration": "00:45",
-    "likeCount": 13033,
-    "exposureCount": 649215,
-    "clickCount": 27088,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_002",
@@ -1610,11 +1732,13 @@
     "ctaText": "立即预订",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 24715,
-    "exposureCount": 1505318,
-    "clickCount": 56660,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_003",
@@ -1636,11 +1760,13 @@
     "ctaText": "立即下单",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 14098,
-    "exposureCount": 1187938,
-    "clickCount": 63312,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_004",
@@ -1662,11 +1788,13 @@
     "ctaText": "去品尝",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 50360,
-    "exposureCount": 1846697,
-    "clickCount": 136716,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_005",
@@ -1688,11 +1816,13 @@
     "ctaText": "立即下单",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 24076,
-    "exposureCount": 676236,
-    "clickCount": 45763,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_006",
@@ -1714,11 +1844,13 @@
     "ctaText": "去充值",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 24780,
-    "exposureCount": 1073891,
-    "clickCount": 43998,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_007",
@@ -1739,11 +1871,13 @@
     "ctaText": "立即开通",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 25625,
-    "exposureCount": 754914,
-    "clickCount": 47894,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_008",
@@ -1766,11 +1900,13 @@
     "ctaText": "领取权益",
     "imageType": "gradient",
     "videoDuration": "00:30",
-    "likeCount": 13962,
-    "exposureCount": 1291289,
-    "clickCount": 75178,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_009",
@@ -1793,11 +1929,13 @@
     "ctaText": "去团购",
     "imageType": "gradient",
     "videoDuration": "00:15",
-    "likeCount": 9737,
-    "exposureCount": 595587,
-    "clickCount": 29157,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_010",
@@ -1819,11 +1957,13 @@
     "ctaText": "去预约",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 22147,
-    "exposureCount": 633546,
-    "clickCount": 42828,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_011",
@@ -1845,11 +1985,13 @@
     "ctaText": "去下单",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 1048,
-    "exposureCount": 90649,
-    "clickCount": 6114,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_012",
@@ -1871,11 +2013,13 @@
     "ctaText": "开通月卡",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 18922,
-    "exposureCount": 1688364,
-    "clickCount": 131463,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_013",
@@ -1896,11 +2040,13 @@
     "ctaText": "去享用",
     "imageType": "gradient",
     "videoDuration": "00:15",
-    "likeCount": 26374,
-    "exposureCount": 1809990,
-    "clickCount": 56144,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_014",
@@ -1921,11 +2067,13 @@
     "ctaText": "去逛逛",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 55879,
-    "exposureCount": 1453956,
-    "clickCount": 51934,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_015",
@@ -1947,11 +2095,13 @@
     "ctaText": "去逛逛",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 46725,
-    "exposureCount": 1658301,
-    "clickCount": 80335,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_016",
@@ -1974,11 +2124,13 @@
     "ctaText": "去团购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 10477,
-    "exposureCount": 276699,
-    "clickCount": 16307,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_017",
@@ -2001,11 +2153,13 @@
     "ctaText": "去点餐",
     "imageType": "gradient",
     "videoDuration": "00:15",
-    "likeCount": 37223,
-    "exposureCount": 1291719,
-    "clickCount": 83355,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_018",
@@ -2026,11 +2180,13 @@
     "ctaText": "立即预约",
     "imageType": "gradient",
     "videoDuration": "00:45",
-    "likeCount": 44363,
-    "exposureCount": 1309154,
-    "clickCount": 92002,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_019",
@@ -2053,11 +2209,13 @@
     "ctaText": "去团购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 36189,
-    "exposureCount": 1437310,
-    "clickCount": 69750,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_020",
@@ -2079,11 +2237,13 @@
     "ctaText": "去尝鲜",
     "imageType": "gradient",
     "videoDuration": "00:30",
-    "likeCount": 5661,
-    "exposureCount": 271331,
-    "clickCount": 14021,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_021",
@@ -2105,11 +2265,13 @@
     "ctaText": "去探索",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 24710,
-    "exposureCount": 963282,
-    "clickCount": 37381,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_022",
@@ -2132,11 +2294,13 @@
     "ctaText": "去下单",
     "imageType": "gradient",
     "videoDuration": "00:45",
-    "likeCount": 45950,
-    "exposureCount": 1292509,
-    "clickCount": 56120,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_023",
@@ -2157,11 +2321,13 @@
     "ctaText": "去下单",
     "imageType": "gradient",
     "videoDuration": "00:30",
-    "likeCount": 15211,
-    "exposureCount": 561418,
-    "clickCount": 37909,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_024",
@@ -2184,11 +2350,13 @@
     "ctaText": "立即购买",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 45179,
-    "exposureCount": 1834577,
-    "clickCount": 84850,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_025",
@@ -2210,11 +2378,13 @@
     "ctaText": "立即预订",
     "imageType": "gradient",
     "videoDuration": "00:30",
-    "likeCount": 69026,
-    "exposureCount": 1896164,
-    "clickCount": 113405,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_026",
@@ -2237,11 +2407,13 @@
     "ctaText": "立即购买",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 41585,
-    "exposureCount": 1560106,
-    "clickCount": 78506,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_027",
@@ -2262,11 +2434,13 @@
     "ctaText": "立即呼叫",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 32930,
-    "exposureCount": 1404556,
-    "clickCount": 92127,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_028",
@@ -2287,11 +2461,13 @@
     "ctaText": "去抢购",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 20514,
-    "exposureCount": 667056,
-    "clickCount": 27402,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_029",
@@ -2313,11 +2489,13 @@
     "ctaText": "立即预约",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 21175,
-    "exposureCount": 1042499,
-    "clickCount": 60124,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   },
   {
     "id": "local_030",
@@ -2340,10 +2518,12 @@
     "ctaText": "查看门店",
     "imageType": "gradient",
     "videoDuration": "",
-    "likeCount": 10456,
-    "exposureCount": 618152,
-    "clickCount": 28021,
+    "likeCount": 0,
+    "exposureCount": 0,
+    "clickCount": 0,
     "liked": false,
-    "favorite": false
+    "favorite": false,
+    "shareCount": 0,
+    "favorited": false
   }
 ]
