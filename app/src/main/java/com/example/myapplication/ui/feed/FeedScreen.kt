@@ -1,5 +1,10 @@
 package com.example.myapplication.ui.feed
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -20,16 +25,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.model.AdChannel
 import com.example.myapplication.model.AdItem
 import com.example.myapplication.model.FeedListState
 import com.example.myapplication.model.FeedUiState
 import com.example.myapplication.ui.common.showSingleToast
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import kotlin.math.ceil
+import kotlin.math.floor
 
 private const val SHOW_DEBUG_PANEL = false
+private const val REFRESH_FEEDBACK_DURATION_MS = 900L
 
 /**
  * 信息流主页面
@@ -71,6 +81,15 @@ fun FeedScreen(
         initialPage = selectedPage,
         pageCount = { channels.size }
     )
+    val activeTabIndex by remember {
+        derivedStateOf { pagerState.targetPage.coerceIn(0, channels.lastIndex) }
+    }
+    val indicatorPagePosition by remember {
+        derivedStateOf {
+            (pagerState.currentPage + pagerState.currentPageOffsetFraction)
+                .coerceIn(0f, channels.lastIndex.toFloat())
+        }
+    }
     val coroutineScope = rememberCoroutineScope()
     val latestSelectedChannel by rememberUpdatedState(uiState.selectedChannel)
     val latestOnChannelSelect by rememberUpdatedState(onChannelSelect)
@@ -79,6 +98,8 @@ fun FeedScreen(
 
     // 控制面板显示状态
     var isControlPanelVisible by remember { mutableStateOf(false) }
+    var refreshFeedbackMessage by remember { mutableStateOf<String?>(null) }
+    var refreshFeedbackToken by remember { mutableIntStateOf(0) }
 
     val visibleAds = remember(uiState.ads, uiState.selectedTag) { uiState.filteredAds }
     val visibleAdIds = remember(visibleAds) { visibleAds.map { it.id } }
@@ -148,10 +169,18 @@ fun FeedScreen(
             }
     }
 
-    uiState.feedbackMessage?.let { message ->
-        LaunchedEffect(message) {
-            showSingleToast(context, message)
+    LaunchedEffect(uiState.feedbackMessage) {
+        uiState.feedbackMessage?.let { message ->
+            refreshFeedbackMessage = message
+            refreshFeedbackToken += 1
             onFeedbackShown()
+        }
+    }
+
+    LaunchedEffect(refreshFeedbackToken) {
+        if (refreshFeedbackToken > 0) {
+            delay(REFRESH_FEEDBACK_DURATION_MS)
+            refreshFeedbackMessage = null
         }
     }
 
@@ -183,13 +212,21 @@ fun FeedScreen(
 
         // 频道 Tab
         PrimaryTabRow(
-            selectedTabIndex = pagerState.currentPage,
+            selectedTabIndex = activeTabIndex,
             containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.primary
+            contentColor = MaterialTheme.colorScheme.primary,
+            indicator = {
+                TabRowDefaults.PrimaryIndicator(
+                    modifier = pagerTabIndicatorOffset(
+                        pagePosition = indicatorPagePosition
+                    ),
+                    width = Dp.Unspecified
+                )
+            }
         ) {
             channels.forEachIndexed { index, channel ->
                 Tab(
-                    selected = pagerState.currentPage == index,
+                    selected = activeTabIndex == index,
                     onClick = {
                         coroutineScope.launch {
                             pagerState.animateScrollToPage(index)
@@ -198,7 +235,7 @@ fun FeedScreen(
                     text = {
                         Text(
                             text = channel.displayName,
-                            fontWeight = if (pagerState.currentPage == index) {
+                            fontWeight = if (activeTabIndex == index) {
                                 FontWeight.Bold
                             } else {
                                 FontWeight.Normal
@@ -210,6 +247,7 @@ fun FeedScreen(
         }
 
         SearchEntry(onClick = onSearchClick)
+        RefreshFeedbackBanner(message = refreshFeedbackMessage)
 
         // Demo 控制面板
         if (SHOW_DEBUG_PANEL) {
@@ -284,8 +322,90 @@ fun FeedScreen(
         uiState.errorMessage?.let { message ->
             LaunchedEffect(message) {
                 // 自动清除错误信息
-                kotlinx.coroutines.delay(3000)
+                delay(3000)
                 onClearError()
+            }
+        }
+    }
+}
+
+private fun TabIndicatorScope.pagerTabIndicatorOffset(
+    pagePosition: Float
+): Modifier {
+    return Modifier.tabIndicatorLayout { measurable, constraints, tabPositions ->
+        if (tabPositions.isEmpty()) {
+            val placeable = measurable.measure(constraints.copy(minWidth = 0))
+            return@tabIndicatorLayout layout(constraints.maxWidth, constraints.maxHeight) {
+                placeable.placeRelative(0, constraints.maxHeight - placeable.height)
+            }
+        }
+
+        val safePosition = pagePosition.coerceIn(0f, tabPositions.lastIndex.toFloat())
+        val startIndex = floor(safePosition).toInt().coerceIn(0, tabPositions.lastIndex)
+        val endIndex = ceil(safePosition).toInt().coerceIn(0, tabPositions.lastIndex)
+        val fraction = (safePosition - startIndex).coerceIn(0f, 1f)
+        val startPosition = tabPositions[startIndex]
+        val endPosition = tabPositions[endIndex]
+        val indicatorWidth = lerpDp(
+            start = startPosition.contentWidth,
+            stop = endPosition.contentWidth,
+            fraction = fraction
+        )
+        val indicatorCenter = lerpDp(
+            start = startPosition.left + startPosition.width / 2,
+            stop = endPosition.left + endPosition.width / 2,
+            fraction = fraction
+        )
+        val indicatorLeft = indicatorCenter - indicatorWidth / 2
+        val widthPx = indicatorWidth.roundToPx()
+        val placeable = measurable.measure(
+            constraints.copy(
+                minWidth = widthPx,
+                maxWidth = widthPx,
+                minHeight = 0
+            )
+        )
+
+        layout(constraints.maxWidth, constraints.maxHeight) {
+            placeable.placeRelative(
+                x = indicatorLeft.roundToPx(),
+                y = constraints.maxHeight - placeable.height
+            )
+        }
+    }
+}
+
+private fun lerpDp(start: Dp, stop: Dp, fraction: Float): Dp {
+    return start + (stop - start) * fraction
+}
+
+@Composable
+private fun RefreshFeedbackBanner(
+    message: String?
+) {
+    AnimatedVisibility(
+        visible = message != null,
+        enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
+        exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(horizontal = 14.dp, vertical = 6.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ) {
+                Text(
+                    text = message.orEmpty(),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                )
             }
         }
     }

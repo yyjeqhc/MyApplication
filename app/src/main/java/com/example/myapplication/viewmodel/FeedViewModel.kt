@@ -50,6 +50,9 @@ class FeedViewModel(
     /** 每个频道的 mock 刷新轮次，用于让下拉刷新产生稳定但可见的重排效果。 */
     private val channelRefreshRounds = mutableMapOf<AdChannel, Int>()
 
+    /** 防止首屏后的频道预加载重复启动。 */
+    private var hasPreloadedOtherChannels = false
+
     /** Repository 初始化完成前，避免 UI 交互误触发 fallback 数据。 */
     private var repositoryReady = false
 
@@ -126,6 +129,7 @@ class FeedViewModel(
                     statsOverview = currentStatsOverview()
                 )
             }
+            preloadOtherChannelsAfterFirstPage(channel)
         }
     }
 
@@ -427,6 +431,7 @@ class FeedViewModel(
         simulateEmpty = false
         channelCache.clear()
         channelRefreshRounds.clear()
+        hasPreloadedOtherChannels = false
         _uiState.update {
             it.copy(channelSnapshots = emptyMap())
         }
@@ -478,6 +483,7 @@ class FeedViewModel(
         MockAdRepository.reset(getApplication<Application>().applicationContext)
         channelCache.clear()
         channelRefreshRounds.clear()
+        hasPreloadedOtherChannels = false
         _uiState.update {
             it.copy(
                 channelSnapshots = emptyMap(),
@@ -496,6 +502,7 @@ class FeedViewModel(
         MockAdRepository.clearLocalAnalytics(getApplication<Application>().applicationContext)
         channelCache.clear()
         channelRefreshRounds.clear()
+        hasPreloadedOtherChannels = false
         _uiState.update {
             it.copy(
                 channelSnapshots = emptyMap(),
@@ -533,6 +540,34 @@ class FeedViewModel(
                 hasMore = toIndex < orderedAds.size,
                 totalCount = orderedAds.size
             )
+        }
+    }
+
+    private fun preloadOtherChannelsAfterFirstPage(currentChannel: AdChannel) {
+        if (hasPreloadedOtherChannels || simulateError || simulateEmpty) return
+        hasPreloadedOtherChannels = true
+
+        viewModelScope.launch {
+            AdChannel.entries
+                .filter { channel -> channel != currentChannel && channel !in channelCache }
+                .forEach { channel ->
+                    val page = loadPage(channel, page = 1)
+                    if (channel !in channelCache) {
+                        saveChannelCache(
+                            channel = channel,
+                            ads = page.ads,
+                            currentPage = page.currentPage,
+                            hasMore = page.hasMore
+                        )
+                    }
+                }
+
+            _uiState.update {
+                it.copy(
+                    channelSnapshots = currentChannelSnapshots(),
+                    statsOverview = currentStatsOverview()
+                )
+            }
         }
     }
 
