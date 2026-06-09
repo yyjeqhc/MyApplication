@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.myapplication.model.AdCardType
 import com.example.myapplication.model.AdChannel
 import com.example.myapplication.model.AdItem
+import com.example.myapplication.model.AdStatsOverview
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -19,6 +20,9 @@ object MockAdRepository {
 
     /** 内部可变广告列表，作为点赞/收藏等运行时状态源。 */
     private val _ads = mutableListOf<AdItem>()
+
+    /** 本次 App 进程内已计曝光的广告，避免上下滑动重复累计。 */
+    private val sessionExposedAdIds = mutableSetOf<String>()
 
     /** 不可变广告列表（外部访问） */
     val ads: List<AdItem> get() = _ads.toList()
@@ -94,15 +98,47 @@ object MockAdRepository {
     }
 
     /**
+     * 记录曝光。
+     *
+     * 简化口径：广告第一次进入 LazyColumn 可见范围即计 1 次曝光；
+     * 本 App 会话内同一广告只计一次，不做 50% 可见和 1 秒停留判断。
+     */
+    fun recordExposure(adId: String): AdItem? {
+        ensureInitialized()
+        if (!sessionExposedAdIds.add(adId)) return null
+        return updateAd(adId) { ad ->
+            ad.copy(exposureCount = ad.exposureCount + 1)
+        }
+    }
+
+    /**
+     * 记录点击。
+     */
+    fun recordClick(adId: String): AdItem? {
+        ensureInitialized()
+        return updateAd(adId) { ad ->
+            ad.copy(clickCount = ad.clickCount + 1)
+        }
+    }
+
+    /**
+     * 记录分享。
+     */
+    fun recordShare(adId: String): AdItem? {
+        ensureInitialized()
+        return updateAd(adId) { ad ->
+            ad.copy(shareCount = ad.shareCount + 1)
+        }
+    }
+
+    /**
      * 切换点赞状态。
      */
     fun toggleLike(adId: String) {
         ensureInitialized()
-        val index = _ads.indexOfFirst { it.id == adId }
-        if (index != -1) {
-            val ad = _ads[index]
+        updateAd(adId) { ad ->
             val newLiked = !ad.liked
-            _ads[index] = ad.copy(
+            ad.copy(
                 liked = newLiked,
                 likeCount = if (newLiked) ad.likeCount + 1 else (ad.likeCount - 1).coerceAtLeast(0)
             )
@@ -114,11 +150,23 @@ object MockAdRepository {
      */
     fun toggleFavorite(adId: String) {
         ensureInitialized()
-        val index = _ads.indexOfFirst { it.id == adId }
-        if (index != -1) {
-            val ad = _ads[index]
-            _ads[index] = ad.copy(favorited = !ad.favorited)
+        updateAd(adId) { ad ->
+            ad.copy(favorited = !ad.favorited)
         }
+    }
+
+    /**
+     * 全局本地统计总览，用于隐藏的 Demo 控制面板。
+     */
+    fun getStatsOverview(): AdStatsOverview {
+        ensureInitialized()
+        return AdStatsOverview(
+            totalExposureCount = _ads.sumOf { it.exposureCount },
+            totalClickCount = _ads.sumOf { it.clickCount },
+            totalLikeCount = _ads.sumOf { it.likeCount },
+            totalFavoriteCount = _ads.count { it.favorited },
+            totalShareCount = _ads.sumOf { it.shareCount }
+        )
     }
 
     /**
@@ -183,6 +231,7 @@ object MockAdRepository {
     private fun replaceAds(newAds: List<AdItem>, fromAssets: Boolean) {
         _ads.clear()
         _ads.addAll(newAds)
+        sessionExposedAdIds.clear()
         loadedFromAssets = fromAssets
 
         val counts = AdChannel.entries.joinToString { channel ->
@@ -263,6 +312,7 @@ object MockAdRepository {
             likeCount = optInt("likeCount", 0),
             exposureCount = optInt("exposureCount", 0),
             clickCount = optInt("clickCount", 0),
+            shareCount = optInt("shareCount", 0),
             brandName = optString("brand", optString("brandName")),
             ctaText = optString("ctaText", "了解详情"),
             aiSummary = aiSummary,
@@ -281,6 +331,15 @@ object MockAdRepository {
         val array = optJSONArray(name) ?: return emptyList()
         return List(array.length()) { index -> array.optString(index) }
             .filter { it.isNotBlank() }
+    }
+
+    private fun updateAd(adId: String, transform: (AdItem) -> AdItem): AdItem? {
+        val index = _ads.indexOfFirst { it.id == adId }
+        if (index == -1) return null
+
+        val updatedAd = transform(_ads[index])
+        _ads[index] = updatedAd
+        return updatedAd
     }
 
     private inline fun <reified T : Enum<T>> enumValueOrDefault(

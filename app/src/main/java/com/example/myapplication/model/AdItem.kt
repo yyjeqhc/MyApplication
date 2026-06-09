@@ -53,6 +53,9 @@ data class AdItem(
     /** 点击数量 */
     val clickCount: Int,
 
+    /** 分享数量 */
+    val shareCount: Int = 0,
+
     /** 品牌名称 */
     val brandName: String = "",
 

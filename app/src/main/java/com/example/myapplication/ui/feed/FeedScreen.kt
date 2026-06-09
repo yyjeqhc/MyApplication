@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.model.AdChannel
 import com.example.myapplication.model.FeedListState
 import com.example.myapplication.model.FeedUiState
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 private const val SHOW_DEBUG_PANEL = false
 
@@ -38,11 +39,13 @@ fun FeedScreen(
     onAdClick: (String) -> Unit,
     onLikeClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
+    onShareClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
     onClearTagFilter: () -> Unit,
     onChannelSelect: (AdChannel) -> Unit,
     onRefresh: () -> Unit,
     onLoadMore: () -> Unit,
+    onVisibleAdsChanged: (List<String>) -> Unit,
     onRetry: () -> Unit,
     onClearError: () -> Unit,
     onSearchClick: () -> Unit,
@@ -61,6 +64,8 @@ fun FeedScreen(
     var isControlPanelVisible by remember { mutableStateOf(false) }
 
     val visibleAds = uiState.filteredAds
+    val visibleAdIds = remember(visibleAds) { visibleAds.map { it.id } }
+    val visibleAdIdSet = remember(visibleAdIds) { visibleAdIds.toSet() }
 
     // 监听滚动位置，触发加载更多
     val shouldLoadMore = remember(
@@ -84,6 +89,23 @@ fun FeedScreen(
         if (shouldLoadMore.value) {
             onLoadMore()
         }
+    }
+
+    // 简化曝光口径：广告 id 第一次进入 LazyColumn 可见范围即计 1 次曝光；
+    // 不做 50% 可见和 1 秒停留判断，去重逻辑由 ViewModel/Repository 维护。
+    LaunchedEffect(listState, visibleAdIds) {
+        snapshotFlow {
+            listState.layoutInfo.visibleItemsInfo
+                .mapNotNull { it.key as? String }
+                .filter { it in visibleAdIdSet }
+                .distinct()
+        }
+            .distinctUntilChanged()
+            .collect { visibleIds ->
+                if (visibleIds.isNotEmpty()) {
+                    onVisibleAdsChanged(visibleIds)
+                }
+            }
     }
 
     Column(
@@ -136,6 +158,7 @@ fun FeedScreen(
         if (SHOW_DEBUG_PANEL) {
             DemoControlPanel(
                 isVisible = isControlPanelVisible,
+                statsOverview = uiState.statsOverview,
                 onToggleVisibility = { isControlPanelVisible = !isControlPanelVisible },
                 onSimulateNormal = onSimulateNormal,
                 onSimulateEmpty = onSimulateEmpty,
@@ -238,7 +261,8 @@ fun FeedScreen(
                                 onLikeClick = { onLikeClick(ad.id) },
                                 onFavoriteClick = { onFavoriteClick(ad.id) },
                                 onShareClick = {
-                                    Toast.makeText(context, "分享功能开发中", Toast.LENGTH_SHORT).show()
+                                    onShareClick(ad.id)
+                                    Toast.makeText(context, "已记录分享", Toast.LENGTH_SHORT).show()
                                 },
                                 onTagClick = onTagClick
                             )

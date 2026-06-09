@@ -28,6 +28,7 @@ import com.example.myapplication.model.AdChannel
 import com.example.myapplication.model.AdItem
 import com.example.myapplication.ui.feed.AdTagRow
 import com.example.myapplication.ui.feed.formatCount
+import java.util.Locale
 
 /**
  * 广告详情页
@@ -40,6 +41,8 @@ fun AdDetailScreen(
     onBack: () -> Unit,
     onLikeClick: () -> Unit,
     onFavoriteClick: () -> Unit,
+    onShareClick: () -> Unit,
+    onCtaClick: () -> Unit,
     onTagClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -80,9 +83,11 @@ fun AdDetailScreen(
                 onLikeClick = onLikeClick,
                 onFavoriteClick = onFavoriteClick,
                 onShareClick = {
-                    Toast.makeText(context, "分享功能开发中", Toast.LENGTH_SHORT).show()
+                    onShareClick()
+                    Toast.makeText(context, "已记录分享", Toast.LENGTH_SHORT).show()
                 },
                 onCtaClick = {
+                    onCtaClick()
                     Toast.makeText(context, "${ad.ctaText}功能开发中", Toast.LENGTH_SHORT).show()
                 }
             )
@@ -514,36 +519,37 @@ private fun StatisticsSection(
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
                 StatItem(
-                    count = ad.exposureCount,
+                    value = formatCount(ad.exposureCount),
                     label = "曝光"
                 )
                 StatItem(
-                    count = ad.clickCount,
+                    value = formatCount(ad.clickCount),
                     label = "点击"
                 )
                 StatItem(
-                    count = calculateCTR(ad.clickCount, ad.exposureCount),
-                    label = "CTR",
-                    isPercentage = true
+                    value = formatCTR(ad.clickCount, ad.exposureCount),
+                    label = "CTR"
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 第二行：点赞、收藏
+            // 第二行：点赞、收藏、分享
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
                 StatItem(
-                    count = ad.likeCount,
+                    value = formatCount(ad.likeCount),
                     label = "点赞"
                 )
                 StatItem(
-                    count = if (ad.favorited) 1 else 0,
-                    label = "收藏状态",
-                    isText = true,
-                    textValue = if (ad.favorited) "已收藏" else "未收藏"
+                    value = if (ad.favorited) "已收藏" else "未收藏",
+                    label = "收藏"
+                )
+                StatItem(
+                    value = formatCount(ad.shareCount),
+                    label = "分享"
                 )
             }
         }
@@ -555,11 +561,8 @@ private fun StatisticsSection(
  */
 @Composable
 private fun StatItem(
-    count: Int,
+    value: String,
     label: String,
-    isPercentage: Boolean = false,
-    isText: Boolean = false,
-    textValue: String = "",
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -567,11 +570,7 @@ private fun StatItem(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = when {
-                isText -> textValue
-                isPercentage -> "${count}%"
-                else -> formatCount(count)
-            },
+            text = value,
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
@@ -586,13 +585,13 @@ private fun StatItem(
 }
 
 /**
- * 计算 CTR（点击率）
+ * 格式化 CTR（点击率）
  */
-private fun calculateCTR(clicks: Int, impressions: Int): Int {
+private fun formatCTR(clicks: Int, impressions: Int): String {
     return if (impressions > 0) {
-        ((clicks.toFloat() / impressions.toFloat()) * 100).toInt()
+        String.format(Locale.US, "%.1f%%", clicks.toFloat() / impressions.toFloat() * 100f)
     } else {
-        0
+        "0.0%"
     }
 }
 

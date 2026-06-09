@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.model.AdStatsOverview
+import java.util.Locale
 
 /**
  * Demo 控制面板
@@ -17,6 +19,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun DemoControlPanel(
     isVisible: Boolean,
+    statsOverview: AdStatsOverview,
     onToggleVisibility: () -> Unit,
     onSimulateNormal: () -> Unit,
     onSimulateEmpty: () -> Unit,
@@ -69,10 +72,12 @@ fun DemoControlPanel(
                     )
 
                     Text(
-                        text = "用于验收空态、错误态和分页状态",
+                        text = "用于验收空态、错误态、分页状态和本地统计",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+
+                    StatsOverviewGrid(statsOverview = statsOverview)
 
                     Spacer(modifier = Modifier.height(4.dp))
 
@@ -117,13 +122,97 @@ fun DemoControlPanel(
 
                     // 说明文字
                     Text(
-                        text = "正常：显示广告列表\n空态：无数据状态\n错误：模拟加载失败\n重置：恢复初始数据和分页",
+                        text = "正常：显示广告列表\n空态：无数据状态\n错误：模拟加载失败\n重置：恢复初始数据、分页和会话曝光去重",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 18.sp
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun StatsOverviewGrid(
+    statsOverview: AdStatsOverview,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            OverviewStatItem(
+                label = "总曝光",
+                value = formatCount(statsOverview.totalExposureCount),
+                modifier = Modifier.weight(1f)
+            )
+            OverviewStatItem(
+                label = "总点击",
+                value = formatCount(statsOverview.totalClickCount),
+                modifier = Modifier.weight(1f)
+            )
+            OverviewStatItem(
+                label = "CTR",
+                value = String.format(Locale.US, "%.1f%%", statsOverview.ctrPercent),
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            OverviewStatItem(
+                label = "总点赞",
+                value = formatCount(statsOverview.totalLikeCount),
+                modifier = Modifier.weight(1f)
+            )
+            OverviewStatItem(
+                label = "收藏",
+                value = formatCount(statsOverview.totalFavoriteCount),
+                modifier = Modifier.weight(1f)
+            )
+            OverviewStatItem(
+                label = "分享",
+                value = formatCount(statsOverview.totalShareCount),
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun OverviewStatItem(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(6.dp),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 7.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1
+            )
         }
     }
 }

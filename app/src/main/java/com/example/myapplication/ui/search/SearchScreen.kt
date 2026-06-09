@@ -35,6 +35,7 @@ fun SearchScreen(
     onAdClick: (String) -> Unit,
     onLikeClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
+    onShareClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -102,8 +103,9 @@ fun SearchScreen(
                     onLikeClick = onLikeClick,
                     onFavoriteClick = onFavoriteClick,
                     onTagClick = onTagClick,
-                    onShareClick = {
-                        Toast.makeText(context, "分享功能开发中", Toast.LENGTH_SHORT).show()
+                    onShareClick = { adId ->
+                        onShareClick(adId)
+                        Toast.makeText(context, "已记录分享", Toast.LENGTH_SHORT).show()
                     }
                 )
             }
@@ -242,7 +244,7 @@ private fun SearchResultList(
     onLikeClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
-    onShareClick: () -> Unit
+    onShareClick: (String) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -272,7 +274,7 @@ private fun SearchResultList(
                 onClick = { onAdClick(ad.id) },
                 onLikeClick = { onLikeClick(ad.id) },
                 onFavoriteClick = { onFavoriteClick(ad.id) },
-                onShareClick = onShareClick,
+                onShareClick = { onShareClick(ad.id) },
                 onTagClick = onTagClick
             )
         }

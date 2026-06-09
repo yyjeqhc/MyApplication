@@ -94,14 +94,17 @@ fun AdApp(
     // 根据 selectedAdId 获取最新的广告对象
     val selectedAd = remember(uiState.ads, searchResults, selectedAdId, detailRefreshKey) {
         selectedAdId?.let { id ->
-            uiState.ads.find { it.id == id }
+            viewModel.getAdById(id)
+                ?: uiState.ads.find { it.id == id }
                 ?: searchResults.find { it.id == id }
-                ?: viewModel.getAdById(id)
         }
     }
 
     // 点击广告卡片回调
     val onAdClick: (String) -> Unit = { adId ->
+        viewModel.recordClick(adId)
+        refreshSearchResults()
+        detailRefreshKey++
         selectedAdId = adId
     }
 
@@ -123,6 +126,16 @@ fun AdApp(
             },
             onFavoriteClick = {
                 viewModel.toggleFavorite(selectedAd.id)
+                refreshSearchResults()
+                detailRefreshKey++
+            },
+            onShareClick = {
+                viewModel.recordShare(selectedAd.id)
+                refreshSearchResults()
+                detailRefreshKey++
+            },
+            onCtaClick = {
+                viewModel.recordClick(selectedAd.id)
                 refreshSearchResults()
                 detailRefreshKey++
             },
@@ -152,6 +165,10 @@ fun AdApp(
                 viewModel.toggleFavorite(it)
                 refreshSearchResults()
             },
+            onShareClick = {
+                viewModel.recordShare(it)
+                refreshSearchResults()
+            },
             onTagClick = {
                 viewModel.selectTag(it)
                 isSearchVisible = false
@@ -168,6 +185,10 @@ fun AdApp(
             onAdClick = onAdClick,
             onLikeClick = { viewModel.toggleLike(it) },
             onFavoriteClick = { viewModel.toggleFavorite(it) },
+            onShareClick = {
+                viewModel.recordShare(it)
+                refreshSearchResults()
+            },
             onTagClick = {
                 viewModel.selectTag(it)
                 coroutineScope.launch {
@@ -183,6 +204,7 @@ fun AdApp(
             onChannelSelect = { viewModel.selectChannel(it) },
             onRefresh = { viewModel.refresh() },
             onLoadMore = { viewModel.loadMore() },
+            onVisibleAdsChanged = { viewModel.recordExposures(it) },
             onRetry = { viewModel.retry() },
             onClearError = { viewModel.clearError() },
             onSearchClick = { isSearchVisible = true },

@@ -30,13 +30,34 @@ data class FeedUiState(
     val currentPage: Int = 1,
 
     /** 错误信息（null 表示无错误） */
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+
+    /** 全局本地统计总览（调试面板默认隐藏） */
+    val statsOverview: AdStatsOverview = AdStatsOverview()
 ) {
     /** 当前筛选后实际展示的广告列表 */
     val filteredAds: List<AdItem>
         get() = selectedTag?.let { tag ->
             ads.filter { ad -> tag in ad.tags }
         } ?: ads
+}
+
+/**
+ * 本地埋点总览，仅基于当前 App 进程内的 mock 数据计算。
+ */
+data class AdStatsOverview(
+    val totalExposureCount: Int = 0,
+    val totalClickCount: Int = 0,
+    val totalLikeCount: Int = 0,
+    val totalFavoriteCount: Int = 0,
+    val totalShareCount: Int = 0
+) {
+    val ctrPercent: Float
+        get() = if (totalExposureCount > 0) {
+            totalClickCount.toFloat() / totalExposureCount.toFloat() * 100f
+        } else {
+            0f
+        }
 }
 
 /**

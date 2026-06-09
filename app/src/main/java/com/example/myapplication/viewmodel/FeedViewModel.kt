@@ -52,6 +52,9 @@ class FeedViewModel(
                 "total=${MockAdRepository.ads.size}, " +
                 AdChannel.entries.joinToString { "${it.name}=${MockAdRepository.getChannelCount(it)}" }
         )
+        _uiState.update {
+            it.copy(statsOverview = currentStatsOverview())
+        }
 
         // 首次加载数据
         loadInitialData()
@@ -89,7 +92,8 @@ class FeedViewModel(
                     listState = if (page.ads.isEmpty()) FeedListState.Empty else FeedListState.Success,
                     currentPage = page.currentPage,
                     hasMore = page.hasMore,
-                    errorMessage = null
+                    errorMessage = null,
+                    statsOverview = currentStatsOverview()
                 )
             }
         }
@@ -127,7 +131,8 @@ class FeedViewModel(
                     listState = if (cached.ads.isEmpty()) FeedListState.Empty else FeedListState.Success,
                     errorMessage = null,
                     isRefreshing = false,
-                    isLoadingMore = false
+                    isLoadingMore = false,
+                    statsOverview = currentStatsOverview()
                 )
             }
             return
@@ -146,7 +151,8 @@ class FeedViewModel(
                 listState = if (page.ads.isEmpty()) FeedListState.Empty else FeedListState.Success,
                 isRefreshing = false,
                 isLoadingMore = false,
-                errorMessage = null
+                errorMessage = null,
+                statsOverview = currentStatsOverview()
             )
         }
     }
@@ -204,7 +210,8 @@ class FeedViewModel(
                     currentPage = page.currentPage,
                     hasMore = page.hasMore,
                     listState = if (page.ads.isEmpty()) FeedListState.Empty else FeedListState.Success,
-                    errorMessage = null
+                    errorMessage = null,
+                    statsOverview = currentStatsOverview()
                 )
             }
         }
@@ -251,7 +258,8 @@ class FeedViewModel(
                     isLoadingMore = false,
                     currentPage = page.currentPage,
                     hasMore = page.hasMore,
-                    errorMessage = null
+                    errorMessage = null,
+                    statsOverview = currentStatsOverview()
                 )
             }
             _uiState.value.let { state ->
@@ -261,23 +269,42 @@ class FeedViewModel(
     }
 
     /**
+     * 批量记录广告曝光。
+     */
+    fun recordExposures(adIds: Collection<String>) {
+        val updatedAds = adIds.mapNotNull { adId ->
+            MockAdRepository.recordExposure(adId)
+        }
+        syncAds(updatedAds)
+    }
+
+    /**
+     * 记录广告点击。
+     */
+    fun recordClick(adId: String) {
+        MockAdRepository.recordClick(adId)?.let { updatedAd ->
+            syncAd(updatedAd)
+        }
+    }
+
+    /**
+     * 记录广告分享。
+     */
+    fun recordShare(adId: String) {
+        MockAdRepository.recordShare(adId)?.let { updatedAd ->
+            syncAd(updatedAd)
+        }
+    }
+
+    /**
      * 切换点赞状态
      */
     fun toggleLike(adId: String) {
         MockAdRepository.toggleLike(adId)
 
-        _uiState.update { state ->
-            state.copy(
-                ads = state.ads.map { ad ->
-                    if (ad.id == adId) {
-                        MockAdRepository.getAdById(adId) ?: ad.toggleLikeLocally()
-                    } else {
-                        ad
-                    }
-                }
-            )
+        MockAdRepository.getAdById(adId)?.let { updatedAd ->
+            syncAd(updatedAd)
         }
-        saveCurrentChannelCache()
     }
 
     /**
@@ -286,18 +313,9 @@ class FeedViewModel(
     fun toggleFavorite(adId: String) {
         MockAdRepository.toggleFavorite(adId)
 
-        _uiState.update { state ->
-            state.copy(
-                ads = state.ads.map { ad ->
-                    if (ad.id == adId) {
-                        MockAdRepository.getAdById(adId) ?: ad.copy(favorited = !ad.favorited)
-                    } else {
-                        ad
-                    }
-                }
-            )
+        MockAdRepository.getAdById(adId)?.let { updatedAd ->
+            syncAd(updatedAd)
         }
-        saveCurrentChannelCache()
     }
 
     /**
@@ -361,7 +379,8 @@ class FeedViewModel(
                 listState = FeedListState.Empty,
                 currentPage = 1,
                 hasMore = false,
-                errorMessage = null
+                errorMessage = null,
+                statsOverview = currentStatsOverview()
             )
         }
         saveChannelCache(_uiState.value.selectedChannel, emptyList(), currentPage = 1, hasMore = false)
@@ -390,6 +409,9 @@ class FeedViewModel(
         simulateEmpty = false
         MockAdRepository.reset(getApplication<Application>().applicationContext)
         channelCache.clear()
+        _uiState.update {
+            it.copy(statsOverview = currentStatsOverview())
+        }
         loadInitialData()
     }
 
@@ -419,16 +441,39 @@ class FeedViewModel(
         return currentAds + nextAds.filter { existingIds.add(it.id) }
     }
 
-    private fun AdItem.toggleLikeLocally(): AdItem {
-        val newLiked = !liked
-        val newLikeCount = if (newLiked) likeCount + 1 else (likeCount - 1).coerceAtLeast(0)
-        return copy(liked = newLiked, likeCount = newLikeCount)
+    private fun syncAd(updatedAd: AdItem) {
+        syncAds(listOf(updatedAd))
     }
 
-    private fun saveCurrentChannelCache() {
-        val state = _uiState.value
-        saveChannelCache(state.selectedChannel, state.ads, state.currentPage, state.hasMore)
+    private fun syncAds(updatedAds: Collection<AdItem>) {
+        val updatedById = updatedAds.associateBy { it.id }
+
+        _uiState.update { state ->
+            state.copy(
+                ads = if (updatedById.isEmpty()) state.ads else state.ads.replaceAds(updatedById),
+                statsOverview = currentStatsOverview()
+            )
+        }
+
+        if (updatedById.isEmpty()) return
+
+        channelCache.keys.toList().forEach { channel ->
+            val cached = channelCache[channel] ?: return@forEach
+            channelCache[channel] = cached.copy(
+                ads = cached.ads.replaceAds(updatedById)
+            )
+        }
     }
+
+    private fun List<AdItem>.replaceAds(updatedById: Map<String, AdItem>): List<AdItem> {
+        var changed = false
+        val replacedAds = map { ad ->
+            updatedById[ad.id]?.also { changed = true } ?: ad
+        }
+        return if (changed) replacedAds else this
+    }
+
+    private fun currentStatsOverview() = MockAdRepository.getStatsOverview()
 
     private fun saveChannelCache(
         channel: AdChannel,
