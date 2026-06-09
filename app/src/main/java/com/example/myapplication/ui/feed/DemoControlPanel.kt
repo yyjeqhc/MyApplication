@@ -36,7 +36,7 @@ fun DemoControlPanel(
                 onClick = onToggleVisibility,
                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
                 colors = ButtonDefaults.textButtonColors(
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.62f)
                 )
             ) {
                 Text(
@@ -54,21 +54,22 @@ fun DemoControlPanel(
                     .padding(horizontal = 16.dp, vertical = 4.dp),
                 shape = RoundedCornerShape(8.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Demo 控制面板",
+                        text = "调试面板",
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
 
                     Text(
-                        text = "快速切换页面状态进行测试",
+                        text = "用于验收空态、错误态和分页状态",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -116,7 +117,7 @@ fun DemoControlPanel(
 
                     // 说明文字
                     Text(
-                        text = "💡 正常：显示广告列表\n📭 空态：无数据状态\n😞 错误：模拟加载失败\n🔄 重置：恢复初始数据和分页",
+                        text = "正常：显示广告列表\n空态：无数据状态\n错误：模拟加载失败\n重置：恢复初始数据和分页",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 18.sp

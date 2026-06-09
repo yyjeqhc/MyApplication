@@ -24,9 +24,9 @@ fun SkeletonCard(
 ) {
     // 闪烁动画
     val shimmerColors = listOf(
-        Color.LightGray.copy(alpha = 0.6f),
-        Color.LightGray.copy(alpha = 0.2f),
-        Color.LightGray.copy(alpha = 0.6f)
+        Color(0xFFE3E5EA).copy(alpha = 0.72f),
+        Color(0xFFF4F5F7).copy(alpha = 0.86f),
+        Color(0xFFE3E5EA).copy(alpha = 0.72f)
     )
 
     val transition = rememberInfiniteTransition(label = "shimmer")
@@ -56,8 +56,8 @@ private fun SkeletonCardImpl(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(14.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column {
             // 图片占位
@@ -151,9 +151,9 @@ fun SmallImageSkeletonCard(
     modifier: Modifier = Modifier
 ) {
     val shimmerColors = listOf(
-        Color.LightGray.copy(alpha = 0.6f),
-        Color.LightGray.copy(alpha = 0.2f),
-        Color.LightGray.copy(alpha = 0.6f)
+        Color(0xFFE3E5EA).copy(alpha = 0.72f),
+        Color(0xFFF4F5F7).copy(alpha = 0.86f),
+        Color(0xFFE3E5EA).copy(alpha = 0.72f)
     )
 
     val transition = rememberInfiniteTransition(label = "shimmer_small")
@@ -175,8 +175,8 @@ fun SmallImageSkeletonCard(
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(14.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
             modifier = Modifier.padding(12.dp)

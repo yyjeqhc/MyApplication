@@ -42,11 +42,14 @@ fun SmallImageAdCard(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier.padding(14.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth()
@@ -54,8 +57,8 @@ fun SmallImageAdCard(
                 // 左侧小图占位
                 Box(
                     modifier = Modifier
-                        .size(100.dp)
-                        .clip(RoundedCornerShape(8.dp))
+                        .size(96.dp)
+                        .clip(RoundedCornerShape(10.dp))
                         .background(
                             brush = Brush.linearGradient(
                                 colors = listOf(
@@ -104,11 +107,11 @@ fun SmallImageAdCard(
                     // 品牌名称
                     if (ad.brandName.isNotEmpty()) {
                         Text(
-                            text = ad.brandName,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Medium
-                        )
+                        text = ad.brandName,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold
+                    )
                         Spacer(modifier = Modifier.height(2.dp))
                     }
 
@@ -116,7 +119,7 @@ fun SmallImageAdCard(
                     Text(
                         text = ad.title,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.SemiBold,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -157,12 +160,12 @@ fun SmallImageAdCard(
                         imageVector = if (ad.liked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                         contentDescription = "点赞",
                         tint = if (ad.liked) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = formatCount(ad.likeCount),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -176,12 +179,12 @@ fun SmallImageAdCard(
                         imageVector = if (ad.favorited) Icons.Default.Star else Icons.Default.StarBorder,
                         contentDescription = "收藏",
                         tint = if (ad.favorited) Color(0xFFFFB800) else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "收藏",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -195,12 +198,12 @@ fun SmallImageAdCard(
                         imageVector = Icons.Default.Share,
                         contentDescription = "分享",
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "分享",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

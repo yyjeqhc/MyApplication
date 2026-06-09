@@ -40,15 +40,18 @@ fun LargeImageAdCard(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column {
             // 大图占位区域
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .height(188.dp)
                     .background(
                         brush = Brush.linearGradient(
                             colors = listOf(
@@ -61,9 +64,9 @@ fun LargeImageAdCard(
             ) {
                 // 图片占位文字
                 Text(
-                    text = "🖼️ 大图广告",
+                    text = "广告封面",
                     color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     modifier = Modifier.align(Alignment.Center)
                 )
 
@@ -74,8 +77,8 @@ fun LargeImageAdCard(
                             .align(Alignment.TopStart)
                             .padding(8.dp)
                             .background(
-                                color = Color.Black.copy(alpha = 0.5f),
-                                shape = RoundedCornerShape(4.dp)
+                                color = Color.Black.copy(alpha = 0.42f),
+                                shape = RoundedCornerShape(6.dp)
                             )
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
@@ -106,7 +109,7 @@ fun LargeImageAdCard(
 
             // 内容区域
             Column(
-                modifier = Modifier.padding(12.dp)
+                modifier = Modifier.padding(14.dp)
             ) {
                 // 品牌名称
                 if (ad.brandName.isNotEmpty()) {
@@ -114,7 +117,7 @@ fun LargeImageAdCard(
                         text = ad.brandName,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.SemiBold
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                 }
@@ -123,7 +126,7 @@ fun LargeImageAdCard(
                 Text(
                     text = ad.title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -150,12 +153,17 @@ fun LargeImageAdCard(
                 // CTA 按钮
                 Button(
                     onClick = onClick,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(38.dp),
+                    shape = RoundedCornerShape(9.dp)
                 ) {
                     Text(
                         text = ad.ctaText,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
@@ -176,14 +184,14 @@ fun LargeImageAdCard(
                             imageVector = if (ad.liked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = "点赞",
                             tint = if (ad.liked) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = formatCount(ad.likeCount),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     }
 
                     // 收藏
@@ -195,14 +203,14 @@ fun LargeImageAdCard(
                             imageVector = if (ad.favorited) Icons.Default.Star else Icons.Default.StarBorder,
                             contentDescription = "收藏",
                             tint = if (ad.favorited) Color(0xFFFFB800) else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "收藏",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     }
 
                     // 分享
@@ -214,14 +222,14 @@ fun LargeImageAdCard(
                             imageVector = Icons.Default.Share,
                             contentDescription = "分享",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "分享",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     }
                 }
             }

@@ -1,15 +1,20 @@
 package com.example.myapplication.ui.feed
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -20,18 +25,35 @@ import androidx.compose.ui.unit.sp
 fun AdTagChip(
     tag: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selected: Boolean = false
 ) {
     AssistChip(
         onClick = onClick,
         label = {
             Text(
                 text = tag,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium
+                fontSize = 11.sp,
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         },
-        modifier = modifier.height(28.dp)
+        modifier = modifier.height(26.dp),
+        shape = RoundedCornerShape(13.dp),
+        colors = AssistChipDefaults.assistChipColors(
+            containerColor = if (selected) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
+            },
+            labelColor = if (selected) {
+                MaterialTheme.colorScheme.onPrimaryContainer
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            }
+        ),
+        border = null
     )
 }
 
@@ -42,18 +64,48 @@ fun AdTagRow(
     modifier: Modifier = Modifier,
     maxTags: Int = tags.size
 ) {
+    val visibleTags = tags.take(maxTags)
+    val overflowCount = (tags.size - visibleTags.size).coerceAtLeast(0)
+
     Row(
         modifier = modifier
             .horizontalScroll(rememberScrollState())
             .padding(vertical = 2.dp),
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        tags.take(maxTags).forEach { tag ->
+        visibleTags.forEach { tag ->
             AdTagChip(
                 tag = tag,
                 onClick = { onTagClick(tag) }
             )
         }
+        if (overflowCount > 0) {
+            TagOverflowChip(count = overflowCount)
+        }
+    }
+}
+
+@Composable
+private fun TagOverflowChip(
+    count: Int,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .height(26.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+                shape = RoundedCornerShape(13.dp)
+            )
+            .padding(horizontal = 9.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "+$count",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
@@ -74,9 +126,10 @@ fun AiSummaryText(
     Text(
         text = summary,
         modifier = modifier,
-        style = MaterialTheme.typography.bodyMedium,
+        style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         maxLines = maxLines,
-        overflow = TextOverflow.Ellipsis
+        overflow = TextOverflow.Ellipsis,
+        lineHeight = 18.sp
     )
 }

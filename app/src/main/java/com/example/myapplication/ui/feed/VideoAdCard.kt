@@ -43,15 +43,18 @@ fun VideoAdCard(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column {
             // 视频占位区域
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
+                    .height(176.dp)
                     .background(
                         brush = Brush.linearGradient(
                             colors = listOf(
@@ -70,25 +73,25 @@ fun VideoAdCard(
                     // 播放按钮
                     Box(
                         modifier = Modifier
-                            .size(56.dp)
+                            .size(54.dp)
                             .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.2f)),
+                            .background(Color.White.copy(alpha = 0.18f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.PlayArrow,
                             contentDescription = "播放",
                             tint = Color.White,
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(30.dp)
                         )
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "🎬 视频广告",
+                        text = "视频广告",
                         color = Color.White.copy(alpha = 0.7f),
-                        fontSize = 13.sp
+                        fontSize = 12.sp
                     )
                 }
 
@@ -99,8 +102,8 @@ fun VideoAdCard(
                             .align(Alignment.TopStart)
                             .padding(8.dp)
                             .background(
-                                color = Color.Black.copy(alpha = 0.5f),
-                                shape = RoundedCornerShape(4.dp)
+                                color = Color.Black.copy(alpha = 0.42f),
+                                shape = RoundedCornerShape(6.dp)
                             )
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
@@ -124,7 +127,7 @@ fun VideoAdCard(
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                 ) {
                     Text(
-                        text = "00:30",
+                        text = ad.videoDuration.ifBlank { "00:30" },
                         color = Color.White,
                         fontSize = 11.sp
                     )
@@ -133,7 +136,7 @@ fun VideoAdCard(
 
             // 内容区域
             Column(
-                modifier = Modifier.padding(12.dp)
+                modifier = Modifier.padding(14.dp)
             ) {
                 // 品牌名称
                 if (ad.brandName.isNotEmpty()) {
@@ -141,7 +144,7 @@ fun VideoAdCard(
                         text = ad.brandName,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.SemiBold
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                 }
@@ -150,7 +153,7 @@ fun VideoAdCard(
                 Text(
                     text = ad.title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -177,12 +180,17 @@ fun VideoAdCard(
                 // CTA 按钮
                 Button(
                     onClick = onClick,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(38.dp),
+                    shape = RoundedCornerShape(9.dp)
                 ) {
                     Text(
                         text = ad.ctaText,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
@@ -203,12 +211,12 @@ fun VideoAdCard(
                             imageVector = if (ad.liked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = "点赞",
                             tint = if (ad.liked) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = formatCount(ad.likeCount),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -222,12 +230,12 @@ fun VideoAdCard(
                             imageVector = if (ad.favorited) Icons.Default.Star else Icons.Default.StarBorder,
                             contentDescription = "收藏",
                             tint = if (ad.favorited) Color(0xFFFFB800) else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "收藏",
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -241,12 +249,12 @@ fun VideoAdCard(
                             imageVector = Icons.Default.Share,
                             contentDescription = "分享",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "分享",
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
