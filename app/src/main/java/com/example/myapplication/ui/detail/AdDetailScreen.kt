@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.example.myapplication.model.AdCardType
 import com.example.myapplication.model.AdChannel
 import com.example.myapplication.model.AdItem
+import com.example.myapplication.ui.common.AssetImage
 import com.example.myapplication.ui.common.showSingleToast
 import com.example.myapplication.ui.feed.AdTagRow
 import com.example.myapplication.ui.feed.formatCount
@@ -687,16 +688,33 @@ private fun VideoDetailHero(
         modifier = modifier
             .fillMaxWidth()
             .height(260.dp)
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        Color(0xFF111827),
-                        Color(0xFF263244),
-                        Color(0xFF111827)
-                    )
-                )
-            )
     ) {
+        AssetImage(
+            assetPath = ad.imageAsset,
+            contentDescription = ad.title,
+            modifier = Modifier.matchParentSize()
+        ) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color(0xFF111827),
+                                Color(0xFF263244),
+                                Color(0xFF111827)
+                            )
+                        )
+                    )
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(Color.Black.copy(alpha = 0.28f))
+        )
+
         DetailHeroBadge(
             text = "视频广告",
             modifier = Modifier
@@ -762,38 +780,63 @@ private fun LargeImageDetailHero(
         modifier = modifier
             .fillMaxWidth()
             .height(280.dp)
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        Color(0xFF4F46E5),
-                        Color(0xFF7C3AED),
-                        Color(0xFFDB2777)
+    ) {
+        AssetImage(
+            assetPath = ad.imageAsset,
+            contentDescription = ad.title,
+            modifier = Modifier.matchParentSize()
+        ) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color(0xFF4F46E5),
+                                Color(0xFF7C3AED),
+                                Color(0xFFDB2777)
+                            )
+                        )
+                    )
+            )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(112.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(Color.White.copy(alpha = 0.2f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Image,
+                    contentDescription = "商品图片",
+                    tint = Color.White,
+                    modifier = Modifier.size(54.dp)
+                )
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp)
+                .align(Alignment.BottomCenter)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            Color.Black.copy(alpha = 0.62f)
+                        )
                     )
                 )
-            )
-    ) {
+        )
+
         DetailHeroBadge(
             text = "图文广告",
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(16.dp)
         )
-
-        Box(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .size(112.dp)
-                .clip(RoundedCornerShape(24.dp))
-                .background(Color.White.copy(alpha = 0.2f)),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.Image,
-                contentDescription = "商品图片",
-                tint = Color.White,
-                modifier = Modifier.size(54.dp)
-            )
-        }
 
         Column(
             modifier = Modifier
@@ -843,19 +886,26 @@ private fun SmallImageDetailHero(
             modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
+            AssetImage(
+                assetPath = ad.imageAsset,
+                contentDescription = ad.title,
                 modifier = Modifier
                     .size(92.dp)
                     .clip(RoundedCornerShape(18.dp))
-                    .background(Color.White.copy(alpha = 0.22f)),
-                contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Image,
-                    contentDescription = "图文图片",
-                    tint = Color.White,
-                    modifier = Modifier.size(46.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(Color.White.copy(alpha = 0.22f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Image,
+                        contentDescription = "图文图片",
+                        tint = Color.White,
+                        modifier = Modifier.size(46.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(18.dp))

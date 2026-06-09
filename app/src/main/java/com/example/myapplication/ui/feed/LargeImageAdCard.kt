@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.model.AdItem
+import com.example.myapplication.ui.common.AssetImage
 
 /**
  * 大图广告卡片
@@ -47,28 +48,37 @@ fun LargeImageAdCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column {
-            // 大图占位区域
+            // 大图媒体区域
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(188.dp)
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                Color(0xFF6366F1),
-                                Color(0xFF8B5CF6),
-                                Color(0xFFA78BFA)
-                            )
-                        )
-                    )
             ) {
-                // 图片占位文字
-                Text(
-                    text = "广告封面",
-                    color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 14.sp,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                AssetImage(
+                    assetPath = ad.imageAsset,
+                    contentDescription = ad.title,
+                    modifier = Modifier.matchParentSize()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(
+                                        Color(0xFF6366F1),
+                                        Color(0xFF8B5CF6),
+                                        Color(0xFFA78BFA)
+                                    )
+                                )
+                            )
+                    )
+                    Text(
+                        text = "广告封面",
+                        color = Color.White.copy(alpha = 0.8f),
+                        fontSize = 14.sp,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
 
                 // 广告标识
                 if (ad.isAd) {

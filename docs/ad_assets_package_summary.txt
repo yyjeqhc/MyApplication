@@ -1,0 +1,12 @@
+ad asset package summary
+image_count: 50
+image_dir: /mnt/data/ad_assets_package/images
+total_image_size_bytes: 9636378
+total_image_size_mb: 9.19
+min_image_size_kb: 78.1
+max_image_size_kb: 289.6
+width_range: 1200-1200
+video_candidate_count: 10
+modified_android_code: no
+modified_mock_ads_json: no
+git_commit: not_performed

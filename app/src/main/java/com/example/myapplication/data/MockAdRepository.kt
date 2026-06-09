@@ -355,6 +355,7 @@ object MockAdRepository {
             ),
             cardType = cardType,
             imageUrl = optString("imageUrl"),
+            imageAsset = optString("imageAsset"),
             videoUrl = optString(
                 "videoUrl",
                 if (cardType == AdCardType.VIDEO && videoDuration.isNotBlank()) {

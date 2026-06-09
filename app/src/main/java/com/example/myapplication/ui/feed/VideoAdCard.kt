@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.model.AdItem
+import com.example.myapplication.ui.common.AssetImage
 
 /**
  * 视频广告卡片
@@ -50,21 +51,38 @@ fun VideoAdCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column {
-            // 视频占位区域
+            // 视频封面区域
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(176.dp)
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                Color(0xFF1F2937),
-                                Color(0xFF374151),
-                                Color(0xFF4B5563)
-                            )
-                        )
-                    )
             ) {
+                AssetImage(
+                    assetPath = ad.imageAsset,
+                    contentDescription = ad.title,
+                    modifier = Modifier.matchParentSize()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(
+                                        Color(0xFF1F2937),
+                                        Color(0xFF374151),
+                                        Color(0xFF4B5563)
+                                    )
+                                )
+                            )
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(Color.Black.copy(alpha = 0.22f))
+                )
+
                 // 视频图标占位
                 Column(
                     modifier = Modifier.align(Alignment.Center),

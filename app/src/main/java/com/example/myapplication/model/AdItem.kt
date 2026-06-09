@@ -23,6 +23,9 @@ data class AdItem(
     /** 图片链接（第一阶段为占位符） */
     val imageUrl: String,
 
+    /** 本地 assets 图片路径，如 ad_images/example.jpg */
+    val imageAsset: String = "",
+
     /** 视频链接（第一阶段为占位符） */
     val videoUrl: String,
 

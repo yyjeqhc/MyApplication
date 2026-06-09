@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.model.AdItem
+import com.example.myapplication.ui.common.AssetImage
 
 /**
  * 小图广告卡片
@@ -54,28 +55,40 @@ fun SmallImageAdCard(
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // 左侧小图占位
+                // 左侧小图媒体
                 Box(
                     modifier = Modifier
                         .size(96.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(
-                                    Color(0xFF10B981),
-                                    Color(0xFF34D399),
-                                    Color(0xFF6EE7B7)
-                                )
-                            )
-                        ),
+                        .clip(RoundedCornerShape(10.dp)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Image,
-                        contentDescription = "图片",
-                        tint = Color.White.copy(alpha = 0.8f),
-                        modifier = Modifier.size(36.dp)
-                    )
+                    AssetImage(
+                        assetPath = ad.imageAsset,
+                        contentDescription = ad.title,
+                        modifier = Modifier.matchParentSize()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .background(
+                                    brush = Brush.linearGradient(
+                                        colors = listOf(
+                                            Color(0xFF10B981),
+                                            Color(0xFF34D399),
+                                            Color(0xFF6EE7B7)
+                                        )
+                                    )
+                                )
+                        )
+                        Icon(
+                            imageVector = Icons.Default.Image,
+                            contentDescription = "图片",
+                            tint = Color.White.copy(alpha = 0.8f),
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(36.dp)
+                        )
+                    }
 
                     // 广告标识
                     if (ad.isAd) {
