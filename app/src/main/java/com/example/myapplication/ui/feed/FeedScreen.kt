@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.model.AdChannel
+import com.example.myapplication.model.AdItem
 import com.example.myapplication.model.FeedListState
 import com.example.myapplication.model.FeedUiState
 import com.example.myapplication.ui.common.showSingleToast
@@ -74,17 +75,20 @@ fun FeedScreen(
     val latestSelectedChannel by rememberUpdatedState(uiState.selectedChannel)
     val latestOnChannelSelect by rememberUpdatedState(onChannelSelect)
     val selectedListState = listStateForChannel(uiState.selectedChannel)
+    val latestSelectedListState by rememberUpdatedState(selectedListState)
 
     // 控制面板显示状态
     var isControlPanelVisible by remember { mutableStateOf(false) }
 
-    val visibleAds = uiState.filteredAds
+    val visibleAds = remember(uiState.ads, uiState.selectedTag) { uiState.filteredAds }
     val visibleAdIds = remember(visibleAds) { visibleAds.map { it.id } }
     val visibleAdIdSet = remember(visibleAdIds) { visibleAdIds.toSet() }
 
     // 监听滚动位置，触发加载更多
     val shouldLoadMore = remember(
         selectedListState,
+        uiState.listState,
+        uiState.isRefreshing,
         uiState.isLoadingMore,
         uiState.hasMore,
         visibleAds.size
@@ -92,7 +96,10 @@ fun FeedScreen(
         derivedStateOf {
             val lastVisibleItem = selectedListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
             val totalItems = selectedListState.layoutInfo.totalItemsCount
-            visibleAds.isNotEmpty() &&
+            uiState.listState is FeedListState.Success &&
+                !uiState.isRefreshing &&
+                totalItems > 0 &&
+                visibleAds.isNotEmpty() &&
                 lastVisibleItem >= totalItems - 3 &&
                 !uiState.isLoadingMore &&
                 uiState.hasMore
@@ -145,6 +152,12 @@ fun FeedScreen(
         LaunchedEffect(message) {
             showSingleToast(context, message)
             onFeedbackShown()
+        }
+    }
+
+    LaunchedEffect(uiState.refreshCompletedEventId) {
+        if (uiState.refreshCompletedEventId > 0) {
+            latestSelectedListState.scrollToItem(0)
         }
     }
 
@@ -221,8 +234,12 @@ fun FeedScreen(
             val pageChannel = channels[page]
             if (pageChannel == uiState.selectedChannel) {
                 FeedPageContent(
-                    uiState = uiState,
+                    listStateStatus = uiState.listState,
                     visibleAds = visibleAds,
+                    selectedTag = uiState.selectedTag,
+                    isRefreshing = uiState.isRefreshing,
+                    isLoadingMore = uiState.isLoadingMore,
+                    hasMore = uiState.hasMore,
                     listState = listStateForChannel(pageChannel),
                     onAdClick = onAdClick,
                     onLikeClick = onLikeClick,
@@ -234,6 +251,28 @@ fun FeedScreen(
                     onTagClick = onTagClick,
                     onClearTagFilter = onClearTagFilter,
                     onRefresh = onRefresh,
+                    onRetry = onRetry
+                )
+            } else if (uiState.channelSnapshots.containsKey(pageChannel)) {
+                val snapshot = uiState.channelSnapshots.getValue(pageChannel)
+                FeedPageContent(
+                    listStateStatus = snapshot.listState,
+                    visibleAds = snapshot.ads,
+                    selectedTag = null,
+                    isRefreshing = false,
+                    isLoadingMore = false,
+                    hasMore = snapshot.hasMore,
+                    listState = listStateForChannel(pageChannel),
+                    onAdClick = onAdClick,
+                    onLikeClick = onLikeClick,
+                    onFavoriteClick = onFavoriteClick,
+                    onShareClick = {
+                        onShareClick(it)
+                        showSingleToast(context, "已记录分享")
+                    },
+                    onTagClick = onTagClick,
+                    onClearTagFilter = onClearTagFilter,
+                    onRefresh = {},
                     onRetry = onRetry
                 )
             } else {
@@ -254,8 +293,12 @@ fun FeedScreen(
 
 @Composable
 private fun FeedPageContent(
-    uiState: FeedUiState,
-    visibleAds: List<com.example.myapplication.model.AdItem>,
+    listStateStatus: FeedListState,
+    visibleAds: List<AdItem>,
+    selectedTag: String?,
+    isRefreshing: Boolean,
+    isLoadingMore: Boolean,
+    hasMore: Boolean,
     listState: LazyListState,
     onAdClick: (String) -> Unit,
     onLikeClick: (String) -> Unit,
@@ -266,13 +309,13 @@ private fun FeedPageContent(
     onRefresh: () -> Unit,
     onRetry: () -> Unit
 ) {
-    when (uiState.listState) {
+    when (listStateStatus) {
         is FeedListState.Loading -> {
             SkeletonLoadingState()
         }
         is FeedListState.Error -> {
             ErrorState(
-                message = uiState.listState.message,
+                message = listStateStatus.message,
                 onRetry = onRetry
             )
         }
@@ -281,11 +324,11 @@ private fun FeedPageContent(
         }
         is FeedListState.Success -> {
             PullToRefreshBox(
-                isRefreshing = uiState.isRefreshing,
+                isRefreshing = isRefreshing,
                 onRefresh = onRefresh,
                 modifier = Modifier.fillMaxSize()
             ) {
-                if (uiState.isRefreshing) {
+                if (isRefreshing) {
                     LinearProgressIndicator(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -304,7 +347,7 @@ private fun FeedPageContent(
                     ),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    uiState.selectedTag?.let { tag ->
+                    selectedTag?.let { tag ->
                         item(key = "tag_filter") {
                             ActiveTagFilterBar(
                                 tag = tag,
@@ -314,7 +357,7 @@ private fun FeedPageContent(
                         }
                     }
 
-                    if (uiState.isRefreshing) {
+                    if (isRefreshing) {
                         item {
                             Box(
                                 modifier = Modifier
@@ -342,7 +385,8 @@ private fun FeedPageContent(
 
                     items(
                         items = visibleAds,
-                        key = { it.id }
+                        key = { it.id },
+                        contentType = { it.cardType }
                     ) { ad ->
                         AdFeedCard(
                             ad = ad,
@@ -354,7 +398,7 @@ private fun FeedPageContent(
                         )
                     }
 
-                    if (uiState.selectedTag != null && visibleAds.isEmpty()) {
+                    if (selectedTag != null && visibleAds.isEmpty()) {
                         item(key = "empty_filter") {
                             EmptyFilterState(onClear = onClearTagFilter)
                         }
@@ -362,8 +406,8 @@ private fun FeedPageContent(
 
                     item {
                         LoadMoreIndicator(
-                            isLoading = uiState.isLoadingMore,
-                            hasMore = uiState.hasMore
+                            isLoading = isLoadingMore,
+                            hasMore = hasMore
                         )
                     }
                 }

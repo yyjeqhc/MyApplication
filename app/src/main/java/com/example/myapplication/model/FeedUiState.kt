@@ -35,6 +35,12 @@ data class FeedUiState(
     /** 一次性轻量提示信息（null 表示无提示） */
     val feedbackMessage: String? = null,
 
+    /** 下拉刷新完成事件 id，用于 UI 一次性滚回顶部 */
+    val refreshCompletedEventId: Int = 0,
+
+    /** 各频道已加载快照，用于 Pager 直接展示缓存页 */
+    val channelSnapshots: Map<AdChannel, FeedChannelSnapshot> = emptyMap(),
+
     /** 全局本地统计总览（调试面板默认隐藏） */
     val statsOverview: AdStatsOverview = AdStatsOverview()
 ) {
@@ -44,6 +50,13 @@ data class FeedUiState(
             ads.filter { ad -> tag in ad.tags }
         } ?: ads
 }
+
+data class FeedChannelSnapshot(
+    val ads: List<AdItem> = emptyList(),
+    val listState: FeedListState = FeedListState.Loading,
+    val currentPage: Int = 1,
+    val hasMore: Boolean = true
+)
 
 /**
  * 本地埋点总览，仅基于当前 App 进程内的 mock 数据计算。
