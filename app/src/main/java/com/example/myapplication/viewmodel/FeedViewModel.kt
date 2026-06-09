@@ -301,6 +301,20 @@ class FeedViewModel(
     }
 
     /**
+     * 对话式搜索的本地规则入口。
+     */
+    fun searchAds(query: String): List<AdItem> {
+        return MockAdRepository.searchAds(query)
+    }
+
+    /**
+     * 从完整本地数据集中取最新广告状态，供搜索详情页使用。
+     */
+    fun getAdById(adId: String): AdItem? {
+        return MockAdRepository.getAdById(adId)
+    }
+
+    /**
      * 切换错误模拟（用于测试）
      */
     fun toggleErrorSimulation() {

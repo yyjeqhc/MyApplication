@@ -2,11 +2,14 @@ package com.example.myapplication.ui.feed
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
@@ -19,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.model.AdChannel
 import com.example.myapplication.model.FeedListState
 import com.example.myapplication.model.FeedUiState
+
+private const val SHOW_DEBUG_PANEL = false
 
 /**
  * 信息流主页面
@@ -40,6 +45,7 @@ fun FeedScreen(
     onLoadMore: () -> Unit,
     onRetry: () -> Unit,
     onClearError: () -> Unit,
+    onSearchClick: () -> Unit,
     onSimulateNormal: () -> Unit,
     onSimulateEmpty: () -> Unit,
     onSimulateError: () -> Unit,
@@ -124,15 +130,19 @@ fun FeedScreen(
             }
         }
 
+        SearchEntry(onClick = onSearchClick)
+
         // Demo 控制面板
-        DemoControlPanel(
-            isVisible = isControlPanelVisible,
-            onToggleVisibility = { isControlPanelVisible = !isControlPanelVisible },
-            onSimulateNormal = onSimulateNormal,
-            onSimulateEmpty = onSimulateEmpty,
-            onSimulateError = onSimulateError,
-            onResetPagination = onResetPagination
-        )
+        if (SHOW_DEBUG_PANEL) {
+            DemoControlPanel(
+                isVisible = isControlPanelVisible,
+                onToggleVisibility = { isControlPanelVisible = !isControlPanelVisible },
+                onSimulateNormal = onSimulateNormal,
+                onSimulateEmpty = onSimulateEmpty,
+                onSimulateError = onSimulateError,
+                onResetPagination = onResetPagination
+            )
+        }
 
         // 内容区域
         when (uiState.listState) {
@@ -259,6 +269,38 @@ fun FeedScreen(
                 kotlinx.coroutines.delay(3000)
                 onClearError()
             }
+        }
+    }
+}
+
+@Composable
+private fun SearchEntry(
+    onClick: () -> Unit
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(horizontal = 14.dp, vertical = 10.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 9.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "搜索",
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "搜索你想看的广告...",
+                style = MaterialTheme.typography.bodySmall
+            )
         }
     }
 }

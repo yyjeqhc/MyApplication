@@ -136,6 +136,43 @@ object MockAdRepository {
         return _ads.count { it.channel == channel }
     }
 
+    /**
+     * 本地规则版自然语言搜索。
+     * 规则优先级：标签命中 > 频道词 > 标题/品牌/摘要等字段 contains 命中。
+     */
+    fun searchAds(query: String): List<AdItem> {
+        ensureInitialized()
+
+        val normalizedQuery = query.normalizeForSearch()
+        if (normalizedQuery.isBlank()) return emptyList()
+
+        val matchedTags = TAG_POOL.filter { tag ->
+            normalizedQuery.contains(tag.normalizeForSearch())
+        }
+        val matchedChannel = CHANNEL_KEYWORDS.firstNotNullOfOrNull { (channel, keywords) ->
+            channel.takeIf {
+                keywords.any { keyword -> normalizedQuery.contains(keyword.normalizeForSearch()) }
+            }
+        }
+        val freeKeywords = extractFreeKeywords(normalizedQuery, matchedTags, matchedChannel)
+
+        return _ads
+            .mapNotNull { ad ->
+                val score = ad.searchScore(
+                    matchedTags = matchedTags,
+                    matchedChannel = matchedChannel,
+                    freeKeywords = freeKeywords
+                )
+                if (score > 0) ad to score else null
+            }
+            .sortedWith(
+                compareByDescending<Pair<AdItem, Int>> { it.second }
+                    .thenByDescending { it.first.likeCount }
+                    .thenBy { it.first.id }
+            )
+            .map { it.first }
+    }
+
     private fun ensureInitialized() {
         if (!initialized) {
             replaceAds(defaultAds(), fromAssets = false)
@@ -268,6 +305,71 @@ object MockAdRepository {
         }
     }
 
+    private fun AdItem.searchScore(
+        matchedTags: List<String>,
+        matchedChannel: AdChannel?,
+        freeKeywords: List<String>
+    ): Int {
+        var score = 0
+
+        if (matchedChannel == channel) {
+            score += 5
+        }
+
+        matchedTags.forEach { tag ->
+            if (tag in tags) {
+                score += 10
+            } else if (category.contains(tag) || aiSummary.contains(tag) || summary.contains(tag)) {
+                score += 3
+            }
+        }
+
+        freeKeywords.forEach { keyword ->
+            score += when {
+                brandName.contains(keyword) || title.contains(keyword) -> 6
+                tags.any { it.contains(keyword) || keyword.contains(it) } -> 5
+                subtitle.contains(keyword) ||
+                    aiSummary.contains(keyword) ||
+                    category.contains(keyword) ||
+                    scene.contains(keyword) ||
+                    targetAudience.contains(keyword) -> 4
+                summary.contains(keyword) || recommendationReason.contains(keyword) -> 2
+                else -> 0
+            }
+        }
+
+        return score
+    }
+
+    private fun extractFreeKeywords(
+        normalizedQuery: String,
+        matchedTags: List<String>,
+        matchedChannel: AdChannel?
+    ): List<String> {
+        var remaining = normalizedQuery
+        matchedTags.forEach { tag ->
+            remaining = remaining.replace(tag.normalizeForSearch(), " ")
+        }
+        matchedChannel?.let { channel ->
+            CHANNEL_KEYWORDS[channel]?.forEach { keyword ->
+                remaining = remaining.replace(keyword.normalizeForSearch(), " ")
+            }
+        }
+        SEARCH_STOP_WORDS.forEach { stopWord ->
+            remaining = remaining.replace(stopWord, " ")
+        }
+
+        return remaining
+            .split(Regex("[\\s,，。.!！?？、；;：:]+"))
+            .map { it.trim() }
+            .filter { it.length >= 2 }
+            .distinct()
+    }
+
+    private fun String.normalizeForSearch(): String {
+        return trim().lowercase()
+    }
+
     private fun defaultAds(): List<AdItem> = listOf(
         AdItem(
             id = "fallback_featured_001",
@@ -350,5 +452,49 @@ object MockAdRepository {
         val currentPage: Int,
         val hasMore: Boolean,
         val totalCount: Int
+    )
+
+    private val TAG_POOL = listOf(
+        "运动",
+        "学生党",
+        "性价比",
+        "数码",
+        "美妆",
+        "通勤",
+        "外卖",
+        "家居",
+        "游戏",
+        "旅游",
+        "亲子",
+        "本地生活",
+        "优惠",
+        "轻奢",
+        "效率"
+    )
+
+    private val CHANNEL_KEYWORDS = mapOf(
+        AdChannel.FEATURED to listOf("精选", "推荐"),
+        AdChannel.ECOMMERCE to listOf("电商", "购物", "商城"),
+        AdChannel.LOCAL to listOf("本地", "附近", "到店", "周边", "本地生活")
+    )
+
+    private val SEARCH_STOP_WORDS = listOf(
+        "我想看",
+        "我想找",
+        "有没有",
+        "推荐",
+        "一些",
+        "适合",
+        "想看",
+        "想找",
+        "看看",
+        "广告",
+        "一个",
+        "一下",
+        "有",
+        "的",
+        "和",
+        "或",
+        "高"
     )
 }
