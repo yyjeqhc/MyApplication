@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
@@ -41,6 +42,7 @@ import kotlin.math.floor
 
 private const val SHOW_DEBUG_PANEL = false
 private const val REFRESH_FEEDBACK_DURATION_MS = 900L
+private const val FEED_VIDEO_AUTOPLAY_DELAY_MS = 900L
 
 /**
  * 信息流主页面
@@ -52,6 +54,7 @@ private const val REFRESH_FEEDBACK_DURATION_MS = 900L
 fun FeedScreen(
     uiState: FeedUiState,
     playingVideoAdId: String?,
+    manualPausedVideoAdIds: Set<String>,
     videoPlaybackPositions: Map<String, Long>,
     videoDurations: Map<String, Long>,
     videoSeekPositions: Map<String, Long>,
@@ -62,6 +65,9 @@ fun FeedScreen(
     onFavoriteClick: (String) -> Unit,
     onShareClick: (String) -> Unit,
     onVideoPlayToggle: (String) -> Unit,
+    onVideoAutoPlay: (String) -> Unit,
+    onVideoAutoPause: (String) -> Unit,
+    onVisibleFeedVideoIdsChanged: (List<String>) -> Unit,
     onVideoPlaybackUpdate: (String, Long, Long) -> Unit,
     onVideoPlaybackEnded: (String) -> Unit,
     onVideoSeek: (String, Long) -> Unit,
@@ -105,6 +111,12 @@ fun FeedScreen(
     val latestOnChannelSelect by rememberUpdatedState(onChannelSelect)
     val selectedListState = listStateForChannel(uiState.selectedChannel)
     val latestSelectedListState by rememberUpdatedState(selectedListState)
+    val latestPlayingVideoAdId by rememberUpdatedState(playingVideoAdId)
+    val latestManualPausedVideoAdIds by rememberUpdatedState(manualPausedVideoAdIds)
+    val latestOnVideoPlayToggle by rememberUpdatedState(onVideoPlayToggle)
+    val latestOnVideoAutoPlay by rememberUpdatedState(onVideoAutoPlay)
+    val latestOnVideoAutoPause by rememberUpdatedState(onVideoAutoPause)
+    val latestOnVisibleFeedVideoIdsChanged by rememberUpdatedState(onVisibleFeedVideoIdsChanged)
 
     // 控制面板显示状态
     var isControlPanelVisible by remember { mutableStateOf(false) }
@@ -114,6 +126,7 @@ fun FeedScreen(
     val visibleAds = remember(uiState.ads, uiState.selectedTag) { uiState.filteredAds }
     val visibleAdIds = remember(visibleAds) { visibleAds.map { it.id } }
     val visibleAdIdSet = remember(visibleAdIds) { visibleAdIds.toSet() }
+    val adsById = remember(visibleAds) { visibleAds.associateBy { it.id } }
 
     // 监听滚动位置，触发加载更多
     val shouldLoadMore = remember(
@@ -145,7 +158,7 @@ fun FeedScreen(
     }
 
     LaunchedEffect(uiState.selectedChannel) {
-        playingVideoAdId?.let(onVideoPlayToggle)
+        latestPlayingVideoAdId?.let(latestOnVideoAutoPause)
         if (pagerState.currentPage != selectedPage) {
             pagerState.animateScrollToPage(selectedPage)
         }
@@ -177,8 +190,45 @@ fun FeedScreen(
                 if (visibleIds.isNotEmpty()) {
                     onVisibleAdsChanged(visibleIds)
                 }
-                if (playingVideoAdId != null && playingVideoAdId !in visibleIds) {
-                    onVideoPlayToggle(playingVideoAdId)
+                val visibleVideoIds = visibleIds.filter { adsById[it]?.cardType == AdCardType.VIDEO }
+                latestOnVisibleFeedVideoIdsChanged(visibleVideoIds)
+                latestPlayingVideoAdId?.let { playingId ->
+                    if (playingId !in visibleIds) {
+                        latestOnVideoAutoPause(playingId)
+                    }
+                }
+            }
+    }
+
+    LaunchedEffect(uiState.isRefreshing) {
+        if (uiState.isRefreshing) {
+            latestPlayingVideoAdId?.let(latestOnVideoAutoPause)
+        }
+    }
+
+    LaunchedEffect(selectedListState, visibleAdIds, adsById) {
+        snapshotFlow {
+            selectFeedVideoAutoplayCandidate(
+                listState = selectedListState,
+                adsById = adsById,
+                manualPausedVideoAdIds = latestManualPausedVideoAdIds
+            )
+        }
+            .distinctUntilChanged()
+            .collect { candidateAdId ->
+                if (candidateAdId == null) return@collect
+                delay(FEED_VIDEO_AUTOPLAY_DELAY_MS)
+                val stableCandidateAdId = selectFeedVideoAutoplayCandidate(
+                    listState = selectedListState,
+                    adsById = adsById,
+                    manualPausedVideoAdIds = latestManualPausedVideoAdIds
+                )
+                if (
+                    stableCandidateAdId == candidateAdId &&
+                    latestPlayingVideoAdId != candidateAdId &&
+                    candidateAdId !in latestManualPausedVideoAdIds
+                ) {
+                    latestOnVideoAutoPlay(candidateAdId)
                 }
             }
     }
@@ -359,6 +409,49 @@ fun FeedScreen(
             }
         }
     }
+}
+
+private fun selectFeedVideoAutoplayCandidate(
+    listState: LazyListState,
+    adsById: Map<String, AdItem>,
+    manualPausedVideoAdIds: Set<String>
+): String? {
+    val layoutInfo = listState.layoutInfo
+    if (layoutInfo.visibleItemsInfo.isEmpty()) return null
+
+    val viewportCenter = (layoutInfo.viewportStartOffset + layoutInfo.viewportEndOffset) / 2
+    return layoutInfo.visibleItemsInfo
+        .mapNotNull { item ->
+            item.feedVideoCandidateDistance(
+                adsById = adsById,
+                manualPausedVideoAdIds = manualPausedVideoAdIds,
+                viewportCenter = viewportCenter
+            )
+        }
+        .minByOrNull { it.distanceToViewportCenter }
+        ?.adId
+}
+
+private data class FeedVideoCandidate(
+    val adId: String,
+    val distanceToViewportCenter: Int
+)
+
+private fun LazyListItemInfo.feedVideoCandidateDistance(
+    adsById: Map<String, AdItem>,
+    manualPausedVideoAdIds: Set<String>,
+    viewportCenter: Int
+): FeedVideoCandidate? {
+    val adId = key as? String ?: return null
+    val ad = adsById[adId] ?: return null
+    if (ad.cardType != AdCardType.VIDEO || ad.videoAsset.isBlank() || adId in manualPausedVideoAdIds) {
+        return null
+    }
+    val itemCenter = offset + size / 2
+    return FeedVideoCandidate(
+        adId = adId,
+        distanceToViewportCenter = kotlin.math.abs(itemCenter - viewportCenter)
+    )
 }
 
 private fun TabIndicatorScope.pagerTabIndicatorOffset(

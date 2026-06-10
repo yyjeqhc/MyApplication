@@ -62,6 +62,7 @@ fun AdApp(
     var hasSearched by remember { mutableStateOf(false) }
     var detailRefreshKey by remember { mutableIntStateOf(0) }
     var playingFeedVideoAdId by remember { mutableStateOf<String?>(null) }
+    var manualPausedFeedVideoAdIds by remember { mutableStateOf<Set<String>>(emptySet()) }
     var detailAutoPlayVideoAdId by remember { mutableStateOf<String?>(null) }
     var videoPlaybackPositions by remember { mutableStateOf<Map<String, Long>>(emptyMap()) }
     var videoDurations by remember { mutableStateOf<Map<String, Long>>(emptyMap()) }
@@ -109,9 +110,7 @@ fun AdApp(
     // 点击广告卡片回调
     val onAdClick: (String) -> Unit = { adId ->
         detailAutoPlayVideoAdId = if (playingFeedVideoAdId == adId) adId else null
-        if (playingFeedVideoAdId == adId) {
-            playingFeedVideoAdId = null
-        }
+        playingFeedVideoAdId = null
         viewModel.recordClick(adId)
         refreshSearchResults()
         detailRefreshKey++
@@ -214,6 +213,7 @@ fun AdApp(
         FeedScreen(
             uiState = uiState,
             playingVideoAdId = playingFeedVideoAdId,
+            manualPausedVideoAdIds = manualPausedFeedVideoAdIds,
             videoPlaybackPositions = videoPlaybackPositions,
             videoDurations = videoDurations,
             videoSeekPositions = videoSeekPositions,
@@ -239,7 +239,27 @@ fun AdApp(
                 refreshSearchResults()
             },
             onVideoPlayToggle = { adId ->
-                playingFeedVideoAdId = if (playingFeedVideoAdId == adId) null else adId
+                if (playingFeedVideoAdId == adId) {
+                    playingFeedVideoAdId = null
+                    manualPausedFeedVideoAdIds = manualPausedFeedVideoAdIds + adId
+                } else {
+                    playingFeedVideoAdId = adId
+                    manualPausedFeedVideoAdIds = manualPausedFeedVideoAdIds - adId
+                }
+            },
+            onVideoAutoPlay = { adId ->
+                if (adId !in manualPausedFeedVideoAdIds) {
+                    playingFeedVideoAdId = adId
+                }
+            },
+            onVideoAutoPause = { adId ->
+                if (playingFeedVideoAdId == adId) {
+                    playingFeedVideoAdId = null
+                }
+            },
+            onVisibleFeedVideoIdsChanged = { visibleVideoIds ->
+                val visibleVideoIdSet = visibleVideoIds.toSet()
+                manualPausedFeedVideoAdIds = manualPausedFeedVideoAdIds.intersect(visibleVideoIdSet)
             },
             onVideoPlaybackUpdate = { adId, positionMs, durationMs ->
                 videoPlaybackPositions = videoPlaybackPositions + (adId to positionMs)
