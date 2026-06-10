@@ -48,6 +48,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
     // Material Icons Extended - 包含所有 Material 图标
     implementation("androidx.compose.material:material-icons-extended")
     // ViewModel Compose - 用于 viewModel() 函数

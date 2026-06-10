@@ -13,12 +13,18 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.model.AdCardType
 import com.example.myapplication.model.AdItem
 import com.example.myapplication.ui.common.showSingleToast
 import com.example.myapplication.ui.feed.AdFeedCard
@@ -246,6 +252,14 @@ private fun SearchResultList(
     onTagClick: (String) -> Unit,
     onShareClick: (String) -> Unit
 ) {
+    var playingVideoAdId by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(results) {
+        if (playingVideoAdId != null && results.none { it.id == playingVideoAdId }) {
+            playingVideoAdId = null
+        }
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
@@ -275,7 +289,16 @@ private fun SearchResultList(
                 onLikeClick = { onLikeClick(ad.id) },
                 onFavoriteClick = { onFavoriteClick(ad.id) },
                 onShareClick = { onShareClick(ad.id) },
-                onTagClick = onTagClick
+                onTagClick = onTagClick,
+                isVideoPlaying = ad.cardType == AdCardType.VIDEO && playingVideoAdId == ad.id,
+                onVideoClick = {
+                    playingVideoAdId = if (playingVideoAdId == ad.id) null else ad.id
+                },
+                onVideoError = {
+                    if (playingVideoAdId == ad.id) {
+                        playingVideoAdId = null
+                    }
+                }
             )
         }
     }

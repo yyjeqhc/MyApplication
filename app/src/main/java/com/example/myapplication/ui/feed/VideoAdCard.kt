@@ -8,12 +8,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.model.AdItem
 import com.example.myapplication.ui.common.AssetImage
+import com.example.myapplication.ui.common.LocalVideoPlayer
 
 /**
  * 视频广告卡片
@@ -38,8 +45,23 @@ fun VideoAdCard(
     onFavoriteClick: () -> Unit,
     onShareClick: () -> Unit,
     onTagClick: (String) -> Unit,
+    isPlaying: Boolean = false,
+    onVideoClick: () -> Unit = {},
+    onVideoError: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    var hasPlaybackError by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
+    var hasRequestedPlayback by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
+    val canPlayVideo = ad.videoAsset.isNotBlank() && !hasPlaybackError
+    val isActivelyPlaying = canPlayVideo && isPlaying
+    val shouldShowVideo = canPlayVideo && hasRequestedPlayback
+
+    LaunchedEffect(isPlaying) {
+        if (isPlaying) {
+            hasRequestedPlayback = true
+        }
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -56,25 +78,44 @@ fun VideoAdCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(176.dp)
+                    .clickable {
+                        if (canPlayVideo) {
+                            hasRequestedPlayback = true
+                            onVideoClick()
+                        }
+                    }
             ) {
-                AssetImage(
-                    assetPath = ad.imageAsset,
-                    contentDescription = ad.title,
-                    modifier = Modifier.matchParentSize()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .matchParentSize()
-                            .background(
-                                brush = Brush.linearGradient(
-                                    colors = listOf(
-                                        Color(0xFF1F2937),
-                                        Color(0xFF374151),
-                                        Color(0xFF4B5563)
+                if (shouldShowVideo) {
+                    LocalVideoPlayer(
+                        assetPath = ad.videoAsset,
+                        isPlaying = isPlaying,
+                        modifier = Modifier.matchParentSize(),
+                        onPlaybackError = {
+                            hasPlaybackError = true
+                            hasRequestedPlayback = false
+                            onVideoError()
+                        }
+                    )
+                } else {
+                    AssetImage(
+                        assetPath = ad.imageAsset,
+                        contentDescription = ad.title,
+                        modifier = Modifier.matchParentSize()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .background(
+                                    brush = Brush.linearGradient(
+                                        colors = listOf(
+                                            Color(0xFF1F2937),
+                                            Color(0xFF374151),
+                                            Color(0xFF4B5563)
+                                        )
                                     )
                                 )
-                            )
-                    )
+                        )
+                    }
                 }
 
                 Box(
@@ -97,8 +138,8 @@ fun VideoAdCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Default.PlayArrow,
-                            contentDescription = "播放",
+                            imageVector = if (isActivelyPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                            contentDescription = if (isActivelyPlaying) "暂停" else "播放",
                             tint = Color.White,
                             modifier = Modifier.size(30.dp)
                         )

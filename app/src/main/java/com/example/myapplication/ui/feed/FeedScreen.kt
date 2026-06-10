@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.model.AdCardType
 import com.example.myapplication.model.AdChannel
 import com.example.myapplication.model.AdItem
 import com.example.myapplication.model.FeedListState
@@ -100,6 +101,7 @@ fun FeedScreen(
     var isControlPanelVisible by remember { mutableStateOf(false) }
     var refreshFeedbackMessage by remember { mutableStateOf<String?>(null) }
     var refreshFeedbackToken by remember { mutableIntStateOf(0) }
+    var playingVideoAdId by remember { mutableStateOf<String?>(null) }
 
     val visibleAds = remember(uiState.ads, uiState.selectedTag) { uiState.filteredAds }
     val visibleAdIds = remember(visibleAds) { visibleAds.map { it.id } }
@@ -135,6 +137,7 @@ fun FeedScreen(
     }
 
     LaunchedEffect(uiState.selectedChannel) {
+        playingVideoAdId = null
         if (pagerState.currentPage != selectedPage) {
             pagerState.animateScrollToPage(selectedPage)
         }
@@ -165,6 +168,9 @@ fun FeedScreen(
             .collect { visibleIds ->
                 if (visibleIds.isNotEmpty()) {
                     onVisibleAdsChanged(visibleIds)
+                }
+                if (playingVideoAdId != null && playingVideoAdId !in visibleIds) {
+                    playingVideoAdId = null
                 }
             }
     }
@@ -288,6 +294,10 @@ fun FeedScreen(
                     },
                     onTagClick = onTagClick,
                     onClearTagFilter = onClearTagFilter,
+                    playingVideoAdId = playingVideoAdId,
+                    onVideoClick = { adId ->
+                        playingVideoAdId = if (playingVideoAdId == adId) null else adId
+                    },
                     onRefresh = onRefresh,
                     onRetry = onRetry
                 )
@@ -310,6 +320,8 @@ fun FeedScreen(
                     },
                     onTagClick = onTagClick,
                     onClearTagFilter = onClearTagFilter,
+                    playingVideoAdId = null,
+                    onVideoClick = {},
                     onRefresh = {},
                     onRetry = onRetry
                 )
@@ -426,6 +438,8 @@ private fun FeedPageContent(
     onShareClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
     onClearTagFilter: () -> Unit,
+    playingVideoAdId: String?,
+    onVideoClick: (String) -> Unit,
     onRefresh: () -> Unit,
     onRetry: () -> Unit
 ) {
@@ -514,7 +528,14 @@ private fun FeedPageContent(
                             onLikeClick = { onLikeClick(ad.id) },
                             onFavoriteClick = { onFavoriteClick(ad.id) },
                             onShareClick = { onShareClick(ad.id) },
-                            onTagClick = onTagClick
+                            onTagClick = onTagClick,
+                            isVideoPlaying = ad.cardType == AdCardType.VIDEO && playingVideoAdId == ad.id,
+                            onVideoClick = { onVideoClick(ad.id) },
+                            onVideoError = {
+                                if (playingVideoAdId == ad.id) {
+                                    onVideoClick(ad.id)
+                                }
+                            }
                         )
                     }
 

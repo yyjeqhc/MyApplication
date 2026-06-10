@@ -17,6 +17,9 @@ fun AdFeedCard(
     onFavoriteClick: () -> Unit,
     onShareClick: () -> Unit,
     onTagClick: (String) -> Unit,
+    isVideoPlaying: Boolean = false,
+    onVideoClick: () -> Unit = {},
+    onVideoError: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     when (ad.cardType) {
@@ -50,6 +53,9 @@ fun AdFeedCard(
                 onFavoriteClick = onFavoriteClick,
                 onShareClick = onShareClick,
                 onTagClick = onTagClick,
+                isPlaying = isVideoPlaying,
+                onVideoClick = onVideoClick,
+                onVideoError = onVideoError,
                 modifier = modifier
             )
         }

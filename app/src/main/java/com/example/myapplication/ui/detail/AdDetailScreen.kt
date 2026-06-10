@@ -2,6 +2,7 @@ package com.example.myapplication.ui.detail
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -12,6 +13,11 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,6 +32,7 @@ import com.example.myapplication.model.AdCardType
 import com.example.myapplication.model.AdChannel
 import com.example.myapplication.model.AdItem
 import com.example.myapplication.ui.common.AssetImage
+import com.example.myapplication.ui.common.LocalVideoPlayer
 import com.example.myapplication.ui.common.showSingleToast
 import com.example.myapplication.ui.feed.AdTagRow
 import com.example.myapplication.ui.feed.formatCount
@@ -684,29 +691,59 @@ private fun VideoDetailHero(
     ad: AdItem,
     modifier: Modifier = Modifier
 ) {
+    var isPlaying by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
+    var hasRequestedPlayback by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
+    var hasPlaybackError by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
+    val canPlayVideo = ad.videoAsset.isNotBlank() && !hasPlaybackError
+    val shouldShowVideo = canPlayVideo && hasRequestedPlayback
+
+    LaunchedEffect(hasPlaybackError) {
+        if (hasPlaybackError) {
+            isPlaying = false
+            hasRequestedPlayback = false
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(260.dp)
+            .clickable {
+                if (canPlayVideo) {
+                    hasRequestedPlayback = true
+                    isPlaying = !isPlaying
+                }
+            }
     ) {
-        AssetImage(
-            assetPath = ad.imageAsset,
-            contentDescription = ad.title,
-            modifier = Modifier.matchParentSize()
-        ) {
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                Color(0xFF111827),
-                                Color(0xFF263244),
-                                Color(0xFF111827)
+        if (shouldShowVideo) {
+            LocalVideoPlayer(
+                assetPath = ad.videoAsset,
+                isPlaying = isPlaying,
+                modifier = Modifier.matchParentSize(),
+                onPlaybackError = {
+                    hasPlaybackError = true
+                }
+            )
+        } else {
+            AssetImage(
+                assetPath = ad.imageAsset,
+                contentDescription = ad.title,
+                modifier = Modifier.matchParentSize()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    Color(0xFF111827),
+                                    Color(0xFF263244),
+                                    Color(0xFF111827)
+                                )
                             )
                         )
-                    )
-            )
+                )
+            }
         }
 
         Box(
@@ -731,8 +768,8 @@ private fun VideoDetailHero(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = Icons.Default.PlayArrow,
-                contentDescription = "播放",
+                imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                contentDescription = if (isPlaying) "暂停" else "播放",
                 tint = Color.White,
                 modifier = Modifier.size(48.dp)
             )

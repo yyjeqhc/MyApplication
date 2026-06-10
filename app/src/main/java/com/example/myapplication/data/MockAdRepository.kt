@@ -364,6 +364,7 @@ object MockAdRepository {
                     ""
                 }
             ),
+            videoAsset = optString("videoAsset"),
             imageType = optString("imageType"),
             videoDuration = videoDuration,
             tags = optStringArray("tags"),
@@ -547,6 +548,7 @@ object MockAdRepository {
             cardType = AdCardType.VIDEO,
             imageUrl = "",
             videoUrl = "",
+            videoAsset = "ad_videos/video_home_01.mp4",
             imageType = "gradient",
             videoDuration = "00:30",
             tags = listOf("本地生活", "优惠", "效率"),

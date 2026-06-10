@@ -29,6 +29,9 @@ data class AdItem(
     /** 视频链接（第一阶段为占位符） */
     val videoUrl: String,
 
+    /** 本地 assets 视频路径，如 ad_videos/example.mp4 */
+    val videoAsset: String = "",
+
     /** 图片展示类型（从 assets mock 数据读取，用于后续扩展） */
     val imageType: String = "",
 

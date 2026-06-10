@@ -2346,7 +2346,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_skincare_02.jpg"
+    "imageAsset": "ad_images/ecommerce_skincare_02.jpg",
+    "videoAsset": "ad_videos/video_coffee_01.mp4"
   },
   {
     "id": "featured_video_002",
@@ -2375,7 +2376,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_sportswear_01.jpg"
+    "imageAsset": "ad_images/ecommerce_sportswear_01.jpg",
+    "videoAsset": "ad_videos/video_digital_desk_01.mp4"
   },
   {
     "id": "featured_video_003",
@@ -2404,7 +2406,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_keyboard_02.jpg"
+    "imageAsset": "ad_images/ecommerce_keyboard_02.jpg",
+    "videoAsset": "ad_videos/video_gaming_01.mp4"
   },
   {
     "id": "featured_video_004",
@@ -2433,7 +2436,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_sportswear_02.jpg"
+    "imageAsset": "ad_images/ecommerce_sportswear_02.jpg",
+    "videoAsset": "ad_videos/video_running_01.mp4"
   },
   {
     "id": "featured_video_005",
@@ -5832,7 +5836,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_home_storage_02.jpg"
+    "imageAsset": "ad_images/ecommerce_home_storage_02.jpg",
+    "videoAsset": "ad_videos/video_home_01.mp4"
   },
   {
     "id": "ecommerce_video_002",
@@ -5861,7 +5866,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_study_desk_02.jpg"
+    "imageAsset": "ad_images/featured_study_desk_02.jpg",
+    "videoAsset": "ad_videos/video_fitness_01.mp4"
   },
   {
     "id": "ecommerce_video_003",
@@ -9317,7 +9323,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_badminton_02.jpg"
+    "imageAsset": "ad_images/local_badminton_02.jpg",
+    "videoAsset": "ad_videos/video_parent_child_01.mp4"
   },
   {
     "id": "local_video_002",
@@ -9404,7 +9411,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_coffee_01.jpg"
+    "imageAsset": "ad_images/local_coffee_01.jpg",
+    "videoAsset": "ad_videos/video_travel_01.mp4"
   },
   {
     "id": "local_video_005",
