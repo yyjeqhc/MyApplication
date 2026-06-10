@@ -54,6 +54,8 @@ fun FeedScreen(
     playingVideoAdId: String?,
     videoPlaybackPositions: Map<String, Long>,
     videoDurations: Map<String, Long>,
+    videoSeekPositions: Map<String, Long>,
+    videoSeekRequestIds: Map<String, Long>,
     listStateForChannel: (AdChannel) -> LazyListState,
     onAdClick: (String) -> Unit,
     onLikeClick: (String) -> Unit,
@@ -62,6 +64,7 @@ fun FeedScreen(
     onVideoPlayToggle: (String) -> Unit,
     onVideoPlaybackUpdate: (String, Long, Long) -> Unit,
     onVideoPlaybackEnded: (String) -> Unit,
+    onVideoSeek: (String, Long) -> Unit,
     onTagClick: (String) -> Unit,
     onClearTagFilter: () -> Unit,
     onChannelSelect: (AdChannel) -> Unit,
@@ -302,9 +305,12 @@ fun FeedScreen(
                     playingVideoAdId = playingVideoAdId,
                     videoPlaybackPositions = videoPlaybackPositions,
                     videoDurations = videoDurations,
+                    videoSeekPositions = videoSeekPositions,
+                    videoSeekRequestIds = videoSeekRequestIds,
                     onVideoClick = onVideoPlayToggle,
                     onVideoPlaybackUpdate = onVideoPlaybackUpdate,
                     onVideoPlaybackEnded = onVideoPlaybackEnded,
+                    onVideoSeek = onVideoSeek,
                     onRefresh = onRefresh,
                     onRetry = onRetry
                 )
@@ -330,9 +336,12 @@ fun FeedScreen(
                     playingVideoAdId = null,
                     videoPlaybackPositions = videoPlaybackPositions,
                     videoDurations = videoDurations,
+                    videoSeekPositions = videoSeekPositions,
+                    videoSeekRequestIds = videoSeekRequestIds,
                     onVideoClick = {},
                     onVideoPlaybackUpdate = onVideoPlaybackUpdate,
                     onVideoPlaybackEnded = onVideoPlaybackEnded,
+                    onVideoSeek = onVideoSeek,
                     onRefresh = {},
                     onRetry = onRetry
                 )
@@ -452,9 +461,12 @@ private fun FeedPageContent(
     playingVideoAdId: String?,
     videoPlaybackPositions: Map<String, Long>,
     videoDurations: Map<String, Long>,
+    videoSeekPositions: Map<String, Long>,
+    videoSeekRequestIds: Map<String, Long>,
     onVideoClick: (String) -> Unit,
     onVideoPlaybackUpdate: (String, Long, Long) -> Unit,
     onVideoPlaybackEnded: (String) -> Unit,
+    onVideoSeek: (String, Long) -> Unit,
     onRefresh: () -> Unit,
     onRetry: () -> Unit
 ) {
@@ -547,11 +559,14 @@ private fun FeedPageContent(
                             isVideoPlaying = ad.cardType == AdCardType.VIDEO && playingVideoAdId == ad.id,
                             videoPositionMs = videoPlaybackPositions[ad.id] ?: 0L,
                             videoDurationMs = videoDurations[ad.id] ?: 0L,
+                            videoSeekPositionMs = videoSeekPositions[ad.id] ?: 0L,
+                            videoSeekRequestId = videoSeekRequestIds[ad.id] ?: 0L,
                             onVideoClick = { onVideoClick(ad.id) },
                             onVideoPlaybackUpdate = { positionMs, durationMs ->
                                 onVideoPlaybackUpdate(ad.id, positionMs, durationMs)
                             },
                             onVideoPlaybackEnded = { onVideoPlaybackEnded(ad.id) },
+                            onVideoSeek = { positionMs -> onVideoSeek(ad.id, positionMs) },
                             onVideoError = {
                                 if (playingVideoAdId == ad.id) {
                                     onVideoClick(ad.id)

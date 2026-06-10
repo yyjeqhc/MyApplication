@@ -65,6 +65,8 @@ fun AdApp(
     var detailAutoPlayVideoAdId by remember { mutableStateOf<String?>(null) }
     var videoPlaybackPositions by remember { mutableStateOf<Map<String, Long>>(emptyMap()) }
     var videoDurations by remember { mutableStateOf<Map<String, Long>>(emptyMap()) }
+    var videoSeekPositions by remember { mutableStateOf<Map<String, Long>>(emptyMap()) }
+    var videoSeekRequestIds by remember { mutableStateOf<Map<String, Long>>(emptyMap()) }
 
     // 每个频道独立保存滚动状态，避免 Tab 切换后丢失位置
     val featuredListState = rememberLazyListState()
@@ -128,6 +130,8 @@ fun AdApp(
             ad = selectedAd,
             initialVideoPositionMs = videoPlaybackPositions[selectedAd.id] ?: 0L,
             initialVideoDurationMs = videoDurations[selectedAd.id] ?: 0L,
+            videoSeekPositionMs = videoSeekPositions[selectedAd.id] ?: 0L,
+            videoSeekRequestId = videoSeekRequestIds[selectedAd.id] ?: 0L,
             autoPlayVideo = detailAutoPlayVideoAdId == selectedAd.id,
             onVideoPlaybackUpdate = { positionMs, durationMs ->
                 videoPlaybackPositions = videoPlaybackPositions + (selectedAd.id to positionMs)
@@ -136,7 +140,17 @@ fun AdApp(
                 }
             },
             onVideoPlaybackEnded = {
-                videoPlaybackPositions = videoPlaybackPositions + (selectedAd.id to 0L)
+                val durationMs = videoDurations[selectedAd.id] ?: 0L
+                if (durationMs > 0L) {
+                    videoPlaybackPositions = videoPlaybackPositions + (selectedAd.id to durationMs)
+                }
+            },
+            onVideoSeek = { positionMs ->
+                videoPlaybackPositions = videoPlaybackPositions + (selectedAd.id to positionMs)
+                videoSeekPositions = videoSeekPositions + (selectedAd.id to positionMs)
+                videoSeekRequestIds = videoSeekRequestIds + (
+                    selectedAd.id to ((videoSeekRequestIds[selectedAd.id] ?: 0L) + 1L)
+                )
             },
             onBack = onBack,
             onLikeClick = {
@@ -202,6 +216,8 @@ fun AdApp(
             playingVideoAdId = playingFeedVideoAdId,
             videoPlaybackPositions = videoPlaybackPositions,
             videoDurations = videoDurations,
+            videoSeekPositions = videoSeekPositions,
+            videoSeekRequestIds = videoSeekRequestIds,
             listStateForChannel = { channel ->
                 when (channel) {
                     AdChannel.FEATURED -> featuredListState
@@ -235,7 +251,17 @@ fun AdApp(
                 if (playingFeedVideoAdId == adId) {
                     playingFeedVideoAdId = null
                 }
-                videoPlaybackPositions = videoPlaybackPositions + (adId to 0L)
+                val durationMs = videoDurations[adId] ?: 0L
+                if (durationMs > 0L) {
+                    videoPlaybackPositions = videoPlaybackPositions + (adId to durationMs)
+                }
+            },
+            onVideoSeek = { adId, positionMs ->
+                videoPlaybackPositions = videoPlaybackPositions + (adId to positionMs)
+                videoSeekPositions = videoSeekPositions + (adId to positionMs)
+                videoSeekRequestIds = videoSeekRequestIds + (
+                    adId to ((videoSeekRequestIds[adId] ?: 0L) + 1L)
+                )
             },
             onTagClick = {
                 viewModel.selectTag(it)

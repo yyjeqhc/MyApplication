@@ -31,7 +31,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 private const val LOCAL_VIDEO_PLAYER_TAG = "LocalVideoPlayer"
-private const val POSITION_UPDATE_INTERVAL_MS = 500L
+private const val POSITION_UPDATE_INTERVAL_MS = 250L
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -41,6 +41,8 @@ fun LocalVideoPlayer(
     modifier: Modifier = Modifier,
     initialPositionMs: Long = 0L,
     autoPlay: Boolean = isPlaying,
+    seekToPositionMs: Long = 0L,
+    seekRequestId: Long = 0L,
     onBufferingChanged: (Boolean) -> Unit = {},
     onReadyChanged: (Boolean) -> Unit = {},
     onReady: (Long) -> Unit = {},
@@ -70,7 +72,7 @@ fun LocalVideoPlayer(
         val safeInitialPositionMs = max(0L, initialPositionMs)
 
         ExoPlayer.Builder(context).build().apply {
-            repeatMode = Player.REPEAT_MODE_ONE
+            repeatMode = Player.REPEAT_MODE_OFF
             playWhenReady = autoPlay
             volume = 0f
             setMediaSource(mediaSource)
@@ -101,7 +103,7 @@ fun LocalVideoPlayer(
                     latestOnReady.value(durationMs)
                     latestOnPositionChanged.value(player.currentPosition.coercePosition(durationMs), durationMs)
                 } else if (playbackState == Player.STATE_ENDED) {
-                    latestOnPositionChanged.value(0L, durationMs)
+                    latestOnPositionChanged.value(durationMs, durationMs)
                     latestOnPlaybackEnded.value()
                 }
             }
@@ -144,9 +146,27 @@ fun LocalVideoPlayer(
             "set isPlaying=$isPlaying assetPath=$normalizedAssetPath uri=$videoUri"
         )
         if (isPlaying) {
+            val durationMs = player.duration.sanitizedDuration()
+            if (durationMs > 0L && player.currentPosition >= durationMs) {
+                player.seekTo(0L)
+                latestOnPositionChanged.value(0L, durationMs)
+            }
             player.play()
         } else {
             player.pause()
+        }
+    }
+
+    LaunchedEffect(player, seekRequestId) {
+        if (seekRequestId > 0L) {
+            val durationMs = player.duration.sanitizedDuration()
+            val targetPositionMs = seekToPositionMs.coercePosition(durationMs)
+            Log.d(
+                LOCAL_VIDEO_PLAYER_TAG,
+                "seek target=$targetPositionMs duration=$durationMs request=$seekRequestId assetPath=$normalizedAssetPath uri=$videoUri"
+            )
+            player.seekTo(targetPositionMs)
+            latestOnPositionChanged.value(targetPositionMs, durationMs)
         }
     }
 

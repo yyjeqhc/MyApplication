@@ -35,6 +35,7 @@ import com.example.myapplication.model.AdChannel
 import com.example.myapplication.model.AdItem
 import com.example.myapplication.ui.common.AssetImage
 import com.example.myapplication.ui.common.LocalVideoPlayer
+import com.example.myapplication.ui.common.VideoProgressBar
 import com.example.myapplication.ui.common.showSingleToast
 import com.example.myapplication.ui.feed.AdTagRow
 import com.example.myapplication.ui.feed.formatCount
@@ -50,9 +51,12 @@ fun AdDetailScreen(
     ad: AdItem,
     initialVideoPositionMs: Long = 0L,
     initialVideoDurationMs: Long = 0L,
+    videoSeekPositionMs: Long = 0L,
+    videoSeekRequestId: Long = 0L,
     autoPlayVideo: Boolean = false,
     onVideoPlaybackUpdate: (Long, Long) -> Unit = { _, _ -> },
     onVideoPlaybackEnded: () -> Unit = {},
+    onVideoSeek: (Long) -> Unit = {},
     onBack: () -> Unit,
     onLikeClick: () -> Unit,
     onFavoriteClick: () -> Unit,
@@ -119,9 +123,12 @@ fun AdDetailScreen(
                 ad = ad,
                 initialVideoPositionMs = initialVideoPositionMs,
                 initialVideoDurationMs = initialVideoDurationMs,
+                videoSeekPositionMs = videoSeekPositionMs,
+                videoSeekRequestId = videoSeekRequestId,
                 autoPlayVideo = autoPlayVideo,
                 onVideoPlaybackUpdate = onVideoPlaybackUpdate,
-                onVideoPlaybackEnded = onVideoPlaybackEnded
+                onVideoPlaybackEnded = onVideoPlaybackEnded,
+                onVideoSeek = onVideoSeek
             )
 
             Column(
@@ -693,9 +700,12 @@ private fun DetailMediaHero(
     ad: AdItem,
     initialVideoPositionMs: Long = 0L,
     initialVideoDurationMs: Long = 0L,
+    videoSeekPositionMs: Long = 0L,
+    videoSeekRequestId: Long = 0L,
     autoPlayVideo: Boolean = false,
     onVideoPlaybackUpdate: (Long, Long) -> Unit = { _, _ -> },
     onVideoPlaybackEnded: () -> Unit = {},
+    onVideoSeek: (Long) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     when (ad.cardType) {
@@ -703,9 +713,12 @@ private fun DetailMediaHero(
             ad = ad,
             initialPositionMs = initialVideoPositionMs,
             initialDurationMs = initialVideoDurationMs,
+            seekToPositionMs = videoSeekPositionMs,
+            seekRequestId = videoSeekRequestId,
             autoPlay = autoPlayVideo,
             onVideoPlaybackUpdate = onVideoPlaybackUpdate,
             onVideoPlaybackEnded = onVideoPlaybackEnded,
+            onVideoSeek = onVideoSeek,
             modifier = modifier
         )
         AdCardType.LARGE_IMAGE -> LargeImageDetailHero(ad = ad, modifier = modifier)
@@ -718,9 +731,12 @@ private fun VideoDetailHero(
     ad: AdItem,
     initialPositionMs: Long = 0L,
     initialDurationMs: Long = 0L,
+    seekToPositionMs: Long = 0L,
+    seekRequestId: Long = 0L,
     autoPlay: Boolean = false,
     onVideoPlaybackUpdate: (Long, Long) -> Unit = { _, _ -> },
     onVideoPlaybackEnded: () -> Unit = {},
+    onVideoSeek: (Long) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var isPlaying by remember(ad.id, ad.videoAsset) { mutableStateOf(autoPlay) }
@@ -741,6 +757,9 @@ private fun VideoDetailHero(
         } else {
             0f
         }
+    }
+    val durationLabel = remember(currentDurationMs, ad.videoDuration) {
+        formatVideoDuration(currentDurationMs).ifBlank { ad.videoDuration }
     }
     val playButtonInteractionSource = remember { MutableInteractionSource() }
 
@@ -773,6 +792,8 @@ private fun VideoDetailHero(
                 isPlaying = isPlaying,
                 initialPositionMs = initialPositionMs,
                 autoPlay = autoPlay,
+                seekToPositionMs = seekToPositionMs,
+                seekRequestId = seekRequestId,
                 modifier = Modifier.matchParentSize(),
                 onBufferingChanged = { isVideoBuffering = it },
                 onReadyChanged = { isVideoReady = it },
@@ -788,7 +809,10 @@ private fun VideoDetailHero(
                     onVideoPlaybackUpdate(positionMs, durationMs)
                 },
                 onPlaybackEnded = {
-                    currentPositionMs = 0L
+                    if (currentDurationMs > 0L) {
+                        currentPositionMs = currentDurationMs
+                    }
+                    isPlaying = false
                     onVideoPlaybackEnded()
                 },
                 onFirstFrameRendered = { hasRenderedFirstFrame = true },
@@ -890,27 +914,38 @@ private fun VideoDetailHero(
             )
         }
 
-        DetailHeroBadge(
-            text = ad.videoDuration.ifBlank { "00:30" },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
-        )
+        if (durationLabel.isNotBlank()) {
+            DetailHeroBadge(
+                text = durationLabel,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+            )
+        }
 
         if (ad.videoAsset.isNotBlank()) {
-            LinearProgressIndicator(
-                progress = { progress },
+            VideoProgressBar(
+                progress = progress,
+                durationMs = currentDurationMs,
+                onSeek = { positionMs ->
+                    currentPositionMs = positionMs
+                    onVideoSeek(positionMs)
+                },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .height(3.dp),
-                color = Color.White.copy(alpha = 0.9f),
-                trackColor = Color.White.copy(alpha = 0.22f),
-                gapSize = 0.dp,
-                drawStopIndicator = {}
             )
         }
     }
+}
+
+private fun formatVideoDuration(durationMs: Long): String {
+    if (durationMs <= 0L) return ""
+
+    val totalSeconds = durationMs / 1000L
+    val minutes = totalSeconds / 60L
+    val seconds = totalSeconds % 60L
+    return "%02d:%02d".format(minutes, seconds)
 }
 
 @Composable

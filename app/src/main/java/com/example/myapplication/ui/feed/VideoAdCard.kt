@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import com.example.myapplication.model.AdItem
 import com.example.myapplication.ui.common.AssetImage
 import com.example.myapplication.ui.common.LocalVideoPlayer
+import com.example.myapplication.ui.common.VideoProgressBar
 
 /**
  * 视频广告卡片
@@ -50,9 +51,12 @@ fun VideoAdCard(
     initialPositionMs: Long = 0L,
     videoPositionMs: Long = 0L,
     videoDurationMs: Long = 0L,
+    videoSeekPositionMs: Long = 0L,
+    videoSeekRequestId: Long = 0L,
     onVideoClick: () -> Unit = {},
     onVideoPlaybackUpdate: (Long, Long) -> Unit = { _, _ -> },
     onVideoPlaybackEnded: () -> Unit = {},
+    onVideoSeek: (Long) -> Unit = {},
     onVideoError: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -72,6 +76,9 @@ fun VideoAdCard(
         } else {
             0f
         }
+    }
+    val durationLabel = remember(videoDurationMs, ad.videoDuration) {
+        formatVideoDuration(videoDurationMs).ifBlank { ad.videoDuration }
     }
     val mediaClickInteractionSource = remember { MutableInteractionSource() }
     val playButtonInteractionSource = remember { MutableInteractionSource() }
@@ -113,6 +120,8 @@ fun VideoAdCard(
                         isPlaying = isPlaying,
                         initialPositionMs = initialPositionMs,
                         autoPlay = isPlaying,
+                        seekToPositionMs = videoSeekPositionMs,
+                        seekRequestId = videoSeekRequestId,
                         modifier = Modifier.matchParentSize(),
                         onBufferingChanged = { isVideoBuffering = it },
                         onReadyChanged = { isVideoReady = it },
@@ -238,35 +247,33 @@ fun VideoAdCard(
                     }
                 }
 
-                // 时长标签
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(8.dp)
-                        .background(
-                            color = Color.Black.copy(alpha = 0.6f),
-                            shape = RoundedCornerShape(4.dp)
+                if (durationLabel.isNotBlank()) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(8.dp)
+                            .background(
+                                color = Color.Black.copy(alpha = 0.6f),
+                                shape = RoundedCornerShape(4.dp)
+                            )
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = durationLabel,
+                            color = Color.White,
+                            fontSize = 11.sp
                         )
-                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                ) {
-                    Text(
-                        text = ad.videoDuration.ifBlank { "00:30" },
-                        color = Color.White,
-                        fontSize = 11.sp
-                    )
+                    }
                 }
 
                 if (ad.videoAsset.isNotBlank()) {
-                    LinearProgressIndicator(
-                        progress = { progress },
+                    VideoProgressBar(
+                        progress = progress,
+                        durationMs = videoDurationMs,
+                        onSeek = onVideoSeek,
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
-                            .height(3.dp),
-                        color = Color.White.copy(alpha = 0.9f),
-                        trackColor = Color.White.copy(alpha = 0.22f),
-                        gapSize = 0.dp,
-                        drawStopIndicator = {}
                     )
                 }
             }
@@ -399,4 +406,13 @@ fun VideoAdCard(
             }
         }
     }
+}
+
+private fun formatVideoDuration(durationMs: Long): String {
+    if (durationMs <= 0L) return ""
+
+    val totalSeconds = durationMs / 1000L
+    val minutes = totalSeconds / 60L
+    val seconds = totalSeconds % 60L
+    return "%02d:%02d".format(minutes, seconds)
 }

@@ -20,9 +20,12 @@ fun AdFeedCard(
     isVideoPlaying: Boolean = false,
     videoPositionMs: Long = 0L,
     videoDurationMs: Long = 0L,
+    videoSeekPositionMs: Long = 0L,
+    videoSeekRequestId: Long = 0L,
     onVideoClick: () -> Unit = {},
     onVideoPlaybackUpdate: (Long, Long) -> Unit = { _, _ -> },
     onVideoPlaybackEnded: () -> Unit = {},
+    onVideoSeek: (Long) -> Unit = {},
     onVideoError: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -61,9 +64,12 @@ fun AdFeedCard(
                 initialPositionMs = videoPositionMs,
                 videoPositionMs = videoPositionMs,
                 videoDurationMs = videoDurationMs,
+                videoSeekPositionMs = videoSeekPositionMs,
+                videoSeekRequestId = videoSeekRequestId,
                 onVideoClick = onVideoClick,
                 onVideoPlaybackUpdate = onVideoPlaybackUpdate,
                 onVideoPlaybackEnded = onVideoPlaybackEnded,
+                onVideoSeek = onVideoSeek,
                 onVideoError = onVideoError,
                 modifier = modifier
             )
