@@ -53,6 +53,9 @@ class FeedViewModel(
     /** 防止首屏后的频道预加载重复启动。 */
     private var hasPreloadedOtherChannels = false
 
+    /** 防止同一频道的加载更多任务被底部滚动监听重复启动。 */
+    private val loadMoreInFlightChannels = mutableSetOf<AdChannel>()
+
     /** Repository 初始化完成前，避免 UI 交互误触发 fallback 数据。 */
     private var repositoryReady = false
 
@@ -277,45 +280,61 @@ class FeedViewModel(
     fun loadMore() {
         if (!repositoryReady) return
         val currentState = _uiState.value
+        val channel = currentState.selectedChannel
         if (
+            channel in loadMoreInFlightChannels ||
             currentState.isLoadingMore ||
+            currentState.isRefreshing ||
             !currentState.hasMore ||
             (currentState.selectedTag != null && currentState.filteredAds.isEmpty())
         ) {
             return
         }
 
+        loadMoreInFlightChannels += channel
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoadingMore = true) }
+            try {
+                _uiState.update { state ->
+                    if (state.selectedChannel == channel) {
+                        state.copy(isLoadingMore = true)
+                    } else {
+                        state
+                    }
+                }
 
-            if (simulateError) {
+                if (simulateError) {
+                    _uiState.update {
+                        it.copy(
+                            isLoadingMore = false,
+                            errorMessage = "加载更多失败"
+                        )
+                    }
+                    return@launch
+                }
+
+                val currentPage = currentState.currentPage
+                if (_uiState.value.selectedChannel != channel) return@launch
+
+                val page = loadPage(channel, currentPage + 1)
+                val mergedAds = mergeAdsById(_uiState.value.ads, page.ads)
+                saveChannelCache(channel, mergedAds, page.currentPage, page.hasMore)
+
                 _uiState.update {
                     it.copy(
+                        ads = mergedAds,
                         isLoadingMore = false,
-                        errorMessage = "加载更多失败"
+                        currentPage = page.currentPage,
+                        hasMore = page.hasMore,
+                        errorMessage = null,
+                        channelSnapshots = currentChannelSnapshots(),
+                        statsOverview = currentStatsOverview()
                     )
                 }
-                return@launch
-            }
-
-            val channel = currentState.selectedChannel
-            val currentPage = currentState.currentPage
-            if (_uiState.value.selectedChannel != channel) return@launch
-
-            val page = loadPage(channel, currentPage + 1)
-            val mergedAds = mergeAdsById(_uiState.value.ads, page.ads)
-            saveChannelCache(channel, mergedAds, page.currentPage, page.hasMore)
-
-            _uiState.update {
-                it.copy(
-                    ads = mergedAds,
-                    isLoadingMore = false,
-                    currentPage = page.currentPage,
-                    hasMore = page.hasMore,
-                    errorMessage = null,
-                    channelSnapshots = currentChannelSnapshots(),
-                    statsOverview = currentStatsOverview()
-                )
+            } finally {
+                loadMoreInFlightChannels -= channel
+                if (_uiState.value.selectedChannel == channel && _uiState.value.isLoadingMore) {
+                    _uiState.update { it.copy(isLoadingMore = false) }
+                }
             }
         }
     }
