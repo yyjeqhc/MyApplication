@@ -61,6 +61,13 @@ fun AdApp(
     var searchResults by remember { mutableStateOf(emptyList<AdItem>()) }
     var hasSearched by remember { mutableStateOf(false) }
     var detailRefreshKey by remember { mutableIntStateOf(0) }
+
+    // Video state is intentionally kept at the app level so feed, search, and detail share one timeline per ad.
+    // playingFeedVideoAdId is the currently playing feed card; autoPlayingFeedVideoAdId marks the subset started by
+    // feed autoplay preview; manualPausedFeedVideoAdIds only blocks autoplay while that card remains visible.
+    // detailAutoPlayVideoAdId carries the user's play intent into detail: paused or seek-only videos keep position
+    // but do not auto-play. Position/duration are keyed by adId. Seek uses request ids because seeking to the same
+    // millisecond twice must still be observable by LocalVideoPlayer across recompositions.
     var playingFeedVideoAdId by remember { mutableStateOf<String?>(null) }
     var autoPlayingFeedVideoAdId by remember { mutableStateOf<String?>(null) }
     var manualPausedFeedVideoAdIds by remember { mutableStateOf<Set<String>>(emptySet()) }
@@ -112,7 +119,8 @@ fun AdApp(
         }
     }
 
-    // 点击广告卡片回调
+    // Feed autoplay is only a lightweight preview. When that preview ends or leaves the screen, it may reset to 0
+    // so the next impression starts cleanly. User-driven play, seek, or navigation to detail must not use this path.
     fun resetFeedVideoPreview(adId: String) {
         videoPlaybackPositions = videoPlaybackPositions + (adId to 0L)
         videoSeekPositions = videoSeekPositions + (adId to 0L)
@@ -122,6 +130,9 @@ fun AdApp(
     }
 
     fun openAdDetail(adId: String, shouldAutoPlayInDetail: Boolean) {
+        // Keep videoPlaybackPositions[adId] as the source of truth for detail initial position.
+        // Clear only pending seek requests for this ad: a stale feed preview reset request, e.g. seek-to-0,
+        // would otherwise run after detail initialization and override the preserved resume position.
         detailAutoPlayVideoAdId = if (shouldAutoPlayInDetail) adId else null
         playingFeedVideoAdId = null
         autoPlayingFeedVideoAdId = null
@@ -215,6 +226,8 @@ fun AdApp(
             onQueryChange = { searchQuery = it },
             onSearch = { runSearch(it) },
             onBack = { isSearchVisible = false },
+            // Search videos do not autoplay in the results list, but they share global position/duration/seek state
+            // with feed and detail. The Boolean records whether the user was actively playing before navigation.
             onAdClick = { adId, shouldAutoPlayInDetail ->
                 openAdDetail(
                     adId = adId,
