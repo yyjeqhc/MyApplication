@@ -35,6 +35,10 @@ fun SearchScreen(
     query: String,
     results: List<AdItem>,
     hasSearched: Boolean,
+    videoPlaybackPositions: Map<String, Long>,
+    videoDurations: Map<String, Long>,
+    videoSeekPositions: Map<String, Long>,
+    videoSeekRequestIds: Map<String, Long>,
     onQueryChange: (String) -> Unit,
     onSearch: (String) -> Unit,
     onBack: () -> Unit,
@@ -42,6 +46,9 @@ fun SearchScreen(
     onLikeClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
     onShareClick: (String) -> Unit,
+    onVideoPlaybackUpdate: (String, Long, Long) -> Unit,
+    onVideoPlaybackEnded: (String) -> Unit,
+    onVideoSeek: (String, Long) -> Unit,
     onTagClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -105,6 +112,10 @@ fun SearchScreen(
                 results.isEmpty() -> SearchEmptyState(query = query)
                 else -> SearchResultList(
                     results = results,
+                    videoPlaybackPositions = videoPlaybackPositions,
+                    videoDurations = videoDurations,
+                    videoSeekPositions = videoSeekPositions,
+                    videoSeekRequestIds = videoSeekRequestIds,
                     onAdClick = onAdClick,
                     onLikeClick = onLikeClick,
                     onFavoriteClick = onFavoriteClick,
@@ -112,7 +123,10 @@ fun SearchScreen(
                     onShareClick = { adId ->
                         onShareClick(adId)
                         showSingleToast(context, "已记录分享")
-                    }
+                    },
+                    onVideoPlaybackUpdate = onVideoPlaybackUpdate,
+                    onVideoPlaybackEnded = onVideoPlaybackEnded,
+                    onVideoSeek = onVideoSeek
                 )
             }
         }
@@ -246,11 +260,18 @@ private fun SearchEmptyState(
 @Composable
 private fun SearchResultList(
     results: List<AdItem>,
+    videoPlaybackPositions: Map<String, Long>,
+    videoDurations: Map<String, Long>,
+    videoSeekPositions: Map<String, Long>,
+    videoSeekRequestIds: Map<String, Long>,
     onAdClick: (String) -> Unit,
     onLikeClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
-    onShareClick: (String) -> Unit
+    onShareClick: (String) -> Unit,
+    onVideoPlaybackUpdate: (String, Long, Long) -> Unit,
+    onVideoPlaybackEnded: (String) -> Unit,
+    onVideoSeek: (String, Long) -> Unit
 ) {
     var playingVideoAdId by remember { mutableStateOf<String?>(null) }
 
@@ -291,8 +312,24 @@ private fun SearchResultList(
                 onShareClick = { onShareClick(ad.id) },
                 onTagClick = onTagClick,
                 isVideoPlaying = ad.cardType == AdCardType.VIDEO && playingVideoAdId == ad.id,
+                videoPositionMs = videoPlaybackPositions[ad.id] ?: 0L,
+                videoDurationMs = videoDurations[ad.id] ?: 0L,
+                videoSeekPositionMs = videoSeekPositions[ad.id] ?: 0L,
+                videoSeekRequestId = videoSeekRequestIds[ad.id] ?: 0L,
                 onVideoClick = {
                     playingVideoAdId = if (playingVideoAdId == ad.id) null else ad.id
+                },
+                onVideoPlaybackUpdate = { positionMs, durationMs ->
+                    onVideoPlaybackUpdate(ad.id, positionMs, durationMs)
+                },
+                onVideoPlaybackEnded = {
+                    if (playingVideoAdId == ad.id) {
+                        playingVideoAdId = null
+                    }
+                    onVideoPlaybackEnded(ad.id)
+                },
+                onVideoSeek = { positionMs ->
+                    onVideoSeek(ad.id, positionMs)
                 },
                 onVideoError = {
                     if (playingVideoAdId == ad.id) {

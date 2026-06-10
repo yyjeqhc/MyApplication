@@ -196,6 +196,10 @@ fun AdApp(
             query = searchQuery,
             results = searchResults,
             hasSearched = hasSearched,
+            videoPlaybackPositions = videoPlaybackPositions,
+            videoDurations = videoDurations,
+            videoSeekPositions = videoSeekPositions,
+            videoSeekRequestIds = videoSeekRequestIds,
             onQueryChange = { searchQuery = it },
             onSearch = { runSearch(it) },
             onBack = { isSearchVisible = false },
@@ -211,6 +215,25 @@ fun AdApp(
             onShareClick = {
                 viewModel.recordShare(it)
                 refreshSearchResults()
+            },
+            onVideoPlaybackUpdate = { adId, positionMs, durationMs ->
+                videoPlaybackPositions = videoPlaybackPositions + (adId to positionMs)
+                if (durationMs > 0L) {
+                    videoDurations = videoDurations + (adId to durationMs)
+                }
+            },
+            onVideoPlaybackEnded = { adId ->
+                val durationMs = videoDurations[adId] ?: 0L
+                if (durationMs > 0L) {
+                    videoPlaybackPositions = videoPlaybackPositions + (adId to durationMs)
+                }
+            },
+            onVideoSeek = { adId, positionMs ->
+                videoPlaybackPositions = videoPlaybackPositions + (adId to positionMs)
+                videoSeekPositions = videoSeekPositions + (adId to positionMs)
+                videoSeekRequestIds = videoSeekRequestIds + (
+                    adId to ((videoSeekRequestIds[adId] ?: 0L) + 1L)
+                )
             },
             onTagClick = {
                 viewModel.selectTag(it)
