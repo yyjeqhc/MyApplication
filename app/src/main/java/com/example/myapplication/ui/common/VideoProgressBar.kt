@@ -9,6 +9,7 @@ import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -29,7 +30,10 @@ fun VideoProgressBar(
     onSeek: (Long) -> Unit,
     modifier: Modifier = Modifier,
     color: Color = Color.White.copy(alpha = 0.9f),
-    trackColor: Color = Color.White.copy(alpha = 0.22f)
+    trackColor: Color = Color.White.copy(alpha = 0.22f),
+    compact: Boolean = false,
+    isActive: Boolean = true,
+    showWhenIdle: Boolean = true
 ) {
     var isDragging by remember { mutableStateOf(false) }
     var dragProgress by remember { mutableFloatStateOf(0f) }
@@ -41,6 +45,22 @@ fun VideoProgressBar(
     )
     val displayedProgress = if (isDragging) dragProgress else animatedProgress
     val canSeek = durationMs > 0L
+    val shouldShow = showWhenIdle || isActive || isDragging || safeProgress > 0.01f
+    val containerHeight = if (compact) 10.dp else 18.dp
+    val barHeight = if (compact) 2.dp else 3.dp
+    val horizontalPadding = if (compact) 8.dp else 0.dp
+    val effectiveColor = if (compact && !isActive && !isDragging) {
+        color.copy(alpha = 0.36f)
+    } else {
+        color
+    }
+    val effectiveTrackColor = if (compact) {
+        trackColor.copy(alpha = if (isActive || isDragging || safeProgress > 0.01f) 0.12f else 0.04f)
+    } else {
+        trackColor
+    }
+
+    if (!shouldShow) return
 
     fun progressToPosition(targetProgress: Float): Long {
         return (targetProgress.coerceIn(0f, 1f) * durationMs).roundToLong()
@@ -49,7 +69,8 @@ fun VideoProgressBar(
 
     Box(
         modifier = modifier
-            .height(18.dp)
+            .height(containerHeight)
+            .padding(horizontal = horizontalPadding)
             .then(
                 if (canSeek) {
                     Modifier.pointerInput(durationMs) {
@@ -78,14 +99,14 @@ fun VideoProgressBar(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(3.dp)
-                .background(trackColor)
+                .height(barHeight)
+                .background(effectiveTrackColor)
         )
         Box(
             modifier = Modifier
                 .fillMaxWidth(displayedProgress.coerceIn(0f, 1f))
-                .height(3.dp)
-                .background(color)
+                .height(barHeight)
+                .background(effectiveColor)
         )
     }
 }

@@ -271,6 +271,11 @@ fun VideoAdCard(
                         progress = progress,
                         durationMs = videoDurationMs,
                         onSeek = onVideoSeek,
+                        compact = true,
+                        isActive = isActivelyPlaying,
+                        showWhenIdle = false,
+                        color = Color.White.copy(alpha = 0.72f),
+                        trackColor = Color.White.copy(alpha = 0.10f),
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()

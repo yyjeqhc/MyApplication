@@ -42,7 +42,7 @@ import kotlin.math.floor
 
 private const val SHOW_DEBUG_PANEL = false
 private const val REFRESH_FEEDBACK_DURATION_MS = 900L
-private const val FEED_VIDEO_AUTOPLAY_DELAY_MS = 900L
+private const val FEED_VIDEO_AUTOPLAY_DELAY_MS = 1500L
 
 /**
  * 信息流主页面
