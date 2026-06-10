@@ -121,6 +121,8 @@ fun AdApp(
         detailAutoPlayVideoAdId = if (playingFeedVideoAdId == adId) adId else null
         playingFeedVideoAdId = null
         autoPlayingFeedVideoAdId = null
+        videoSeekPositions = videoSeekPositions - adId
+        videoSeekRequestIds = videoSeekRequestIds - adId
         viewModel.recordClick(adId)
         refreshSearchResults()
         detailRefreshKey++
