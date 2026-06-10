@@ -84,19 +84,11 @@ fun LocalVideoPlayer(
     }
 
     DisposableEffect(player) {
-        Log.d(
-            LOCAL_VIDEO_PLAYER_TAG,
-            "prepare assetPath=$normalizedAssetPath uri=$videoUri"
-        )
         val listener = object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 val isBuffering = playbackState == Player.STATE_BUFFERING
                 val isReady = playbackState == Player.STATE_READY
                 val durationMs = player.duration.sanitizedDuration()
-                Log.d(
-                    LOCAL_VIDEO_PLAYER_TAG,
-                    "state=$playbackState ready=$isReady buffering=$isBuffering assetPath=$normalizedAssetPath uri=$videoUri"
-                )
                 latestOnBufferingChanged.value(isBuffering)
                 latestOnReadyChanged.value(isReady)
                 if (isReady) {
@@ -109,10 +101,6 @@ fun LocalVideoPlayer(
             }
 
             override fun onRenderedFirstFrame() {
-                Log.d(
-                    LOCAL_VIDEO_PLAYER_TAG,
-                    "first frame assetPath=$normalizedAssetPath uri=$videoUri"
-                )
                 latestOnFirstFrameRendered.value()
             }
 
@@ -130,10 +118,6 @@ fun LocalVideoPlayer(
         onDispose {
             val durationMs = player.duration.sanitizedDuration()
             latestOnPositionChanged.value(player.currentPosition.coercePosition(durationMs), durationMs)
-            Log.d(
-                LOCAL_VIDEO_PLAYER_TAG,
-                "release assetPath=$normalizedAssetPath uri=$videoUri"
-            )
             player.removeListener(listener)
             player.release()
         }
@@ -141,10 +125,6 @@ fun LocalVideoPlayer(
 
     LaunchedEffect(player, isPlaying) {
         player.volume = 0f
-        Log.d(
-            LOCAL_VIDEO_PLAYER_TAG,
-            "set isPlaying=$isPlaying assetPath=$normalizedAssetPath uri=$videoUri"
-        )
         if (isPlaying) {
             val durationMs = player.duration.sanitizedDuration()
             if (durationMs > 0L && player.currentPosition >= durationMs) {
@@ -161,10 +141,6 @@ fun LocalVideoPlayer(
         if (seekRequestId > 0L) {
             val durationMs = player.duration.sanitizedDuration()
             val targetPositionMs = seekToPositionMs.coercePosition(durationMs)
-            Log.d(
-                LOCAL_VIDEO_PLAYER_TAG,
-                "seek target=$targetPositionMs duration=$durationMs request=$seekRequestId assetPath=$normalizedAssetPath uri=$videoUri"
-            )
             player.seekTo(targetPositionMs)
             latestOnPositionChanged.value(targetPositionMs, durationMs)
         }
