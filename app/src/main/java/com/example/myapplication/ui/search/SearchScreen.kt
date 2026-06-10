@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -282,6 +283,21 @@ private fun SearchResultList(
     LaunchedEffect(results) {
         if (playingVideoAdId != null && results.none { it.id == playingVideoAdId }) {
             playingVideoAdId = null
+        }
+    }
+
+    LaunchedEffect(listState, results) {
+        snapshotFlow {
+            listState.layoutInfo.visibleItemsInfo
+                .mapNotNull { item -> item.key as? String }
+                .filter { key -> key != "search_result_count" }
+                .toSet()
+        }.collect { visibleAdIds ->
+            playingVideoAdId?.let { playingId ->
+                if (playingId !in visibleAdIds) {
+                    playingVideoAdId = null
+                }
+            }
         }
     }
 
