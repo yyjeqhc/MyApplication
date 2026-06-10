@@ -25,6 +25,13 @@ import kotlinx.coroutines.launch
  * 应用主 Activity
  * 管理全局状态和页面切换
  */
+private data class SavedListPosition(
+    val channel: AdChannel,
+    val anchorAdId: String?,
+    val index: Int,
+    val offset: Int
+)
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,8 +95,26 @@ fun AdApp(
         AdChannel.ECOMMERCE -> ecommerceListState
         AdChannel.LOCAL -> localListState
     }
+    var tagFilterReturnPosition by remember { mutableStateOf<SavedListPosition?>(null) }
+    var pendingTagFilterRestorePosition by remember { mutableStateOf<SavedListPosition?>(null) }
 
     val coroutineScope = rememberCoroutineScope()
+
+    fun saveTagFilterReturnPosition() {
+        val adIds = uiState.ads.mapTo(mutableSetOf()) { it.id }
+        val anchorItem = currentListState.layoutInfo.visibleItemsInfo
+            .firstOrNull { item -> (item.key as? String) in adIds }
+        val anchorAdId = anchorItem?.key as? String
+        val anchorOffset = anchorItem?.let { item ->
+            (currentListState.layoutInfo.viewportStartOffset - item.offset).coerceAtLeast(0)
+        } ?: currentListState.firstVisibleItemScrollOffset
+        tagFilterReturnPosition = SavedListPosition(
+            channel = uiState.selectedChannel,
+            anchorAdId = anchorAdId,
+            index = currentListState.firstVisibleItemIndex,
+            offset = anchorOffset
+        )
+    }
 
     fun runSearch(query: String) {
         val trimmedQuery = query.trim()
@@ -123,7 +148,31 @@ fun AdApp(
     BackHandler(
         enabled = selectedAd == null && !isSearchVisible && uiState.selectedTag != null
     ) {
+        pendingTagFilterRestorePosition = tagFilterReturnPosition
+        tagFilterReturnPosition = null
         viewModel.clearTagFilter()
+    }
+
+    LaunchedEffect(
+        uiState.selectedTag,
+        uiState.selectedChannel,
+        uiState.ads,
+        pendingTagFilterRestorePosition
+    ) {
+        val returnPosition = pendingTagFilterRestorePosition
+        if (uiState.selectedTag == null && returnPosition != null) {
+            pendingTagFilterRestorePosition = null
+            if (returnPosition.channel == uiState.selectedChannel && uiState.ads.isNotEmpty()) {
+                val anchorIndex = returnPosition.anchorAdId?.let { anchorAdId ->
+                    uiState.ads.indexOfFirst { ad -> ad.id == anchorAdId }.takeIf { it >= 0 }
+                }
+                val safeIndex = anchorIndex ?: returnPosition.index.coerceIn(0, uiState.ads.lastIndex)
+                currentListState.scrollToItem(
+                    index = safeIndex,
+                    scrollOffset = returnPosition.offset.coerceAtLeast(0)
+                )
+            }
+        }
     }
 
     // Feed autoplay is only a lightweight preview. When that preview ends or leaves the screen, it may reset to 0
@@ -212,6 +261,7 @@ fun AdApp(
                 // CTA 只做用户反馈，不计入列表点击统计，避免污染 CTR。
             },
             onTagClick = { tag ->
+                saveTagFilterReturnPosition()
                 viewModel.selectTag(tag)
                 isSearchVisible = false
                 selectedAdId = null
@@ -273,6 +323,7 @@ fun AdApp(
                 )
             },
             onTagClick = {
+                saveTagFilterReturnPosition()
                 viewModel.selectTag(it)
                 isSearchVisible = false
                 coroutineScope.launch {
@@ -375,6 +426,7 @@ fun AdApp(
                 )
             },
             onTagClick = {
+                saveTagFilterReturnPosition()
                 viewModel.selectTag(it)
                 coroutineScope.launch {
                     currentListState.animateScrollToItem(0)
