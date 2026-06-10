@@ -3,6 +3,7 @@ package com.example.myapplication.ui.detail
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -21,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -694,13 +696,29 @@ private fun VideoDetailHero(
     var isPlaying by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
     var hasRequestedPlayback by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
     var hasPlaybackError by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
+    var isVideoBuffering by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
+    var isVideoReady by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
+    var hasRenderedFirstFrame by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
     val canPlayVideo = ad.videoAsset.isNotBlank() && !hasPlaybackError
     val shouldShowVideo = canPlayVideo && hasRequestedPlayback
+    val shouldShowCover = !hasRenderedFirstFrame || hasPlaybackError || !shouldShowVideo
+    val shouldShowLoading = canPlayVideo && isPlaying && !hasRenderedFirstFrame && (isVideoBuffering || !isVideoReady)
+    val playButtonInteractionSource = remember { MutableInteractionSource() }
+
+    fun handlePlayButtonClick() {
+        if (canPlayVideo) {
+            hasRequestedPlayback = true
+            isPlaying = !isPlaying
+        }
+    }
 
     LaunchedEffect(hasPlaybackError) {
         if (hasPlaybackError) {
             isPlaying = false
             hasRequestedPlayback = false
+            isVideoBuffering = false
+            isVideoReady = false
+            hasRenderedFirstFrame = false
         }
     }
 
@@ -708,23 +726,23 @@ private fun VideoDetailHero(
         modifier = modifier
             .fillMaxWidth()
             .height(260.dp)
-            .clickable {
-                if (canPlayVideo) {
-                    hasRequestedPlayback = true
-                    isPlaying = !isPlaying
-                }
-            }
+            .clipToBounds()
     ) {
         if (shouldShowVideo) {
             LocalVideoPlayer(
                 assetPath = ad.videoAsset,
                 isPlaying = isPlaying,
                 modifier = Modifier.matchParentSize(),
+                onBufferingChanged = { isVideoBuffering = it },
+                onReadyChanged = { isVideoReady = it },
+                onFirstFrameRendered = { hasRenderedFirstFrame = true },
                 onPlaybackError = {
                     hasPlaybackError = true
                 }
             )
-        } else {
+        }
+
+        if (shouldShowCover) {
             AssetImage(
                 assetPath = ad.imageAsset,
                 contentDescription = ad.title,
@@ -749,7 +767,11 @@ private fun VideoDetailHero(
         Box(
             modifier = Modifier
                 .matchParentSize()
-                .background(Color.Black.copy(alpha = 0.28f))
+                .background(
+                    Color.Black.copy(
+                        alpha = if (shouldShowCover) 0.28f else 0.08f
+                    )
+                )
         )
 
         DetailHeroBadge(
@@ -764,15 +786,28 @@ private fun VideoDetailHero(
                 .align(Alignment.Center)
                 .size(82.dp)
                 .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.18f)),
+                .background(Color.White.copy(alpha = if (isPlaying) 0.12f else 0.18f))
+                .clickable(
+                    interactionSource = playButtonInteractionSource,
+                    indication = null,
+                    onClick = ::handlePlayButtonClick
+                ),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                contentDescription = if (isPlaying) "暂停" else "播放",
-                tint = Color.White,
-                modifier = Modifier.size(48.dp)
-            )
+            if (shouldShowLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(34.dp),
+                    color = Color.White,
+                    strokeWidth = 3.dp
+                )
+            } else {
+                Icon(
+                    imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                    contentDescription = if (isPlaying) "暂停" else "播放",
+                    tint = Color.White,
+                    modifier = Modifier.size(if (isPlaying) 38.dp else 48.dp)
+                )
+            }
         }
 
         Column(

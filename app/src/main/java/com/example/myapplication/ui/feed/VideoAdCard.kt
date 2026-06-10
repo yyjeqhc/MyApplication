@@ -2,6 +2,7 @@ package com.example.myapplication.ui.feed
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -52,9 +53,23 @@ fun VideoAdCard(
 ) {
     var hasPlaybackError by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
     var hasRequestedPlayback by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
+    var isVideoBuffering by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
+    var isVideoReady by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
+    var hasRenderedFirstFrame by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
     val canPlayVideo = ad.videoAsset.isNotBlank() && !hasPlaybackError
     val isActivelyPlaying = canPlayVideo && isPlaying
     val shouldShowVideo = canPlayVideo && hasRequestedPlayback
+    val shouldShowCover = !hasRenderedFirstFrame || hasPlaybackError || !shouldShowVideo
+    val shouldShowLoading = canPlayVideo && isPlaying && !hasRenderedFirstFrame && (isVideoBuffering || !isVideoReady)
+    val mediaClickInteractionSource = remember { MutableInteractionSource() }
+    val playButtonInteractionSource = remember { MutableInteractionSource() }
+
+    fun handlePlayButtonClick() {
+        if (canPlayVideo) {
+            hasRequestedPlayback = true
+            onVideoClick()
+        }
+    }
 
     LaunchedEffect(isPlaying) {
         if (isPlaying) {
@@ -77,26 +92,29 @@ fun VideoAdCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(176.dp)
-                    .clickable {
-                        if (canPlayVideo) {
-                            hasRequestedPlayback = true
-                            onVideoClick()
-                        }
-                    }
+                    .height(220.dp)
+                    .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
             ) {
                 if (shouldShowVideo) {
                     LocalVideoPlayer(
                         assetPath = ad.videoAsset,
                         isPlaying = isPlaying,
                         modifier = Modifier.matchParentSize(),
+                        onBufferingChanged = { isVideoBuffering = it },
+                        onReadyChanged = { isVideoReady = it },
+                        onFirstFrameRendered = { hasRenderedFirstFrame = true },
                         onPlaybackError = {
                             hasPlaybackError = true
                             hasRequestedPlayback = false
+                            isVideoBuffering = false
+                            isVideoReady = false
+                            hasRenderedFirstFrame = false
                             onVideoError()
                         }
                     )
-                } else {
+                }
+
+                if (shouldShowCover) {
                     AssetImage(
                         assetPath = ad.imageAsset,
                         contentDescription = ad.title,
@@ -121,7 +139,21 @@ fun VideoAdCard(
                 Box(
                     modifier = Modifier
                         .matchParentSize()
-                        .background(Color.Black.copy(alpha = 0.22f))
+                        .background(
+                            Color.Black.copy(
+                                alpha = if (shouldShowCover) 0.22f else 0.08f
+                            )
+                        )
+                )
+
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable(
+                            interactionSource = mediaClickInteractionSource,
+                            indication = null,
+                            onClick = onClick
+                        )
                 )
 
                 // 视频图标占位
@@ -134,15 +166,28 @@ fun VideoAdCard(
                         modifier = Modifier
                             .size(54.dp)
                             .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.18f)),
+                            .background(Color.White.copy(alpha = if (isActivelyPlaying) 0.12f else 0.18f))
+                            .clickable(
+                                interactionSource = playButtonInteractionSource,
+                                indication = null,
+                                onClick = ::handlePlayButtonClick
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            imageVector = if (isActivelyPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                            contentDescription = if (isActivelyPlaying) "暂停" else "播放",
-                            tint = Color.White,
-                            modifier = Modifier.size(30.dp)
-                        )
+                        if (shouldShowLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = Color.White,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Icon(
+                                imageVector = if (isActivelyPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                                contentDescription = if (isActivelyPlaying) "暂停" else "播放",
+                                tint = Color.White,
+                                modifier = Modifier.size(if (isActivelyPlaying) 24.dp else 30.dp)
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))

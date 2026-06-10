@@ -173,7 +173,7 @@
     "shareCount": 0,
     "favorited": false,
     "imageAsset": "ad_images/ecommerce_sportswear_01.jpg",
-    "videoAsset": "ad_videos/video_digital_desk_01.mp4"
+    "videoAsset": "ad_videos/video_running_01.mp4"
   },
   {
     "id": "featured_large_003",
@@ -261,7 +261,7 @@
     "shareCount": 0,
     "favorited": false,
     "imageAsset": "ad_images/ecommerce_keyboard_02.jpg",
-    "videoAsset": "ad_videos/video_gaming_01.mp4"
+    "videoAsset": "ad_videos/video_digital_desk_01.mp4"
   },
   {
     "id": "featured_small_004",
@@ -349,7 +349,7 @@
     "shareCount": 0,
     "favorited": false,
     "imageAsset": "ad_images/ecommerce_sportswear_02.jpg",
-    "videoAsset": "ad_videos/video_running_01.mp4"
+    "videoAsset": "ad_videos/video_travel_01.mp4"
   },
   {
     "id": "featured_large_005",
@@ -436,7 +436,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_makeup_01.jpg"
+    "imageAsset": "ad_images/ecommerce_makeup_01.jpg",
+    "videoAsset": "ad_videos/video_fitness_01.mp4"
   },
   {
     "id": "featured_small_006",
@@ -523,7 +524,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_sportswear_02.jpg"
+    "imageAsset": "ad_images/ecommerce_sportswear_02.jpg",
+    "videoAsset": "ad_videos/video_parent_child_01.mp4"
   },
   {
     "id": "featured_large_007",
@@ -610,7 +612,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_home_storage_02.jpg"
+    "imageAsset": "ad_images/ecommerce_home_storage_02.jpg",
+    "videoAsset": "ad_videos/video_home_01.mp4"
   },
   {
     "id": "featured_small_008",
@@ -697,7 +700,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_weekend_market_02.jpg"
+    "imageAsset": "ad_images/featured_weekend_market_02.jpg",
+    "videoAsset": "ad_videos/video_gaming_01.mp4"
   },
   {
     "id": "featured_large_009",
@@ -784,7 +788,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_study_desk_02.jpg"
+    "imageAsset": "ad_images/featured_study_desk_02.jpg",
+    "videoAsset": "ad_videos/video_coffee_01.mp4"
   },
   {
     "id": "featured_small_010",
@@ -871,7 +876,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_home_storage_02.jpg"
+    "imageAsset": "ad_images/ecommerce_home_storage_02.jpg",
+    "videoAsset": "ad_videos/video_running_01.mp4"
   },
   {
     "id": "featured_large_011",
@@ -958,7 +964,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_sportswear_01.jpg"
+    "imageAsset": "ad_images/ecommerce_sportswear_01.jpg",
+    "videoAsset": "ad_videos/video_digital_desk_01.mp4"
   },
   {
     "id": "featured_small_012",
@@ -1045,7 +1052,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_study_desk_01.jpg"
+    "imageAsset": "ad_images/featured_study_desk_01.jpg",
+    "videoAsset": "ad_videos/video_travel_01.mp4"
   },
   {
     "id": "featured_large_013",
@@ -1132,7 +1140,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_skincare_02.jpg"
+    "imageAsset": "ad_images/ecommerce_skincare_02.jpg",
+    "videoAsset": "ad_videos/video_fitness_01.mp4"
   },
   {
     "id": "featured_small_014",
@@ -1219,7 +1228,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_small_appliance_02.jpg"
+    "imageAsset": "ad_images/ecommerce_small_appliance_02.jpg",
+    "videoAsset": "ad_videos/video_parent_child_01.mp4"
   },
   {
     "id": "featured_large_015",
@@ -1306,7 +1316,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_travel_01.jpg"
+    "imageAsset": "ad_images/featured_travel_01.jpg",
+    "videoAsset": "ad_videos/video_home_01.mp4"
   },
   {
     "id": "featured_small_016",
@@ -1393,7 +1404,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_study_desk_01.jpg"
+    "imageAsset": "ad_images/featured_study_desk_01.jpg",
+    "videoAsset": "ad_videos/video_gaming_01.mp4"
   },
   {
     "id": "featured_large_017",
@@ -1480,7 +1492,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_earbuds_02.jpg"
+    "imageAsset": "ad_images/ecommerce_earbuds_02.jpg",
+    "videoAsset": "ad_videos/video_coffee_01.mp4"
   },
   {
     "id": "featured_small_018",
@@ -1567,7 +1580,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_weekend_market_02.jpg"
+    "imageAsset": "ad_images/featured_weekend_market_02.jpg",
+    "videoAsset": "ad_videos/video_running_01.mp4"
   },
   {
     "id": "featured_large_019",
@@ -1654,7 +1668,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_phone_01.jpg"
+    "imageAsset": "ad_images/ecommerce_phone_01.jpg",
+    "videoAsset": "ad_videos/video_digital_desk_01.mp4"
   },
   {
     "id": "featured_small_020",
@@ -1741,7 +1756,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_travel_01.jpg"
+    "imageAsset": "ad_images/featured_travel_01.jpg",
+    "videoAsset": "ad_videos/video_travel_01.mp4"
   },
   {
     "id": "featured_large_021",
@@ -1828,7 +1844,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_weekend_market_02.jpg"
+    "imageAsset": "ad_images/featured_weekend_market_02.jpg",
+    "videoAsset": "ad_videos/video_fitness_01.mp4"
   },
   {
     "id": "featured_small_022",
@@ -1915,7 +1932,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_travel_02.jpg"
+    "imageAsset": "ad_images/featured_travel_02.jpg",
+    "videoAsset": "ad_videos/video_parent_child_01.mp4"
   },
   {
     "id": "featured_large_023",
@@ -2002,7 +2020,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_skincare_01.jpg"
+    "imageAsset": "ad_images/ecommerce_skincare_01.jpg",
+    "videoAsset": "ad_videos/video_home_01.mp4"
   },
   {
     "id": "featured_small_024",
@@ -2089,7 +2108,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_earbuds_02.jpg"
+    "imageAsset": "ad_images/ecommerce_earbuds_02.jpg",
+    "videoAsset": "ad_videos/video_gaming_01.mp4"
   },
   {
     "id": "featured_large_025",
@@ -2176,7 +2196,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_phone_01.jpg"
+    "imageAsset": "ad_images/ecommerce_phone_01.jpg",
+    "videoAsset": "ad_videos/video_coffee_01.mp4"
   },
   {
     "id": "featured_small_026",
@@ -2263,7 +2284,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_weekend_market_01.jpg"
+    "imageAsset": "ad_images/featured_weekend_market_01.jpg",
+    "videoAsset": "ad_videos/video_running_01.mp4"
   },
   {
     "id": "featured_large_027",
@@ -2350,7 +2372,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_sportswear_02.jpg"
+    "imageAsset": "ad_images/ecommerce_sportswear_02.jpg",
+    "videoAsset": "ad_videos/video_digital_desk_01.mp4"
   },
   {
     "id": "featured_small_028",
@@ -2437,7 +2460,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_phone_01.jpg"
+    "imageAsset": "ad_images/ecommerce_phone_01.jpg",
+    "videoAsset": "ad_videos/video_travel_01.mp4"
   },
   {
     "id": "featured_large_029",
@@ -2524,7 +2548,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_weekend_market_02.jpg"
+    "imageAsset": "ad_images/featured_weekend_market_02.jpg",
+    "videoAsset": "ad_videos/video_fitness_01.mp4"
   },
   {
     "id": "featured_small_030",
@@ -2611,7 +2636,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_study_desk_01.jpg"
+    "imageAsset": "ad_images/featured_study_desk_01.jpg",
+    "videoAsset": "ad_videos/video_parent_child_01.mp4"
   },
   {
     "id": "featured_large_031",
@@ -2698,7 +2724,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_makeup_01.jpg"
+    "imageAsset": "ad_images/ecommerce_makeup_01.jpg",
+    "videoAsset": "ad_videos/video_home_01.mp4"
   },
   {
     "id": "featured_small_032",
@@ -2785,7 +2812,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_travel_02.jpg"
+    "imageAsset": "ad_images/featured_travel_02.jpg",
+    "videoAsset": "ad_videos/video_gaming_01.mp4"
   },
   {
     "id": "featured_large_033",
@@ -2872,7 +2900,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_weekend_market_02.jpg"
+    "imageAsset": "ad_images/featured_weekend_market_02.jpg",
+    "videoAsset": "ad_videos/video_coffee_01.mp4"
   },
   {
     "id": "featured_small_034",
@@ -2959,7 +2988,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_keyboard_02.jpg"
+    "imageAsset": "ad_images/ecommerce_keyboard_02.jpg",
+    "videoAsset": "ad_videos/video_running_01.mp4"
   },
   {
     "id": "featured_large_035",
@@ -3046,7 +3076,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_travel_02.jpg"
+    "imageAsset": "ad_images/featured_travel_02.jpg",
+    "videoAsset": "ad_videos/video_digital_desk_01.mp4"
   },
   {
     "id": "featured_small_036",
@@ -3133,7 +3164,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_small_appliance_02.jpg"
+    "imageAsset": "ad_images/ecommerce_small_appliance_02.jpg",
+    "videoAsset": "ad_videos/video_travel_01.mp4"
   },
   {
     "id": "featured_large_037",
@@ -3220,7 +3252,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_monitor_01.jpg"
+    "imageAsset": "ad_images/ecommerce_monitor_01.jpg",
+    "videoAsset": "ad_videos/video_fitness_01.mp4"
   },
   {
     "id": "featured_small_038",
@@ -3307,7 +3340,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_weekend_market_02.jpg"
+    "imageAsset": "ad_images/featured_weekend_market_02.jpg",
+    "videoAsset": "ad_videos/video_parent_child_01.mp4"
   },
   {
     "id": "featured_large_039",
@@ -3394,7 +3428,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_gaming_desk_01.jpg"
+    "imageAsset": "ad_images/featured_gaming_desk_01.jpg",
+    "videoAsset": "ad_videos/video_home_01.mp4"
   },
   {
     "id": "featured_small_040",
@@ -3481,7 +3516,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_phone_01.jpg"
+    "imageAsset": "ad_images/ecommerce_phone_01.jpg",
+    "videoAsset": "ad_videos/video_gaming_01.mp4"
   },
   {
     "id": "ecommerce_large_001",
@@ -3569,7 +3605,7 @@
     "shareCount": 0,
     "favorited": false,
     "imageAsset": "ad_images/ecommerce_home_storage_02.jpg",
-    "videoAsset": "ad_videos/video_home_01.mp4"
+    "videoAsset": "ad_videos/video_coffee_01.mp4"
   },
   {
     "id": "ecommerce_small_002",
@@ -3657,7 +3693,7 @@
     "shareCount": 0,
     "favorited": false,
     "imageAsset": "ad_images/featured_study_desk_02.jpg",
-    "videoAsset": "ad_videos/video_fitness_01.mp4"
+    "videoAsset": "ad_videos/video_running_01.mp4"
   },
   {
     "id": "ecommerce_large_003",
@@ -3745,7 +3781,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_home_storage_02.jpg"
+    "imageAsset": "ad_images/ecommerce_home_storage_02.jpg",
+    "videoAsset": "ad_videos/video_digital_desk_01.mp4"
   },
   {
     "id": "ecommerce_small_004",
@@ -3832,7 +3869,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_travel_01.jpg"
+    "imageAsset": "ad_images/featured_travel_01.jpg",
+    "videoAsset": "ad_videos/video_travel_01.mp4"
   },
   {
     "id": "ecommerce_large_005",
@@ -3919,7 +3957,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_travel_02.jpg"
+    "imageAsset": "ad_images/featured_travel_02.jpg",
+    "videoAsset": "ad_videos/video_fitness_01.mp4"
   },
   {
     "id": "ecommerce_small_006",
@@ -4006,7 +4045,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_study_desk_01.jpg"
+    "imageAsset": "ad_images/featured_study_desk_01.jpg",
+    "videoAsset": "ad_videos/video_parent_child_01.mp4"
   },
   {
     "id": "ecommerce_large_007",
@@ -4094,7 +4134,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_study_desk_02.jpg"
+    "imageAsset": "ad_images/featured_study_desk_02.jpg",
+    "videoAsset": "ad_videos/video_home_01.mp4"
   },
   {
     "id": "ecommerce_small_008",
@@ -4182,7 +4223,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/featured_productivity_tools_01.jpg"
+    "imageAsset": "ad_images/featured_productivity_tools_01.jpg",
+    "videoAsset": "ad_videos/video_gaming_01.mp4"
   },
   {
     "id": "ecommerce_large_009",
@@ -4269,7 +4311,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_home_storage_01.jpg"
+    "imageAsset": "ad_images/ecommerce_home_storage_01.jpg",
+    "videoAsset": "ad_videos/video_coffee_01.mp4"
   },
   {
     "id": "ecommerce_small_010",
@@ -4356,7 +4399,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_small_appliance_01.jpg"
+    "imageAsset": "ad_images/ecommerce_small_appliance_01.jpg",
+    "videoAsset": "ad_videos/video_running_01.mp4"
   },
   {
     "id": "ecommerce_large_011",
@@ -4443,7 +4487,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_home_storage_02.jpg"
+    "imageAsset": "ad_images/ecommerce_home_storage_02.jpg",
+    "videoAsset": "ad_videos/video_digital_desk_01.mp4"
   },
   {
     "id": "ecommerce_small_012",
@@ -4530,7 +4575,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_home_storage_02.jpg"
+    "imageAsset": "ad_images/ecommerce_home_storage_02.jpg",
+    "videoAsset": "ad_videos/video_travel_01.mp4"
   },
   {
     "id": "ecommerce_large_013",
@@ -4617,7 +4663,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_small_appliance_02.jpg"
+    "imageAsset": "ad_images/ecommerce_small_appliance_02.jpg",
+    "videoAsset": "ad_videos/video_fitness_01.mp4"
   },
   {
     "id": "ecommerce_small_014",
@@ -4704,7 +4751,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_phone_02.jpg"
+    "imageAsset": "ad_images/ecommerce_phone_02.jpg",
+    "videoAsset": "ad_videos/video_parent_child_01.mp4"
   },
   {
     "id": "ecommerce_large_015",
@@ -4791,7 +4839,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_home_storage_01.jpg"
+    "imageAsset": "ad_images/ecommerce_home_storage_01.jpg",
+    "videoAsset": "ad_videos/video_home_01.mp4"
   },
   {
     "id": "ecommerce_small_016",
@@ -4878,7 +4927,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_phone_01.jpg"
+    "imageAsset": "ad_images/ecommerce_phone_01.jpg",
+    "videoAsset": "ad_videos/video_gaming_01.mp4"
   },
   {
     "id": "ecommerce_large_017",
@@ -4965,7 +5015,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_earbuds_01.jpg"
+    "imageAsset": "ad_images/ecommerce_earbuds_01.jpg",
+    "videoAsset": "ad_videos/video_coffee_01.mp4"
   },
   {
     "id": "ecommerce_small_018",
@@ -5053,7 +5104,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_keyboard_01.jpg"
+    "imageAsset": "ad_images/ecommerce_keyboard_01.jpg",
+    "videoAsset": "ad_videos/video_running_01.mp4"
   },
   {
     "id": "ecommerce_large_019",
@@ -5140,7 +5192,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_monitor_02.jpg"
+    "imageAsset": "ad_images/ecommerce_monitor_02.jpg",
+    "videoAsset": "ad_videos/video_digital_desk_01.mp4"
   },
   {
     "id": "ecommerce_small_020",
@@ -5227,7 +5280,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_phone_02.jpg"
+    "imageAsset": "ad_images/ecommerce_phone_02.jpg",
+    "videoAsset": "ad_videos/video_travel_01.mp4"
   },
   {
     "id": "ecommerce_large_021",
@@ -5314,7 +5368,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_monitor_01.jpg"
+    "imageAsset": "ad_images/ecommerce_monitor_01.jpg",
+    "videoAsset": "ad_videos/video_fitness_01.mp4"
   },
   {
     "id": "ecommerce_small_022",
@@ -5402,7 +5457,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_phone_02.jpg"
+    "imageAsset": "ad_images/ecommerce_phone_02.jpg",
+    "videoAsset": "ad_videos/video_parent_child_01.mp4"
   },
   {
     "id": "ecommerce_large_023",
@@ -5490,7 +5546,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_keyboard_02.jpg"
+    "imageAsset": "ad_images/ecommerce_keyboard_02.jpg",
+    "videoAsset": "ad_videos/video_home_01.mp4"
   },
   {
     "id": "ecommerce_small_024",
@@ -5577,7 +5634,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_phone_01.jpg"
+    "imageAsset": "ad_images/ecommerce_phone_01.jpg",
+    "videoAsset": "ad_videos/video_gaming_01.mp4"
   },
   {
     "id": "ecommerce_large_025",
@@ -5664,7 +5722,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_sportswear_01.jpg"
+    "imageAsset": "ad_images/ecommerce_sportswear_01.jpg",
+    "videoAsset": "ad_videos/video_coffee_01.mp4"
   },
   {
     "id": "ecommerce_small_026",
@@ -5751,7 +5810,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_shoes_01.jpg"
+    "imageAsset": "ad_images/ecommerce_shoes_01.jpg",
+    "videoAsset": "ad_videos/video_running_01.mp4"
   },
   {
     "id": "ecommerce_large_027",
@@ -5838,7 +5898,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_sportswear_01.jpg"
+    "imageAsset": "ad_images/ecommerce_sportswear_01.jpg",
+    "videoAsset": "ad_videos/video_digital_desk_01.mp4"
   },
   {
     "id": "ecommerce_small_028",
@@ -5925,7 +5986,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_home_storage_02.jpg"
+    "imageAsset": "ad_images/ecommerce_home_storage_02.jpg",
+    "videoAsset": "ad_videos/video_travel_01.mp4"
   },
   {
     "id": "ecommerce_large_029",
@@ -6012,7 +6074,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_sportswear_01.jpg"
+    "imageAsset": "ad_images/ecommerce_sportswear_01.jpg",
+    "videoAsset": "ad_videos/video_fitness_01.mp4"
   },
   {
     "id": "ecommerce_small_030",
@@ -6099,7 +6162,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_skincare_01.jpg"
+    "imageAsset": "ad_images/ecommerce_skincare_01.jpg",
+    "videoAsset": "ad_videos/video_parent_child_01.mp4"
   },
   {
     "id": "ecommerce_large_031",
@@ -6187,7 +6251,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_makeup_01.jpg"
+    "imageAsset": "ad_images/ecommerce_makeup_01.jpg",
+    "videoAsset": "ad_videos/video_home_01.mp4"
   },
   {
     "id": "ecommerce_small_032",
@@ -6274,7 +6339,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_makeup_01.jpg"
+    "imageAsset": "ad_images/ecommerce_makeup_01.jpg",
+    "videoAsset": "ad_videos/video_gaming_01.mp4"
   },
   {
     "id": "ecommerce_large_033",
@@ -6361,7 +6427,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_skincare_01.jpg"
+    "imageAsset": "ad_images/ecommerce_skincare_01.jpg",
+    "videoAsset": "ad_videos/video_coffee_01.mp4"
   },
   {
     "id": "ecommerce_small_034",
@@ -6448,7 +6515,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_small_appliance_01.jpg"
+    "imageAsset": "ad_images/ecommerce_small_appliance_01.jpg",
+    "videoAsset": "ad_videos/video_running_01.mp4"
   },
   {
     "id": "ecommerce_large_035",
@@ -6536,7 +6604,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_small_appliance_01.jpg"
+    "imageAsset": "ad_images/ecommerce_small_appliance_01.jpg",
+    "videoAsset": "ad_videos/video_digital_desk_01.mp4"
   },
   {
     "id": "ecommerce_small_036",
@@ -6624,7 +6693,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_small_appliance_02.jpg"
+    "imageAsset": "ad_images/ecommerce_small_appliance_02.jpg",
+    "videoAsset": "ad_videos/video_travel_01.mp4"
   },
   {
     "id": "ecommerce_large_037",
@@ -6711,7 +6781,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_makeup_02.jpg"
+    "imageAsset": "ad_images/ecommerce_makeup_02.jpg",
+    "videoAsset": "ad_videos/video_fitness_01.mp4"
   },
   {
     "id": "ecommerce_small_038",
@@ -6798,7 +6869,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_keyboard_02.jpg"
+    "imageAsset": "ad_images/ecommerce_keyboard_02.jpg",
+    "videoAsset": "ad_videos/video_parent_child_01.mp4"
   },
   {
     "id": "ecommerce_large_039",
@@ -6885,7 +6957,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_keyboard_02.jpg"
+    "imageAsset": "ad_images/ecommerce_keyboard_02.jpg",
+    "videoAsset": "ad_videos/video_home_01.mp4"
   },
   {
     "id": "ecommerce_small_040",
@@ -6972,7 +7045,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/ecommerce_monitor_01.jpg"
+    "imageAsset": "ad_images/ecommerce_monitor_01.jpg",
+    "videoAsset": "ad_videos/video_gaming_01.mp4"
   },
   {
     "id": "local_large_001",
@@ -7061,7 +7135,7 @@
     "shareCount": 0,
     "favorited": false,
     "imageAsset": "ad_images/local_badminton_02.jpg",
-    "videoAsset": "ad_videos/video_parent_child_01.mp4"
+    "videoAsset": "ad_videos/video_coffee_01.mp4"
   },
   {
     "id": "local_small_002",
@@ -7148,7 +7222,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_milk_tea_01.jpg"
+    "imageAsset": "ad_images/local_milk_tea_01.jpg",
+    "videoAsset": "ad_videos/video_running_01.mp4"
   },
   {
     "id": "local_large_003",
@@ -7235,7 +7310,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_badminton_02.jpg"
+    "imageAsset": "ad_images/local_badminton_02.jpg",
+    "videoAsset": "ad_videos/video_digital_desk_01.mp4"
   },
   {
     "id": "local_small_004",
@@ -7410,7 +7486,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_light_food_01.jpg"
+    "imageAsset": "ad_images/local_light_food_01.jpg",
+    "videoAsset": "ad_videos/video_fitness_01.mp4"
   },
   {
     "id": "local_small_006",
@@ -7497,7 +7574,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_parent_child_02.jpg"
+    "imageAsset": "ad_images/local_parent_child_02.jpg",
+    "videoAsset": "ad_videos/video_parent_child_01.mp4"
   },
   {
     "id": "local_large_007",
@@ -7584,7 +7662,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_photography_service_01.jpg"
+    "imageAsset": "ad_images/local_photography_service_01.jpg",
+    "videoAsset": "ad_videos/video_home_01.mp4"
   },
   {
     "id": "local_small_008",
@@ -7671,7 +7750,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_exhibition_01.jpg"
+    "imageAsset": "ad_images/local_exhibition_01.jpg",
+    "videoAsset": "ad_videos/video_gaming_01.mp4"
   },
   {
     "id": "local_large_009",
@@ -7758,7 +7838,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_badminton_02.jpg"
+    "imageAsset": "ad_images/local_badminton_02.jpg",
+    "videoAsset": "ad_videos/video_coffee_01.mp4"
   },
   {
     "id": "local_small_010",
@@ -7845,7 +7926,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_photography_service_02.jpg"
+    "imageAsset": "ad_images/local_photography_service_02.jpg",
+    "videoAsset": "ad_videos/video_running_01.mp4"
   },
   {
     "id": "local_large_011",
@@ -7932,7 +8014,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_photography_service_01.jpg"
+    "imageAsset": "ad_images/local_photography_service_01.jpg",
+    "videoAsset": "ad_videos/video_digital_desk_01.mp4"
   },
   {
     "id": "local_small_012",
@@ -8019,7 +8102,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_coffee_01.jpg"
+    "imageAsset": "ad_images/local_coffee_01.jpg",
+    "videoAsset": "ad_videos/video_travel_01.mp4"
   },
   {
     "id": "local_large_013",
@@ -8106,7 +8190,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_photography_service_02.jpg"
+    "imageAsset": "ad_images/local_photography_service_02.jpg",
+    "videoAsset": "ad_videos/video_fitness_01.mp4"
   },
   {
     "id": "local_small_014",
@@ -8193,7 +8278,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_dessert_02.jpg"
+    "imageAsset": "ad_images/local_dessert_02.jpg",
+    "videoAsset": "ad_videos/video_parent_child_01.mp4"
   },
   {
     "id": "local_large_015",
@@ -8281,7 +8367,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_coffee_01.jpg"
+    "imageAsset": "ad_images/local_coffee_01.jpg",
+    "videoAsset": "ad_videos/video_home_01.mp4"
   },
   {
     "id": "local_small_016",
@@ -8368,7 +8455,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_milk_tea_02.jpg"
+    "imageAsset": "ad_images/local_milk_tea_02.jpg",
+    "videoAsset": "ad_videos/video_gaming_01.mp4"
   },
   {
     "id": "local_large_017",
@@ -8455,7 +8543,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_milk_tea_01.jpg"
+    "imageAsset": "ad_images/local_milk_tea_01.jpg",
+    "videoAsset": "ad_videos/video_coffee_01.mp4"
   },
   {
     "id": "local_small_018",
@@ -8542,7 +8631,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_light_food_01.jpg"
+    "imageAsset": "ad_images/local_light_food_01.jpg",
+    "videoAsset": "ad_videos/video_running_01.mp4"
   },
   {
     "id": "local_large_019",
@@ -8629,7 +8719,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_badminton_02.jpg"
+    "imageAsset": "ad_images/local_badminton_02.jpg",
+    "videoAsset": "ad_videos/video_digital_desk_01.mp4"
   },
   {
     "id": "local_small_020",
@@ -8716,7 +8807,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_yoga_01.jpg"
+    "imageAsset": "ad_images/local_yoga_01.jpg",
+    "videoAsset": "ad_videos/video_travel_01.mp4"
   },
   {
     "id": "local_large_021",
@@ -8803,7 +8895,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_badminton_02.jpg"
+    "imageAsset": "ad_images/local_badminton_02.jpg",
+    "videoAsset": "ad_videos/video_fitness_01.mp4"
   },
   {
     "id": "local_small_022",
@@ -8890,7 +8983,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_parent_child_01.jpg"
+    "imageAsset": "ad_images/local_parent_child_01.jpg",
+    "videoAsset": "ad_videos/video_parent_child_01.mp4"
   },
   {
     "id": "local_large_023",
@@ -8977,7 +9071,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_exhibition_02.jpg"
+    "imageAsset": "ad_images/local_exhibition_02.jpg",
+    "videoAsset": "ad_videos/video_home_01.mp4"
   },
   {
     "id": "local_small_024",
@@ -9064,7 +9159,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_exhibition_02.jpg"
+    "imageAsset": "ad_images/local_exhibition_02.jpg",
+    "videoAsset": "ad_videos/video_gaming_01.mp4"
   },
   {
     "id": "local_large_025",
@@ -9151,7 +9247,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_exhibition_02.jpg"
+    "imageAsset": "ad_images/local_exhibition_02.jpg",
+    "videoAsset": "ad_videos/video_coffee_01.mp4"
   },
   {
     "id": "local_small_026",
@@ -9238,7 +9335,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_light_food_02.jpg"
+    "imageAsset": "ad_images/local_light_food_02.jpg",
+    "videoAsset": "ad_videos/video_running_01.mp4"
   },
   {
     "id": "local_large_027",
@@ -9325,7 +9423,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_photography_service_02.jpg"
+    "imageAsset": "ad_images/local_photography_service_02.jpg",
+    "videoAsset": "ad_videos/video_digital_desk_01.mp4"
   },
   {
     "id": "local_small_028",
@@ -9413,7 +9512,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_photography_service_02.jpg"
+    "imageAsset": "ad_images/local_photography_service_02.jpg",
+    "videoAsset": "ad_videos/video_travel_01.mp4"
   },
   {
     "id": "local_large_029",
@@ -9500,7 +9600,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_photography_service_01.jpg"
+    "imageAsset": "ad_images/local_photography_service_01.jpg",
+    "videoAsset": "ad_videos/video_fitness_01.mp4"
   },
   {
     "id": "local_small_030",
@@ -9587,7 +9688,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_photography_service_02.jpg"
+    "imageAsset": "ad_images/local_photography_service_02.jpg",
+    "videoAsset": "ad_videos/video_parent_child_01.mp4"
   },
   {
     "id": "local_large_031",
@@ -9674,7 +9776,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_photography_service_01.jpg"
+    "imageAsset": "ad_images/local_photography_service_01.jpg",
+    "videoAsset": "ad_videos/video_home_01.mp4"
   },
   {
     "id": "local_small_032",
@@ -9761,7 +9864,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_parent_child_01.jpg"
+    "imageAsset": "ad_images/local_parent_child_01.jpg",
+    "videoAsset": "ad_videos/video_gaming_01.mp4"
   },
   {
     "id": "local_large_033",
@@ -9848,7 +9952,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_light_food_02.jpg"
+    "imageAsset": "ad_images/local_light_food_02.jpg",
+    "videoAsset": "ad_videos/video_coffee_01.mp4"
   },
   {
     "id": "local_small_034",
@@ -9935,7 +10040,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_coffee_02.jpg"
+    "imageAsset": "ad_images/local_coffee_02.jpg",
+    "videoAsset": "ad_videos/video_running_01.mp4"
   },
   {
     "id": "local_large_035",
@@ -10022,7 +10128,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_photography_service_01.jpg"
+    "imageAsset": "ad_images/local_photography_service_01.jpg",
+    "videoAsset": "ad_videos/video_digital_desk_01.mp4"
   },
   {
     "id": "local_small_036",
@@ -10109,7 +10216,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_badminton_02.jpg"
+    "imageAsset": "ad_images/local_badminton_02.jpg",
+    "videoAsset": "ad_videos/video_travel_01.mp4"
   },
   {
     "id": "local_large_037",
@@ -10196,7 +10304,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_photography_service_01.jpg"
+    "imageAsset": "ad_images/local_photography_service_01.jpg",
+    "videoAsset": "ad_videos/video_fitness_01.mp4"
   },
   {
     "id": "local_small_038",
@@ -10283,7 +10392,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_light_food_01.jpg"
+    "imageAsset": "ad_images/local_light_food_01.jpg",
+    "videoAsset": "ad_videos/video_parent_child_01.mp4"
   },
   {
     "id": "local_large_039",
@@ -10370,7 +10480,8 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_badminton_01.jpg"
+    "imageAsset": "ad_images/local_badminton_01.jpg",
+    "videoAsset": "ad_videos/video_home_01.mp4"
   },
   {
     "id": "local_small_040",
@@ -10457,6 +10568,7 @@
     "favorite": false,
     "shareCount": 0,
     "favorited": false,
-    "imageAsset": "ad_images/local_badminton_01.jpg"
+    "imageAsset": "ad_images/local_badminton_01.jpg",
+    "videoAsset": "ad_videos/video_gaming_01.mp4"
   }
 ]
