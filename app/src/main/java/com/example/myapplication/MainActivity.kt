@@ -74,6 +74,7 @@ fun AdApp(
     val featuredListState = rememberLazyListState()
     val ecommerceListState = rememberLazyListState()
     val localListState = rememberLazyListState()
+    val searchResultListState = rememberLazyListState()
     val currentListState = when (uiState.selectedChannel) {
         AdChannel.FEATURED -> featuredListState
         AdChannel.ECOMMERCE -> ecommerceListState
@@ -90,6 +91,9 @@ fun AdApp(
             emptyList()
         } else {
             viewModel.searchAds(trimmedQuery)
+        }
+        coroutineScope.launch {
+            searchResultListState.scrollToItem(0)
         }
     }
 
@@ -117,8 +121,8 @@ fun AdApp(
         )
     }
 
-    val onAdClick: (String) -> Unit = { adId ->
-        detailAutoPlayVideoAdId = if (playingFeedVideoAdId == adId) adId else null
+    fun openAdDetail(adId: String, shouldAutoPlayInDetail: Boolean) {
+        detailAutoPlayVideoAdId = if (shouldAutoPlayInDetail) adId else null
         playingFeedVideoAdId = null
         autoPlayingFeedVideoAdId = null
         videoSeekPositions = videoSeekPositions - adId
@@ -127,6 +131,13 @@ fun AdApp(
         refreshSearchResults()
         detailRefreshKey++
         selectedAdId = adId
+    }
+
+    val onAdClick: (String) -> Unit = { adId ->
+        openAdDetail(
+            adId = adId,
+            shouldAutoPlayInDetail = playingFeedVideoAdId == adId
+        )
     }
 
     // 返回列表回调
@@ -196,6 +207,7 @@ fun AdApp(
             query = searchQuery,
             results = searchResults,
             hasSearched = hasSearched,
+            searchResultListState = searchResultListState,
             videoPlaybackPositions = videoPlaybackPositions,
             videoDurations = videoDurations,
             videoSeekPositions = videoSeekPositions,
@@ -203,7 +215,12 @@ fun AdApp(
             onQueryChange = { searchQuery = it },
             onSearch = { runSearch(it) },
             onBack = { isSearchVisible = false },
-            onAdClick = onAdClick,
+            onAdClick = { adId, shouldAutoPlayInDetail ->
+                openAdDetail(
+                    adId = adId,
+                    shouldAutoPlayInDetail = shouldAutoPlayInDetail
+                )
+            },
             onLikeClick = {
                 viewModel.toggleLike(it)
                 refreshSearchResults()

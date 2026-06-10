@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -35,6 +36,7 @@ fun SearchScreen(
     query: String,
     results: List<AdItem>,
     hasSearched: Boolean,
+    searchResultListState: LazyListState,
     videoPlaybackPositions: Map<String, Long>,
     videoDurations: Map<String, Long>,
     videoSeekPositions: Map<String, Long>,
@@ -42,7 +44,7 @@ fun SearchScreen(
     onQueryChange: (String) -> Unit,
     onSearch: (String) -> Unit,
     onBack: () -> Unit,
-    onAdClick: (String) -> Unit,
+    onAdClick: (String, Boolean) -> Unit,
     onLikeClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
     onShareClick: (String) -> Unit,
@@ -112,6 +114,7 @@ fun SearchScreen(
                 results.isEmpty() -> SearchEmptyState(query = query)
                 else -> SearchResultList(
                     results = results,
+                    listState = searchResultListState,
                     videoPlaybackPositions = videoPlaybackPositions,
                     videoDurations = videoDurations,
                     videoSeekPositions = videoSeekPositions,
@@ -260,11 +263,12 @@ private fun SearchEmptyState(
 @Composable
 private fun SearchResultList(
     results: List<AdItem>,
+    listState: LazyListState,
     videoPlaybackPositions: Map<String, Long>,
     videoDurations: Map<String, Long>,
     videoSeekPositions: Map<String, Long>,
     videoSeekRequestIds: Map<String, Long>,
-    onAdClick: (String) -> Unit,
+    onAdClick: (String, Boolean) -> Unit,
     onLikeClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
@@ -282,6 +286,7 @@ private fun SearchResultList(
     }
 
     LazyColumn(
+        state = listState,
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
             start = 14.dp,
@@ -306,7 +311,12 @@ private fun SearchResultList(
         ) { ad ->
             AdFeedCard(
                 ad = ad,
-                onClick = { onAdClick(ad.id) },
+                onClick = {
+                    onAdClick(
+                        ad.id,
+                        playingVideoAdId == ad.id
+                    )
+                },
                 onLikeClick = { onLikeClick(ad.id) },
                 onFavoriteClick = { onFavoriteClick(ad.id) },
                 onShareClick = { onShareClick(ad.id) },
