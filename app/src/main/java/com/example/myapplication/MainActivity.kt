@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -116,6 +117,15 @@ fun AdApp(
             viewModel.getAdById(id)
                 ?: uiState.ads.find { it.id == id }
                 ?: searchResults.find { it.id == id }
+        }
+    }
+
+    BackHandler(
+        enabled = selectedAd == null && !isSearchVisible && uiState.selectedTag != null
+    ) {
+        viewModel.clearTagFilter()
+        coroutineScope.launch {
+            currentListState.animateScrollToItem(0)
         }
     }
 

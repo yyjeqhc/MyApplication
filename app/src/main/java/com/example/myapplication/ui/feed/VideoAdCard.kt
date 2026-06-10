@@ -47,6 +47,7 @@ fun VideoAdCard(
     onFavoriteClick: () -> Unit,
     onShareClick: () -> Unit,
     onTagClick: (String) -> Unit,
+    onCtaClick: () -> Unit,
     isPlaying: Boolean = false,
     initialPositionMs: Long = 0L,
     videoPositionMs: Long = 0L,
@@ -328,7 +329,7 @@ fun VideoAdCard(
 
                 // CTA 按钮
                 Button(
-                    onClick = onClick,
+                    onClick = onCtaClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(38.dp),

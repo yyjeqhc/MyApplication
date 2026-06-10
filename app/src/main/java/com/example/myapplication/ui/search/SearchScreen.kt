@@ -278,6 +278,7 @@ private fun SearchResultList(
     onVideoPlaybackEnded: (String) -> Unit,
     onVideoSeek: (String, Long) -> Unit
 ) {
+    val context = LocalContext.current
     var playingVideoAdId by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(results) {
@@ -337,6 +338,7 @@ private fun SearchResultList(
                 onFavoriteClick = { onFavoriteClick(ad.id) },
                 onShareClick = { onShareClick(ad.id) },
                 onTagClick = onTagClick,
+                onCtaClick = { showSingleToast(context, "${ad.ctaText}功能开发中") },
                 isVideoPlaying = ad.cardType == AdCardType.VIDEO && playingVideoAdId == ad.id,
                 videoPositionMs = videoPlaybackPositions[ad.id] ?: 0L,
                 videoDurationMs = videoDurations[ad.id] ?: 0L,

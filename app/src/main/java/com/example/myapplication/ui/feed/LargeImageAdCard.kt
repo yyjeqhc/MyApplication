@@ -35,6 +35,7 @@ fun LargeImageAdCard(
     onFavoriteClick: () -> Unit,
     onShareClick: () -> Unit,
     onTagClick: (String) -> Unit,
+    onCtaClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -162,7 +163,7 @@ fun LargeImageAdCard(
 
                 // CTA 按钮
                 Button(
-                    onClick = onClick,
+                    onClick = onCtaClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(38.dp),

@@ -17,6 +17,7 @@ fun AdFeedCard(
     onFavoriteClick: () -> Unit,
     onShareClick: () -> Unit,
     onTagClick: (String) -> Unit,
+    onCtaClick: () -> Unit,
     isVideoPlaying: Boolean = false,
     videoPositionMs: Long = 0L,
     videoDurationMs: Long = 0L,
@@ -38,6 +39,7 @@ fun AdFeedCard(
                 onFavoriteClick = onFavoriteClick,
                 onShareClick = onShareClick,
                 onTagClick = onTagClick,
+                onCtaClick = onCtaClick,
                 modifier = modifier
             )
         }
@@ -60,6 +62,7 @@ fun AdFeedCard(
                 onFavoriteClick = onFavoriteClick,
                 onShareClick = onShareClick,
                 onTagClick = onTagClick,
+                onCtaClick = onCtaClick,
                 isPlaying = isVideoPlaying,
                 initialPositionMs = videoPositionMs,
                 videoPositionMs = videoPositionMs,

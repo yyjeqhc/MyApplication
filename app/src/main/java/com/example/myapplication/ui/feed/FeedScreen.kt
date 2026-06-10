@@ -563,6 +563,8 @@ private fun FeedPageContent(
     onRefresh: () -> Unit,
     onRetry: () -> Unit
 ) {
+    val context = LocalContext.current
+
     when (listStateStatus) {
         is FeedListState.Loading -> {
             SkeletonLoadingState()
@@ -649,6 +651,7 @@ private fun FeedPageContent(
                             onFavoriteClick = { onFavoriteClick(ad.id) },
                             onShareClick = { onShareClick(ad.id) },
                             onTagClick = onTagClick,
+                            onCtaClick = { showSingleToast(context, "${ad.ctaText}功能开发中") },
                             isVideoPlaying = ad.cardType == AdCardType.VIDEO && playingVideoAdId == ad.id,
                             videoPositionMs = videoPlaybackPositions[ad.id] ?: 0L,
                             videoDurationMs = videoDurations[ad.id] ?: 0L,
