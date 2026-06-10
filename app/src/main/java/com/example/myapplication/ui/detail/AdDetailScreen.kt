@@ -48,6 +48,11 @@ import java.util.Locale
 @Composable
 fun AdDetailScreen(
     ad: AdItem,
+    initialVideoPositionMs: Long = 0L,
+    initialVideoDurationMs: Long = 0L,
+    autoPlayVideo: Boolean = false,
+    onVideoPlaybackUpdate: (Long, Long) -> Unit = { _, _ -> },
+    onVideoPlaybackEnded: () -> Unit = {},
     onBack: () -> Unit,
     onLikeClick: () -> Unit,
     onFavoriteClick: () -> Unit,
@@ -110,7 +115,14 @@ fun AdDetailScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
-            DetailMediaHero(ad = ad)
+            DetailMediaHero(
+                ad = ad,
+                initialVideoPositionMs = initialVideoPositionMs,
+                initialVideoDurationMs = initialVideoDurationMs,
+                autoPlayVideo = autoPlayVideo,
+                onVideoPlaybackUpdate = onVideoPlaybackUpdate,
+                onVideoPlaybackEnded = onVideoPlaybackEnded
+            )
 
             Column(
                 modifier = Modifier.padding(16.dp)
@@ -679,10 +691,23 @@ private fun detailCopyFor(ad: AdItem): DetailCopy {
 @Composable
 private fun DetailMediaHero(
     ad: AdItem,
+    initialVideoPositionMs: Long = 0L,
+    initialVideoDurationMs: Long = 0L,
+    autoPlayVideo: Boolean = false,
+    onVideoPlaybackUpdate: (Long, Long) -> Unit = { _, _ -> },
+    onVideoPlaybackEnded: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     when (ad.cardType) {
-        AdCardType.VIDEO -> VideoDetailHero(ad = ad, modifier = modifier)
+        AdCardType.VIDEO -> VideoDetailHero(
+            ad = ad,
+            initialPositionMs = initialVideoPositionMs,
+            initialDurationMs = initialVideoDurationMs,
+            autoPlay = autoPlayVideo,
+            onVideoPlaybackUpdate = onVideoPlaybackUpdate,
+            onVideoPlaybackEnded = onVideoPlaybackEnded,
+            modifier = modifier
+        )
         AdCardType.LARGE_IMAGE -> LargeImageDetailHero(ad = ad, modifier = modifier)
         AdCardType.SMALL_IMAGE -> SmallImageDetailHero(ad = ad, modifier = modifier)
     }
@@ -691,18 +716,32 @@ private fun DetailMediaHero(
 @Composable
 private fun VideoDetailHero(
     ad: AdItem,
+    initialPositionMs: Long = 0L,
+    initialDurationMs: Long = 0L,
+    autoPlay: Boolean = false,
+    onVideoPlaybackUpdate: (Long, Long) -> Unit = { _, _ -> },
+    onVideoPlaybackEnded: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var isPlaying by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
-    var hasRequestedPlayback by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
+    var isPlaying by remember(ad.id, ad.videoAsset) { mutableStateOf(autoPlay) }
+    var hasRequestedPlayback by remember(ad.id, ad.videoAsset) { mutableStateOf(autoPlay || initialPositionMs > 0L) }
     var hasPlaybackError by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
     var isVideoBuffering by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
     var isVideoReady by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
     var hasRenderedFirstFrame by remember(ad.id, ad.videoAsset) { mutableStateOf(false) }
+    var currentPositionMs by remember(ad.id, ad.videoAsset) { mutableStateOf(initialPositionMs) }
+    var currentDurationMs by remember(ad.id, ad.videoAsset) { mutableStateOf(initialDurationMs) }
     val canPlayVideo = ad.videoAsset.isNotBlank() && !hasPlaybackError
     val shouldShowVideo = canPlayVideo && hasRequestedPlayback
     val shouldShowCover = !hasRenderedFirstFrame || hasPlaybackError || !shouldShowVideo
     val shouldShowLoading = canPlayVideo && isPlaying && !hasRenderedFirstFrame && (isVideoBuffering || !isVideoReady)
+    val progress = remember(currentPositionMs, currentDurationMs) {
+        if (currentDurationMs > 0L) {
+            (currentPositionMs.toFloat() / currentDurationMs.toFloat()).coerceIn(0f, 1f)
+        } else {
+            0f
+        }
+    }
     val playButtonInteractionSource = remember { MutableInteractionSource() }
 
     fun handlePlayButtonClick() {
@@ -732,9 +771,26 @@ private fun VideoDetailHero(
             LocalVideoPlayer(
                 assetPath = ad.videoAsset,
                 isPlaying = isPlaying,
+                initialPositionMs = initialPositionMs,
+                autoPlay = autoPlay,
                 modifier = Modifier.matchParentSize(),
                 onBufferingChanged = { isVideoBuffering = it },
                 onReadyChanged = { isVideoReady = it },
+                onReady = { durationMs ->
+                    currentDurationMs = durationMs
+                    onVideoPlaybackUpdate(currentPositionMs, durationMs)
+                },
+                onPositionChanged = { positionMs, durationMs ->
+                    currentPositionMs = positionMs
+                    if (durationMs > 0L) {
+                        currentDurationMs = durationMs
+                    }
+                    onVideoPlaybackUpdate(positionMs, durationMs)
+                },
+                onPlaybackEnded = {
+                    currentPositionMs = 0L
+                    onVideoPlaybackEnded()
+                },
                 onFirstFrameRendered = { hasRenderedFirstFrame = true },
                 onPlaybackError = {
                     hasPlaybackError = true
@@ -840,6 +896,20 @@ private fun VideoDetailHero(
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
         )
+
+        if (ad.videoAsset.isNotBlank()) {
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .height(3.dp),
+                color = Color.White.copy(alpha = 0.9f),
+                trackColor = Color.White.copy(alpha = 0.22f),
+                gapSize = 0.dp,
+                drawStopIndicator = {}
+            )
+        }
     }
 }
 

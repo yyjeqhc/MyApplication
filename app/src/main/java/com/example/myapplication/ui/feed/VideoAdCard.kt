@@ -47,7 +47,12 @@ fun VideoAdCard(
     onShareClick: () -> Unit,
     onTagClick: (String) -> Unit,
     isPlaying: Boolean = false,
+    initialPositionMs: Long = 0L,
+    videoPositionMs: Long = 0L,
+    videoDurationMs: Long = 0L,
     onVideoClick: () -> Unit = {},
+    onVideoPlaybackUpdate: (Long, Long) -> Unit = { _, _ -> },
+    onVideoPlaybackEnded: () -> Unit = {},
     onVideoError: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -61,6 +66,13 @@ fun VideoAdCard(
     val shouldShowVideo = canPlayVideo && hasRequestedPlayback
     val shouldShowCover = !hasRenderedFirstFrame || hasPlaybackError || !shouldShowVideo
     val shouldShowLoading = canPlayVideo && isPlaying && !hasRenderedFirstFrame && (isVideoBuffering || !isVideoReady)
+    val progress = remember(videoPositionMs, videoDurationMs) {
+        if (videoDurationMs > 0L) {
+            (videoPositionMs.toFloat() / videoDurationMs.toFloat()).coerceIn(0f, 1f)
+        } else {
+            0f
+        }
+    }
     val mediaClickInteractionSource = remember { MutableInteractionSource() }
     val playButtonInteractionSource = remember { MutableInteractionSource() }
 
@@ -99,9 +111,16 @@ fun VideoAdCard(
                     LocalVideoPlayer(
                         assetPath = ad.videoAsset,
                         isPlaying = isPlaying,
+                        initialPositionMs = initialPositionMs,
+                        autoPlay = isPlaying,
                         modifier = Modifier.matchParentSize(),
                         onBufferingChanged = { isVideoBuffering = it },
                         onReadyChanged = { isVideoReady = it },
+                        onReady = { durationMs ->
+                            onVideoPlaybackUpdate(videoPositionMs, durationMs)
+                        },
+                        onPositionChanged = onVideoPlaybackUpdate,
+                        onPlaybackEnded = onVideoPlaybackEnded,
                         onFirstFrameRendered = { hasRenderedFirstFrame = true },
                         onPlaybackError = {
                             hasPlaybackError = true
@@ -234,6 +253,20 @@ fun VideoAdCard(
                         text = ad.videoDuration.ifBlank { "00:30" },
                         color = Color.White,
                         fontSize = 11.sp
+                    )
+                }
+
+                if (ad.videoAsset.isNotBlank()) {
+                    LinearProgressIndicator(
+                        progress = { progress },
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .fillMaxWidth()
+                            .height(3.dp),
+                        color = Color.White.copy(alpha = 0.9f),
+                        trackColor = Color.White.copy(alpha = 0.22f),
+                        gapSize = 0.dp,
+                        drawStopIndicator = {}
                     )
                 }
             }

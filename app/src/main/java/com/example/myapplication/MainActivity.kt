@@ -61,6 +61,10 @@ fun AdApp(
     var searchResults by remember { mutableStateOf(emptyList<AdItem>()) }
     var hasSearched by remember { mutableStateOf(false) }
     var detailRefreshKey by remember { mutableIntStateOf(0) }
+    var playingFeedVideoAdId by remember { mutableStateOf<String?>(null) }
+    var detailAutoPlayVideoAdId by remember { mutableStateOf<String?>(null) }
+    var videoPlaybackPositions by remember { mutableStateOf<Map<String, Long>>(emptyMap()) }
+    var videoDurations by remember { mutableStateOf<Map<String, Long>>(emptyMap()) }
 
     // 每个频道独立保存滚动状态，避免 Tab 切换后丢失位置
     val featuredListState = rememberLazyListState()
@@ -102,6 +106,10 @@ fun AdApp(
 
     // 点击广告卡片回调
     val onAdClick: (String) -> Unit = { adId ->
+        detailAutoPlayVideoAdId = if (playingFeedVideoAdId == adId) adId else null
+        if (playingFeedVideoAdId == adId) {
+            playingFeedVideoAdId = null
+        }
         viewModel.recordClick(adId)
         refreshSearchResults()
         detailRefreshKey++
@@ -118,6 +126,18 @@ fun AdApp(
         // 显示详情页
         AdDetailScreen(
             ad = selectedAd,
+            initialVideoPositionMs = videoPlaybackPositions[selectedAd.id] ?: 0L,
+            initialVideoDurationMs = videoDurations[selectedAd.id] ?: 0L,
+            autoPlayVideo = detailAutoPlayVideoAdId == selectedAd.id,
+            onVideoPlaybackUpdate = { positionMs, durationMs ->
+                videoPlaybackPositions = videoPlaybackPositions + (selectedAd.id to positionMs)
+                if (durationMs > 0L) {
+                    videoDurations = videoDurations + (selectedAd.id to durationMs)
+                }
+            },
+            onVideoPlaybackEnded = {
+                videoPlaybackPositions = videoPlaybackPositions + (selectedAd.id to 0L)
+            },
             onBack = onBack,
             onLikeClick = {
                 viewModel.toggleLike(selectedAd.id)
@@ -179,6 +199,9 @@ fun AdApp(
         // 显示信息流页面
         FeedScreen(
             uiState = uiState,
+            playingVideoAdId = playingFeedVideoAdId,
+            videoPlaybackPositions = videoPlaybackPositions,
+            videoDurations = videoDurations,
             listStateForChannel = { channel ->
                 when (channel) {
                     AdChannel.FEATURED -> featuredListState
@@ -198,6 +221,21 @@ fun AdApp(
             onShareClick = {
                 viewModel.recordShare(it)
                 refreshSearchResults()
+            },
+            onVideoPlayToggle = { adId ->
+                playingFeedVideoAdId = if (playingFeedVideoAdId == adId) null else adId
+            },
+            onVideoPlaybackUpdate = { adId, positionMs, durationMs ->
+                videoPlaybackPositions = videoPlaybackPositions + (adId to positionMs)
+                if (durationMs > 0L) {
+                    videoDurations = videoDurations + (adId to durationMs)
+                }
+            },
+            onVideoPlaybackEnded = { adId ->
+                if (playingFeedVideoAdId == adId) {
+                    playingFeedVideoAdId = null
+                }
+                videoPlaybackPositions = videoPlaybackPositions + (adId to 0L)
             },
             onTagClick = {
                 viewModel.selectTag(it)

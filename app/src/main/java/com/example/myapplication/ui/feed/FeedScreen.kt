@@ -51,11 +51,17 @@ private const val REFRESH_FEEDBACK_DURATION_MS = 900L
 @Composable
 fun FeedScreen(
     uiState: FeedUiState,
+    playingVideoAdId: String?,
+    videoPlaybackPositions: Map<String, Long>,
+    videoDurations: Map<String, Long>,
     listStateForChannel: (AdChannel) -> LazyListState,
     onAdClick: (String) -> Unit,
     onLikeClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
     onShareClick: (String) -> Unit,
+    onVideoPlayToggle: (String) -> Unit,
+    onVideoPlaybackUpdate: (String, Long, Long) -> Unit,
+    onVideoPlaybackEnded: (String) -> Unit,
     onTagClick: (String) -> Unit,
     onClearTagFilter: () -> Unit,
     onChannelSelect: (AdChannel) -> Unit,
@@ -101,7 +107,6 @@ fun FeedScreen(
     var isControlPanelVisible by remember { mutableStateOf(false) }
     var refreshFeedbackMessage by remember { mutableStateOf<String?>(null) }
     var refreshFeedbackToken by remember { mutableIntStateOf(0) }
-    var playingVideoAdId by remember { mutableStateOf<String?>(null) }
 
     val visibleAds = remember(uiState.ads, uiState.selectedTag) { uiState.filteredAds }
     val visibleAdIds = remember(visibleAds) { visibleAds.map { it.id } }
@@ -137,7 +142,7 @@ fun FeedScreen(
     }
 
     LaunchedEffect(uiState.selectedChannel) {
-        playingVideoAdId = null
+        playingVideoAdId?.let(onVideoPlayToggle)
         if (pagerState.currentPage != selectedPage) {
             pagerState.animateScrollToPage(selectedPage)
         }
@@ -170,7 +175,7 @@ fun FeedScreen(
                     onVisibleAdsChanged(visibleIds)
                 }
                 if (playingVideoAdId != null && playingVideoAdId !in visibleIds) {
-                    playingVideoAdId = null
+                    onVideoPlayToggle(playingVideoAdId)
                 }
             }
     }
@@ -295,9 +300,11 @@ fun FeedScreen(
                     onTagClick = onTagClick,
                     onClearTagFilter = onClearTagFilter,
                     playingVideoAdId = playingVideoAdId,
-                    onVideoClick = { adId ->
-                        playingVideoAdId = if (playingVideoAdId == adId) null else adId
-                    },
+                    videoPlaybackPositions = videoPlaybackPositions,
+                    videoDurations = videoDurations,
+                    onVideoClick = onVideoPlayToggle,
+                    onVideoPlaybackUpdate = onVideoPlaybackUpdate,
+                    onVideoPlaybackEnded = onVideoPlaybackEnded,
                     onRefresh = onRefresh,
                     onRetry = onRetry
                 )
@@ -321,7 +328,11 @@ fun FeedScreen(
                     onTagClick = onTagClick,
                     onClearTagFilter = onClearTagFilter,
                     playingVideoAdId = null,
+                    videoPlaybackPositions = videoPlaybackPositions,
+                    videoDurations = videoDurations,
                     onVideoClick = {},
+                    onVideoPlaybackUpdate = onVideoPlaybackUpdate,
+                    onVideoPlaybackEnded = onVideoPlaybackEnded,
                     onRefresh = {},
                     onRetry = onRetry
                 )
@@ -439,7 +450,11 @@ private fun FeedPageContent(
     onTagClick: (String) -> Unit,
     onClearTagFilter: () -> Unit,
     playingVideoAdId: String?,
+    videoPlaybackPositions: Map<String, Long>,
+    videoDurations: Map<String, Long>,
     onVideoClick: (String) -> Unit,
+    onVideoPlaybackUpdate: (String, Long, Long) -> Unit,
+    onVideoPlaybackEnded: (String) -> Unit,
     onRefresh: () -> Unit,
     onRetry: () -> Unit
 ) {
@@ -530,7 +545,13 @@ private fun FeedPageContent(
                             onShareClick = { onShareClick(ad.id) },
                             onTagClick = onTagClick,
                             isVideoPlaying = ad.cardType == AdCardType.VIDEO && playingVideoAdId == ad.id,
+                            videoPositionMs = videoPlaybackPositions[ad.id] ?: 0L,
+                            videoDurationMs = videoDurations[ad.id] ?: 0L,
                             onVideoClick = { onVideoClick(ad.id) },
+                            onVideoPlaybackUpdate = { positionMs, durationMs ->
+                                onVideoPlaybackUpdate(ad.id, positionMs, durationMs)
+                            },
+                            onVideoPlaybackEnded = { onVideoPlaybackEnded(ad.id) },
                             onVideoError = {
                                 if (playingVideoAdId == ad.id) {
                                     onVideoClick(ad.id)

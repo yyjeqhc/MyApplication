@@ -18,7 +18,11 @@ fun AdFeedCard(
     onShareClick: () -> Unit,
     onTagClick: (String) -> Unit,
     isVideoPlaying: Boolean = false,
+    videoPositionMs: Long = 0L,
+    videoDurationMs: Long = 0L,
     onVideoClick: () -> Unit = {},
+    onVideoPlaybackUpdate: (Long, Long) -> Unit = { _, _ -> },
+    onVideoPlaybackEnded: () -> Unit = {},
     onVideoError: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -54,7 +58,12 @@ fun AdFeedCard(
                 onShareClick = onShareClick,
                 onTagClick = onTagClick,
                 isPlaying = isVideoPlaying,
+                initialPositionMs = videoPositionMs,
+                videoPositionMs = videoPositionMs,
+                videoDurationMs = videoDurationMs,
                 onVideoClick = onVideoClick,
+                onVideoPlaybackUpdate = onVideoPlaybackUpdate,
+                onVideoPlaybackEnded = onVideoPlaybackEnded,
                 onVideoError = onVideoError,
                 modifier = modifier
             )
