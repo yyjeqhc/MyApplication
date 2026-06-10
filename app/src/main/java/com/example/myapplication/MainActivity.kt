@@ -124,9 +124,6 @@ fun AdApp(
         enabled = selectedAd == null && !isSearchVisible && uiState.selectedTag != null
     ) {
         viewModel.clearTagFilter()
-        coroutineScope.launch {
-            currentListState.animateScrollToItem(0)
-        }
     }
 
     // Feed autoplay is only a lightweight preview. When that preview ends or leaves the screen, it may reset to 0
