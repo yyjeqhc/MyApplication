@@ -135,7 +135,7 @@ fun AdDetailScreen(
             )
 
             Column(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 18.dp)
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
                 // 品牌名称和广告标识
                 Row(
@@ -144,8 +144,8 @@ fun AdDetailScreen(
                     if (ad.brandName.isNotEmpty()) {
                         Text(
                             text = ad.brandName,
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.86f),
                             fontWeight = FontWeight.SemiBold
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -168,34 +168,34 @@ fun AdDetailScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 // 标题
                 Text(
                     text = ad.title,
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    lineHeight = 31.sp
+                    lineHeight = 28.sp
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 // 副标题
                 Text(
                     text = ad.subtitle,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 24.sp
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.92f),
+                    lineHeight = 22.sp
                 )
 
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 // 智能标签
                 AdTagRow(
                     tags = ad.tags,
                     onTagClick = onTagClick
                 )
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 // 推荐理由：优先解释为什么推荐，而不是先堆字段
                 if (reasonText.isNotEmpty()) {
@@ -203,7 +203,7 @@ fun AdDetailScreen(
                         title = detailCopy.reasonTitle,
                         text = reasonText
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
 
                 // AI 摘要区域
@@ -212,7 +212,7 @@ fun AdDetailScreen(
                         ad = ad,
                         title = detailCopy.aiSummaryTitle
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
 
                 // AI 洞察
@@ -222,7 +222,7 @@ fun AdDetailScreen(
                         title = detailCopy.insightTitle,
                         audienceLabel = detailCopy.audienceLabel
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
 
                 // 广告摘要
@@ -231,7 +231,7 @@ fun AdDetailScreen(
                     text = ad.summary
                 )
 
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 // 互动数据区域
                 StatisticsSection(ad = ad)
@@ -262,7 +262,7 @@ private fun AdDetailBottomBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .padding(horizontal = 12.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -319,7 +319,7 @@ private fun AdDetailBottomBar(
                 onClick = onCtaClick,
                 modifier = Modifier
                     .weight(1f)
-                    .height(44.dp),
+                    .height(42.dp),
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
@@ -350,7 +350,7 @@ private fun AiSummarySection(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -359,7 +359,7 @@ private fun AiSummarySection(
                     imageVector = Icons.Default.AutoAwesome,
                     contentDescription = "AI",
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -370,13 +370,13 @@ private fun AiSummarySection(
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = ad.aiSummary,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = 23.sp
+                lineHeight = 22.sp
             )
         }
     }
@@ -400,7 +400,7 @@ private fun RecommendationReasonSection(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -409,7 +409,7 @@ private fun RecommendationReasonSection(
                     imageVector = Icons.Default.Lightbulb,
                     contentDescription = "推荐",
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -420,13 +420,13 @@ private fun RecommendationReasonSection(
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = 23.sp
+                lineHeight = 22.sp
             )
         }
     }
@@ -451,7 +451,7 @@ private fun AiInsightSection(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -460,7 +460,7 @@ private fun AiInsightSection(
                     imageVector = Icons.Default.People,
                     contentDescription = "人群",
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -491,7 +491,7 @@ private fun InsightRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = 3.dp),
         verticalAlignment = Alignment.Top
     ) {
         Text(
@@ -505,7 +505,7 @@ private fun InsightRow(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            lineHeight = 22.sp,
+            lineHeight = 21.sp,
             modifier = Modifier.weight(1f)
         )
     }
@@ -526,7 +526,7 @@ private fun DescriptionSection(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp)
         ) {
             Text(
                 text = title,
@@ -563,7 +563,7 @@ private fun StatisticsSection(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp)
         ) {
             Text(
                 text = "互动数据",
@@ -594,7 +594,7 @@ private fun StatisticsSection(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -646,7 +646,7 @@ private fun InteractionStatChip(
         }
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {

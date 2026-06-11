@@ -268,7 +268,7 @@ fun FeedScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp)
+                    .height(56.dp)
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -278,7 +278,7 @@ fun FeedScreen(
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
-                    Spacer(modifier = Modifier.height(3.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = "精选可互动广告内容",
                         style = MaterialTheme.typography.bodySmall,
@@ -310,7 +310,7 @@ fun FeedScreen(
                             pagerState.animateScrollToPage(index)
                         }
                     },
-                    modifier = Modifier.height(40.dp),
+                    modifier = Modifier.height(38.dp),
                     text = {
                         Text(
                             text = channel.displayName,
@@ -618,7 +618,7 @@ private fun FeedPageContent(
                         end = 12.dp,
                         bottom = bottomContentPadding
                     ),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     selectedTag?.let { tag ->
                         item(key = "tag_filter") {
@@ -714,7 +714,7 @@ private fun SearchEntry(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
-            .padding(start = 12.dp, end = 12.dp, top = 6.dp, bottom = 8.dp)
+            .padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 6.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(14.dp),
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.36f),
@@ -722,7 +722,7 @@ private fun SearchEntry(
     ) {
         Row(
             modifier = Modifier
-                .height(40.dp)
+                .height(38.dp)
                 .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

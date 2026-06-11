@@ -44,6 +44,7 @@ fun SmallImageAdCard(
     onFavoriteClick: () -> Unit,
     onShareClick: () -> Unit,
     onTagClick: (String) -> Unit,
+    onCtaClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val cardInteractionSource = remember { MutableInteractionSource() }
@@ -73,7 +74,7 @@ fun SmallImageAdCard(
         elevation = CardDefaults.cardElevation(defaultElevation = cardElevation)
     ) {
         Column(
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier.padding(10.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth()
@@ -81,8 +82,8 @@ fun SmallImageAdCard(
                 // 左侧小图媒体
                 Box(
                     modifier = Modifier
-                        .width(116.dp)
-                        .height(132.dp)
+                        .width(110.dp)
+                        .height(126.dp)
                         .clip(RoundedCornerShape(14.dp)),
                     contentAlignment = Alignment.Center
                 ) {
@@ -135,7 +136,7 @@ fun SmallImageAdCard(
                     }
                 }
 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(10.dp))
 
                 // 右侧文字信息
                 Column(
@@ -149,7 +150,7 @@ fun SmallImageAdCard(
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.72f),
                             fontWeight = FontWeight.Medium
                         )
-                        Spacer(modifier = Modifier.height(3.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
                     }
 
                     // 标题
@@ -161,7 +162,7 @@ fun SmallImageAdCard(
                         overflow = TextOverflow.Ellipsis
                     )
 
-                    Spacer(modifier = Modifier.height(5.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
 
                     // AI 摘要
                     AiSummaryText(
@@ -169,18 +170,43 @@ fun SmallImageAdCard(
                         maxLines = 2
                     )
 
-                    Spacer(modifier = Modifier.height(7.dp))
+                    Spacer(modifier = Modifier.height(5.dp))
 
-                    // 智能标签
-                    AdTagRow(
-                        tags = ad.tags,
-                        onTagClick = onTagClick,
-                        maxTags = 2
-                    )
+                    // 智能标签 + 轻量 CTA：小图卡优先保留 1 个可读标签，避免纯省略号
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AdTagRow(
+                            tags = ad.tags,
+                            onTagClick = onTagClick,
+                            maxTags = 1,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        TextButton(
+                            onClick = onCtaClick,
+                            modifier = Modifier.height(30.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+                            colors = ButtonDefaults.textButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
+                                contentColor = MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Text(
+                                text = ad.ctaText,
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             // 互动按钮
             Row(

@@ -143,17 +143,17 @@ fun LargeImageAdCard(
 
             // 内容区域
             Column(
-                modifier = Modifier.padding(start = 14.dp, top = 12.dp, end = 14.dp, bottom = 12.dp)
+                modifier = Modifier.padding(start = 13.dp, top = 10.dp, end = 13.dp, bottom = 10.dp)
             ) {
                 // 品牌名称
                 if (ad.brandName.isNotEmpty()) {
                     Text(
                         text = ad.brandName,
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.72f),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.78f),
                         fontWeight = FontWeight.Medium
                     )
-                    Spacer(modifier = Modifier.height(3.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
                 }
 
                 // 标题
@@ -165,7 +165,7 @@ fun LargeImageAdCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(5.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 // AI 摘要
                 AiSummaryText(
@@ -173,7 +173,7 @@ fun LargeImageAdCard(
                     maxLines = 2
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 // 标签与 CTA 放在同一行，避免按钮孤立撑高卡片
                 Row(
@@ -189,9 +189,9 @@ fun LargeImageAdCard(
                     Spacer(modifier = Modifier.width(8.dp))
                     TextButton(
                         onClick = onCtaClick,
-                        modifier = Modifier.height(32.dp),
+                        modifier = Modifier.height(30.dp),
                         shape = RoundedCornerShape(10.dp),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp),
                         colors = ButtonDefaults.textButtonColors(
                             containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
                             contentColor = MaterialTheme.colorScheme.primary
@@ -207,7 +207,7 @@ fun LargeImageAdCard(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 // 互动按钮
                 Row(

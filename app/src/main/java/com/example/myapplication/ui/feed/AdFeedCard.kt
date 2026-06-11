@@ -51,6 +51,7 @@ fun AdFeedCard(
                 onFavoriteClick = onFavoriteClick,
                 onShareClick = onShareClick,
                 onTagClick = onTagClick,
+                onCtaClick = onCtaClick,
                 modifier = modifier
             )
         }

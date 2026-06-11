@@ -3,7 +3,6 @@ package com.example.myapplication.ui.feed
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -51,15 +50,18 @@ fun AdTagChip(
     AssistChip(
         onClick = onClick,
         label = {
+            val displayTag = if (tag.length > 8) "${tag.take(7)}…" else tag
             Text(
-                text = tag,
+                text = displayTag,
                 fontSize = 12.5.sp,
                 fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Clip
             )
         },
-        modifier = modifier.height(30.dp),
+        modifier = modifier
+            .height(28.dp)
+            .widthIn(min = 42.dp, max = 96.dp),
         shape = RoundedCornerShape(13.dp),
         colors = AssistChipDefaults.assistChipColors(
             containerColor = if (selected) {
@@ -86,12 +88,9 @@ fun AdTagRow(
 ) {
     val visibleTags = tags.take(maxTags)
     val overflowCount = (tags.size - visibleTags.size).coerceAtLeast(0)
-
     Row(
-        modifier = modifier
-            .horizontalScroll(rememberScrollState())
-            .padding(vertical = 2.dp),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = modifier.padding(vertical = 1.dp),
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         visibleTags.forEach { tag ->
@@ -113,7 +112,8 @@ private fun TagOverflowChip(
 ) {
     Box(
         modifier = modifier
-            .height(30.dp)
+            .height(28.dp)
+            .widthIn(min = 42.dp, max = 52.dp)
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
                 shape = RoundedCornerShape(13.dp)
@@ -147,10 +147,10 @@ fun AiSummaryText(
         text = summary,
         modifier = modifier,
         style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.88f),
+        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.94f),
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
-        lineHeight = 20.sp
+        lineHeight = 21.sp
     )
 }
 
@@ -190,19 +190,20 @@ fun FeedActionButton(
                 },
                 shape = RoundedCornerShape(18.dp)
             )
-            .padding(horizontal = 9.dp, vertical = 5.dp),
+            .height(40.dp)
+            .padding(horizontal = 10.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = icon,
             contentDescription = text,
             tint = tint,
-            modifier = Modifier.size(16.dp)
+            modifier = Modifier.size(24.dp)
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(
             text = text,
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.labelMedium,
             color = tint,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
