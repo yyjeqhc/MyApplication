@@ -425,7 +425,7 @@ private fun AiInsightSection(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.24f),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.20f),
         contentColor = MaterialTheme.colorScheme.onSurface,
         shape = RoundedCornerShape(14.dp),
         tonalElevation = 0.dp
@@ -453,15 +453,20 @@ private fun AiInsightSection(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            InsightRow(label = "品类", value = ad.category)
-            InsightRow(label = "场景", value = ad.scene)
-            InsightRow(label = audienceLabel, value = ad.targetAudience)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(7.dp)
+            ) {
+                DetailInfoRow(label = "品类", value = ad.category)
+                DetailInfoRow(label = "场景", value = ad.scene)
+                DetailInfoRow(label = audienceLabel, value = ad.targetAudience)
+            }
         }
     }
 }
 
 @Composable
-private fun InsightRow(
+private fun DetailInfoRow(
     label: String,
     value: String,
     modifier: Modifier = Modifier
@@ -470,22 +475,23 @@ private fun InsightRow(
 
     Row(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 3.dp),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.Top
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.78f),
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.width(44.dp)
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.68f),
+            fontWeight = FontWeight.Medium,
+            lineHeight = 22.sp,
+            modifier = Modifier.width(52.dp)
         )
+        Spacer(modifier = Modifier.width(10.dp))
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.82f),
-            lineHeight = 21.sp,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.86f),
+            lineHeight = 22.sp,
             modifier = Modifier.weight(1f)
         )
     }

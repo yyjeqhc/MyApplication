@@ -18,3 +18,4 @@ local.properties
 *.patch
 ad_assets_images.zip
 videos/
+.codex/*
