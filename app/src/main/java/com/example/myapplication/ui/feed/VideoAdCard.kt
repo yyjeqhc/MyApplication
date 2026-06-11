@@ -360,7 +360,7 @@ fun VideoAdCard(
                         )
                     ) {
                         Text(
-                            text = ad.ctaText,
+                            text = ad.ctaText.ifBlank { "了解详情" },
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Medium,
                             maxLines = 1,

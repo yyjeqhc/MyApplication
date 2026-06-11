@@ -215,7 +215,7 @@ fun AdDetailScreen(
                     Spacer(modifier = Modifier.height(10.dp))
                 }
 
-                // 适合场景：承接推荐理由，减少字段表格感
+                // 适用场景：承接核心亮点，减少字段表格感
                 if (ad.category.isNotEmpty() || ad.scene.isNotEmpty() || ad.targetAudience.isNotEmpty()) {
                     AiInsightSection(
                         ad = ad,
@@ -225,7 +225,7 @@ fun AdDetailScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                // 广告摘要
+                // 内容摘要
                 DescriptionSection(
                     title = detailCopy.descriptionTitle,
                     text = ad.summary
@@ -473,7 +473,7 @@ private fun AiInsightSection(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            InsightRow(label = "品类", value = ad.category)
+            InsightRow(label = "方向", value = ad.category)
             InsightRow(label = "场景", value = ad.scene)
             InsightRow(label = audienceLabel, value = ad.targetAudience)
         }
@@ -566,7 +566,7 @@ private fun StatisticsSection(
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp)
         ) {
             Text(
-                text = "数据表现",
+                text = "互动表现",
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
@@ -701,23 +701,23 @@ private fun detailCopyFor(ad: AdItem): DetailCopy {
         ad.cardType == AdCardType.VIDEO -> DetailCopy(
             aiSummaryTitle = "视频看点",
             reasonTitle = "核心亮点",
-            insightTitle = "适合这些场景",
+            insightTitle = "适用场景",
             audienceLabel = "受众",
-            descriptionTitle = "视频内容摘要"
+            descriptionTitle = "视频看点"
         )
         ad.channel == AdChannel.LOCAL -> DetailCopy(
             aiSummaryTitle = "服务亮点",
             reasonTitle = "核心亮点",
-            insightTitle = "适合这些场景",
+            insightTitle = "适用场景",
             audienceLabel = "人群",
-            descriptionTitle = "广告摘要"
+            descriptionTitle = "内容摘要"
         )
         else -> DetailCopy(
             aiSummaryTitle = "商品亮点",
             reasonTitle = "核心亮点",
-            insightTitle = "适合这些场景",
+            insightTitle = "适用场景",
             audienceLabel = "受众",
-            descriptionTitle = "广告摘要"
+            descriptionTitle = "内容摘要"
         )
     }
 }
