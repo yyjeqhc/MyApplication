@@ -57,9 +57,9 @@
 | `featured_weekend_market_01.jpg` | Pexels | valeria drozdova / photo 34673354 | https://www.pexels.com/photo/34673354/ | 精选/周末活动；周末市集、潮流消费 | 1200x803 | 200.2 KB |
 | `featured_weekend_market_02.jpg` | Pexels | wendywei / photo 18180984 | https://www.pexels.com/photo/18180984/ | 精选/周末活动；音乐/市集、周末活动 | 1200x800 | 257.0 KB |
 
-## Video Candidates
+## Video Sources
 
-视频未下载进压缩包，仅记录候选页面。建议后续从页面选择 720p 或 1080p，裁剪为 5 到 15 秒短视频。
+早期素材包只记录了候选视频页面；当前仓库已经在 `app/src/main/assets/ad_videos/` 中放入 8 个本地 mp4 文件。实际开发时，视频下载后被统一改成项目内语义化文件名，因此本地文件名与原始页面标题或下载文件名不完全一一对应是正常现象。下面表格仅作为历史候选页面和命名来源参考，不代表当前 assets 的完整精确来源清单；实际本地文件以 `docs/video_sources.md` 和仓库 assets 为准。
 
 | 建议文件名 | 分类 | 来源网站 | 页面链接 | 备注 |
 |---|---|---|---|---|
