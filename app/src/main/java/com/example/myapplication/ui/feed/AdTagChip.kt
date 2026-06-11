@@ -53,13 +53,13 @@ fun AdTagChip(
         label = {
             Text(
                 text = tag,
-                fontSize = 11.sp,
+                fontSize = 12.sp,
                 fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         },
-        modifier = modifier.height(26.dp),
+        modifier = modifier.height(28.dp),
         shape = RoundedCornerShape(13.dp),
         colors = AssistChipDefaults.assistChipColors(
             containerColor = if (selected) {
@@ -113,7 +113,7 @@ private fun TagOverflowChip(
 ) {
     Box(
         modifier = modifier
-            .height(26.dp)
+            .height(28.dp)
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
                 shape = RoundedCornerShape(13.dp)
@@ -146,11 +146,11 @@ fun AiSummaryText(
     Text(
         text = summary,
         modifier = modifier,
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.88f),
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
-        lineHeight = 18.sp
+        lineHeight = 20.sp
     )
 }
 
@@ -190,7 +190,7 @@ fun FeedActionButton(
                 },
                 shape = RoundedCornerShape(18.dp)
             )
-            .padding(horizontal = 8.dp, vertical = 5.dp),
+            .padding(horizontal = 9.dp, vertical = 5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(

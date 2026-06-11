@@ -259,20 +259,33 @@ fun FeedScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.22f))
     ) {
-        // 顶部标题栏
-        TopAppBar(
-            title = {
-                Text(
-                    text = "AI 广告推荐",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-                titleContentColor = MaterialTheme.colorScheme.onSurface
-            )
-        )
+        // 顶部标题栏：压缩高度，强化首页入口感
+        Surface(
+            color = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "AI 广告推荐",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(modifier = Modifier.height(1.dp))
+                    Text(
+                        text = "精选可互动广告内容",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
 
         // 频道 Tab
         PrimaryTabRow(
@@ -296,7 +309,7 @@ fun FeedScreen(
                             pagerState.animateScrollToPage(index)
                         }
                     },
-                    modifier = Modifier.height(44.dp),
+                    modifier = Modifier.height(40.dp),
                     text = {
                         Text(
                             text = channel.displayName,
@@ -599,11 +612,11 @@ private fun FeedPageContent(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(
                         start = 12.dp,
-                        top = 6.dp,
+                        top = 8.dp,
                         end = 12.dp,
                         bottom = 18.dp
                     ),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     selectedTag?.let { tag ->
                         item(key = "tag_filter") {
@@ -699,14 +712,16 @@ private fun SearchEntry(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
-            .padding(horizontal = 12.dp, vertical = 4.dp)
+            .padding(start = 12.dp, end = 12.dp, top = 3.dp, bottom = 5.dp)
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(18.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.42f),
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.36f),
         contentColor = MaterialTheme.colorScheme.onSurfaceVariant
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            modifier = Modifier
+                .height(34.dp)
+                .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -717,7 +732,7 @@ private fun SearchEntry(
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "搜索你想看的广告...",
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }

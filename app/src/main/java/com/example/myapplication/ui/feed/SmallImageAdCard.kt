@@ -81,8 +81,8 @@ fun SmallImageAdCard(
                 // 左侧小图媒体
                 Box(
                     modifier = Modifier
-                        .width(104.dp)
-                        .height(108.dp)
+                        .width(112.dp)
+                        .height(118.dp)
                         .clip(RoundedCornerShape(14.dp)),
                     contentAlignment = Alignment.Center
                 ) {
@@ -135,7 +135,7 @@ fun SmallImageAdCard(
                     }
                 }
 
-                Spacer(modifier = Modifier.width(11.dp))
+                Spacer(modifier = Modifier.width(12.dp))
 
                 // 右侧文字信息
                 Column(
@@ -145,31 +145,31 @@ fun SmallImageAdCard(
                     if (ad.brandName.isNotEmpty()) {
                         Text(
                             text = ad.brandName,
-                            style = MaterialTheme.typography.labelSmall,
+                            style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.72f),
                             fontWeight = FontWeight.Medium
                         )
-                        Spacer(modifier = Modifier.height(2.dp))
+                        Spacer(modifier = Modifier.height(3.dp))
                     }
 
                     // 标题
                     Text(
                         text = ad.title,
-                        style = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(5.dp))
 
                     // AI 摘要
                     AiSummaryText(
                         summary = ad.aiSummary.ifBlank { ad.subtitle },
-                        maxLines = 1
+                        maxLines = 2
                     )
 
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(7.dp))
 
                     // 智能标签
                     AdTagRow(
@@ -180,7 +180,7 @@ fun SmallImageAdCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             // 互动按钮
             Row(
