@@ -1,6 +1,10 @@
 # Asset Sources
 
+> 当前展示版素材已切换为 `96_verified` 真实照片素材包，来源记录见 `docs/image_sources.md`。
+
 本包用于 Android 训练营 Demo App 的本地广告素材。图片均来自 Pexels，并已压缩为本地 JPG 文件。
+
+> 当前 App 已接入新生成的 `mock_ads.json` 与 `ad_images.zip` 图片素材包：`app/src/main/assets/mock_ads.json` 包含 72 条广告，当前 mock 数据引用 48 张 `app/src/main/assets/ad_images/` 下的图片。下方图片表仍保留早期 50 张素材包的来源记录；仓库中旧图片未删除，但当前展示以新 mock 数据的 `imageAsset` 引用为准。若需要新 48 张图片的严格版权追踪表，可后续补充对应的原始来源清单。
 
 ## Images
 
