@@ -668,7 +668,7 @@ private fun FeedPageContent(
                             onFavoriteClick = { onFavoriteClick(ad.id) },
                             onShareClick = { onShareClick(ad.id) },
                             onTagClick = onTagClick,
-                            onCtaClick = { showSingleToast(context, "${ad.ctaText}功能开发中") },
+                            onCtaClick = { onAdClick(ad.id) },
                             isVideoPlaying = ad.cardType == AdCardType.VIDEO && playingVideoAdId == ad.id,
                             videoPositionMs = videoPlaybackPositions[ad.id] ?: 0L,
                             videoDurationMs = videoDurations[ad.id] ?: 0L,

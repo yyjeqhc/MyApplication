@@ -110,7 +110,7 @@ fun AdDetailScreen(
                 },
                 onCtaClick = {
                     onCtaClick()
-                    showSingleToast(context, "${ad.ctaText}功能开发中")
+                    showSingleToast(context, "外部跳转功能开发中")
                 }
             )
         }
@@ -215,14 +215,14 @@ fun AdDetailScreen(
                     Spacer(modifier = Modifier.height(10.dp))
                 }
 
-                // AI 洞察
+                // 适合场景：承接推荐理由，减少字段表格感
                 if (ad.category.isNotEmpty() || ad.scene.isNotEmpty() || ad.targetAudience.isNotEmpty()) {
                     AiInsightSection(
                         ad = ad,
                         title = detailCopy.insightTitle,
                         audienceLabel = detailCopy.audienceLabel
                     )
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
 
                 // 广告摘要
@@ -233,7 +233,7 @@ fun AdDetailScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // 互动数据区域
+                // 轻量数据表现，作为辅助信息收尾
                 StatisticsSection(ad = ad)
             }
         }
@@ -323,7 +323,7 @@ private fun AdDetailBottomBar(
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
-                    text = ad.ctaText,
+                    text = ad.ctaText.ifBlank { "了解更多" },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -344,7 +344,7 @@ private fun AiSummarySection(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.94f)
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.90f)
         ),
         shape = RoundedCornerShape(14.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -375,7 +375,7 @@ private fun AiSummarySection(
             Text(
                 text = ad.aiSummary,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.82f),
                 lineHeight = 22.sp
             )
         }
@@ -394,9 +394,9 @@ private fun RecommendationReasonSection(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.94f)
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.34f)
         ),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
@@ -457,7 +457,7 @@ private fun AiInsightSection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Icons.Default.People,
+                    imageVector = Icons.Default.CheckCircle,
                     contentDescription = "人群",
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(18.dp)
@@ -471,7 +471,7 @@ private fun AiInsightSection(
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             InsightRow(label = "品类", value = ad.category)
             InsightRow(label = "场景", value = ad.scene)
@@ -499,7 +499,7 @@ private fun InsightRow(
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.width(48.dp)
+            modifier = Modifier.width(42.dp)
         )
         Text(
             text = value,
@@ -530,7 +530,7 @@ private fun DescriptionSection(
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.SemiBold
             )
 
@@ -566,16 +566,16 @@ private fun StatisticsSection(
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp)
         ) {
             Text(
-                text = "互动数据",
+                text = "数据表现",
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 InteractionStatChip(
                     label = "曝光",
@@ -594,11 +594,11 @@ private fun StatisticsSection(
                 )
             }
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(5.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 InteractionStatChip(
                     label = "点赞",
@@ -637,7 +637,7 @@ private fun InteractionStatChip(
         color = if (highlighted) {
             MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.72f)
         } else {
-            MaterialTheme.colorScheme.surface.copy(alpha = 0.72f)
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.38f)
         },
         contentColor = if (highlighted) {
             MaterialTheme.colorScheme.onTertiaryContainer
@@ -646,7 +646,7 @@ private fun InteractionStatChip(
         }
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+            modifier = Modifier.padding(horizontal = 7.dp, vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -700,22 +700,22 @@ private fun detailCopyFor(ad: AdItem): DetailCopy {
     return when {
         ad.cardType == AdCardType.VIDEO -> DetailCopy(
             aiSummaryTitle = "视频看点",
-            reasonTitle = "观看理由",
-            insightTitle = "适合人群",
+            reasonTitle = "核心亮点",
+            insightTitle = "适合这些场景",
             audienceLabel = "受众",
             descriptionTitle = "视频内容摘要"
         )
         ad.channel == AdChannel.LOCAL -> DetailCopy(
             aiSummaryTitle = "服务亮点",
-            reasonTitle = "到店理由",
-            insightTitle = "适合人群",
+            reasonTitle = "核心亮点",
+            insightTitle = "适合这些场景",
             audienceLabel = "人群",
             descriptionTitle = "广告摘要"
         )
         else -> DetailCopy(
             aiSummaryTitle = "商品亮点",
-            reasonTitle = "推荐理由",
-            insightTitle = "适合场景",
+            reasonTitle = "核心亮点",
+            insightTitle = "适合这些场景",
             audienceLabel = "受众",
             descriptionTitle = "广告摘要"
         )
