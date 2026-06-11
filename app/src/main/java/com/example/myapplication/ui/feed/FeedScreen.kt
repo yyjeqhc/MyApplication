@@ -264,8 +264,8 @@ fun FeedScreen(
             title = {
                 Text(
                     text = "AI 广告推荐",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
                 )
             },
             colors = TopAppBarDefaults.topAppBarColors(
@@ -296,11 +296,13 @@ fun FeedScreen(
                             pagerState.animateScrollToPage(index)
                         }
                     },
+                    modifier = Modifier.height(44.dp),
                     text = {
                         Text(
                             text = channel.displayName,
+                            style = MaterialTheme.typography.labelLarge,
                             fontWeight = if (activeTabIndex == index) {
-                                FontWeight.Bold
+                                FontWeight.SemiBold
                             } else {
                                 FontWeight.Normal
                             }
@@ -596,12 +598,12 @@ private fun FeedPageContent(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(
-                        start = 14.dp,
-                        top = 12.dp,
-                        end = 14.dp,
-                        bottom = 20.dp
+                        start = 12.dp,
+                        top = 6.dp,
+                        end = 12.dp,
+                        bottom = 18.dp
                     ),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     selectedTag?.let { tag ->
                         item(key = "tag_filter") {
@@ -697,14 +699,14 @@ private fun SearchEntry(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
-            .padding(horizontal = 14.dp, vertical = 10.dp)
+            .padding(horizontal = 12.dp, vertical = 4.dp)
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+        shape = RoundedCornerShape(18.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.42f),
         contentColor = MaterialTheme.colorScheme.onSurfaceVariant
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 9.dp),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(

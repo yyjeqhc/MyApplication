@@ -170,8 +170,9 @@ fun AdDetailScreen(
                 // 标题
                 Text(
                     text = ad.title,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 30.sp
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -179,8 +180,9 @@ fun AdDetailScreen(
                 // 副标题
                 Text(
                     text = ad.subtitle,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 24.sp
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -232,8 +234,9 @@ fun AdDetailScreen(
 
                 Text(
                     text = ad.summary,
-                    style = MaterialTheme.typography.bodyLarge,
-                    lineHeight = 28.sp
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 23.sp
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -349,7 +352,7 @@ private fun AiSummarySection(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.55f)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.46f)
         ),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -363,7 +366,7 @@ private fun AiSummarySection(
                 Icon(
                     imageVector = Icons.Default.AutoAwesome,
                     contentDescription = "AI",
-                    tint = MaterialTheme.colorScheme.tertiary,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -371,7 +374,7 @@ private fun AiSummarySection(
                     text = title,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.tertiary
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 
@@ -399,7 +402,7 @@ private fun RecommendationReasonSection(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.55f)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.46f)
         ),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -413,7 +416,7 @@ private fun RecommendationReasonSection(
                 Icon(
                     imageVector = Icons.Default.Lightbulb,
                     contentDescription = "推荐",
-                    tint = MaterialTheme.colorScheme.secondary,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -421,7 +424,7 @@ private fun RecommendationReasonSection(
                     text = title,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.secondary
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 
@@ -450,7 +453,7 @@ private fun AiInsightSection(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.46f)
         ),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -509,7 +512,7 @@ private fun InsightRow(
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             lineHeight = 22.sp,
             modifier = Modifier.weight(1f)
         )

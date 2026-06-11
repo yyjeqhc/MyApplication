@@ -1,7 +1,11 @@
 package com.example.myapplication.ui.feed
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -12,10 +16,13 @@ import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -38,22 +45,38 @@ fun LargeImageAdCard(
     onCtaClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val cardInteractionSource = remember { MutableInteractionSource() }
+    val isPressed by cardInteractionSource.collectIsPressedAsState()
+    val cardElevation by animateDpAsState(
+        targetValue = if (isPressed) 1.dp else 4.dp,
+        label = "largeCardElevation"
+    )
+    val cardAlpha by animateFloatAsState(
+        targetValue = if (isPressed) 0.96f else 1f,
+        label = "largeCardAlpha"
+    )
+
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(14.dp),
+            .graphicsLayer { alpha = cardAlpha }
+            .clickable(
+                interactionSource = cardInteractionSource,
+                indication = null,
+                onClick = onClick
+            ),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = cardElevation)
     ) {
         Column {
             // 大图媒体区域
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(188.dp)
+                    .height(176.dp)
             ) {
                 AssetImage(
                     assetPath = ad.imageAsset,
@@ -120,15 +143,15 @@ fun LargeImageAdCard(
 
             // 内容区域
             Column(
-                modifier = Modifier.padding(14.dp)
+                modifier = Modifier.padding(12.dp)
             ) {
                 // 品牌名称
                 if (ad.brandName.isNotEmpty()) {
                     Text(
                         text = ad.brandName,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.SemiBold
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.72f),
+                        fontWeight = FontWeight.Medium
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                 }
@@ -137,7 +160,7 @@ fun LargeImageAdCard(
                 Text(
                     text = ad.title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -150,35 +173,40 @@ fun LargeImageAdCard(
                     maxLines = 2
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
-                // 智能标签
-                AdTagRow(
-                    tags = ad.tags,
-                    onTagClick = onTagClick,
-                    maxTags = 3
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // CTA 按钮
-                Button(
-                    onClick = onCtaClick,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(38.dp),
-                    shape = RoundedCornerShape(9.dp)
+                // 标签与 CTA 放在同一行，避免按钮孤立撑高卡片
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = ad.ctaText,
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                    AdTagRow(
+                        tags = ad.tags,
+                        onTagClick = onTagClick,
+                        maxTags = 3,
+                        modifier = Modifier.weight(1f)
                     )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    OutlinedButton(
+                        onClick = onCtaClick,
+                        modifier = Modifier.height(30.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Text(
+                            text = ad.ctaText,
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 // 互动按钮
                 Row(
@@ -186,62 +214,18 @@ fun LargeImageAdCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // 点赞
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable { onLikeClick() }
-                    ) {
-                        Icon(
-                            imageVector = if (ad.liked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "点赞",
-                            tint = if (ad.liked) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = formatCount(ad.likeCount),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    LikeActionButton(
+                        liked = ad.liked,
+                        likeCount = ad.likeCount,
+                        onClick = onLikeClick
                     )
-                    }
 
-                    // 收藏
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable { onFavoriteClick() }
-                    ) {
-                        Icon(
-                            imageVector = if (ad.favorited) Icons.Default.Star else Icons.Default.StarBorder,
-                            contentDescription = "收藏",
-                            tint = if (ad.favorited) Color(0xFFFFB800) else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "收藏",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    FavoriteActionButton(
+                        favorited = ad.favorited,
+                        onClick = onFavoriteClick
                     )
-                    }
 
-                    // 分享
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable { onShareClick() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Share,
-                            contentDescription = "分享",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "分享",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    }
+                    ShareActionButton(onClick = onShareClick)
                 }
             }
         }

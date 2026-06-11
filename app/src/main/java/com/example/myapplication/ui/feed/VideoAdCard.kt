@@ -1,8 +1,11 @@
 package com.example.myapplication.ui.feed
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -81,6 +85,16 @@ fun VideoAdCard(
     val durationLabel = remember(videoDurationMs, ad.videoDuration) {
         formatVideoDuration(videoDurationMs).ifBlank { ad.videoDuration }
     }
+    val cardInteractionSource = remember { MutableInteractionSource() }
+    val isCardPressed by cardInteractionSource.collectIsPressedAsState()
+    val cardElevation by animateDpAsState(
+        targetValue = if (isCardPressed) 1.dp else 4.dp,
+        label = "videoCardElevation"
+    )
+    val cardAlpha by animateFloatAsState(
+        targetValue = if (isCardPressed) 0.97f else 1f,
+        label = "videoCardAlpha"
+    )
     val mediaClickInteractionSource = remember { MutableInteractionSource() }
     val playButtonInteractionSource = remember { MutableInteractionSource() }
 
@@ -100,20 +114,25 @@ fun VideoAdCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(14.dp),
+            .graphicsLayer { alpha = cardAlpha }
+            .clickable(
+                interactionSource = cardInteractionSource,
+                indication = null,
+                onClick = onClick
+            ),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = cardElevation)
     ) {
         Column {
             // 视频封面区域
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(220.dp)
-                    .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
+                    .height(208.dp)
+                    .clip(RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp))
             ) {
                 if (shouldShowVideo) {
                     LocalVideoPlayer(
@@ -286,15 +305,15 @@ fun VideoAdCard(
 
             // 内容区域
             Column(
-                modifier = Modifier.padding(14.dp)
+                modifier = Modifier.padding(12.dp)
             ) {
                 // 品牌名称
                 if (ad.brandName.isNotEmpty()) {
                     Text(
                         text = ad.brandName,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.SemiBold
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.72f),
+                        fontWeight = FontWeight.Medium
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                 }
@@ -303,7 +322,7 @@ fun VideoAdCard(
                 Text(
                     text = ad.title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -316,35 +335,40 @@ fun VideoAdCard(
                     maxLines = 2
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
-                // 智能标签
-                AdTagRow(
-                    tags = ad.tags,
-                    onTagClick = onTagClick,
-                    maxTags = 3
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // CTA 按钮
-                Button(
-                    onClick = onCtaClick,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(38.dp),
-                    shape = RoundedCornerShape(9.dp)
+                // 标签与 CTA 放在同一行，保持视频下方信息区紧凑
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = ad.ctaText,
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                    AdTagRow(
+                        tags = ad.tags,
+                        onTagClick = onTagClick,
+                        maxTags = 3,
+                        modifier = Modifier.weight(1f)
                     )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    OutlinedButton(
+                        onClick = onCtaClick,
+                        modifier = Modifier.height(30.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Text(
+                            text = ad.ctaText,
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 // 互动按钮
                 Row(
@@ -352,62 +376,18 @@ fun VideoAdCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // 点赞
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable { onLikeClick() }
-                    ) {
-                        Icon(
-                            imageVector = if (ad.liked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "点赞",
-                            tint = if (ad.liked) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = formatCount(ad.likeCount),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    LikeActionButton(
+                        liked = ad.liked,
+                        likeCount = ad.likeCount,
+                        onClick = onLikeClick
+                    )
 
-                    // 收藏
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable { onFavoriteClick() }
-                    ) {
-                        Icon(
-                            imageVector = if (ad.favorited) Icons.Default.Star else Icons.Default.StarBorder,
-                            contentDescription = "收藏",
-                            tint = if (ad.favorited) Color(0xFFFFB800) else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "收藏",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    FavoriteActionButton(
+                        favorited = ad.favorited,
+                        onClick = onFavoriteClick
+                    )
 
-                    // 分享
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable { onShareClick() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Share,
-                            contentDescription = "分享",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "分享",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    ShareActionButton(onClick = onShareClick)
                 }
             }
         }

@@ -1,7 +1,11 @@
 package com.example.myapplication.ui.feed
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -13,11 +17,14 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -39,18 +46,34 @@ fun SmallImageAdCard(
     onTagClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val cardInteractionSource = remember { MutableInteractionSource() }
+    val isPressed by cardInteractionSource.collectIsPressedAsState()
+    val cardElevation by animateDpAsState(
+        targetValue = if (isPressed) 1.dp else 3.dp,
+        label = "smallCardElevation"
+    )
+    val cardAlpha by animateFloatAsState(
+        targetValue = if (isPressed) 0.97f else 1f,
+        label = "smallCardAlpha"
+    )
+
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(14.dp),
+            .graphicsLayer { alpha = cardAlpha }
+            .clickable(
+                interactionSource = cardInteractionSource,
+                indication = null,
+                onClick = onClick
+            ),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = cardElevation)
     ) {
         Column(
-            modifier = Modifier.padding(14.dp)
+            modifier = Modifier.padding(12.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth()
@@ -58,8 +81,9 @@ fun SmallImageAdCard(
                 // 左侧小图媒体
                 Box(
                     modifier = Modifier
-                        .size(96.dp)
-                        .clip(RoundedCornerShape(10.dp)),
+                        .width(104.dp)
+                        .height(108.dp)
+                        .clip(RoundedCornerShape(14.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     AssetImage(
@@ -111,7 +135,7 @@ fun SmallImageAdCard(
                     }
                 }
 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(11.dp))
 
                 // 右侧文字信息
                 Column(
@@ -120,19 +144,19 @@ fun SmallImageAdCard(
                     // 品牌名称
                     if (ad.brandName.isNotEmpty()) {
                         Text(
-                        text = ad.brandName,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                            text = ad.brandName,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.72f),
+                            fontWeight = FontWeight.Medium
+                        )
                         Spacer(modifier = Modifier.height(2.dp))
                     }
 
                     // 标题
                     Text(
                         text = ad.title,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -142,10 +166,10 @@ fun SmallImageAdCard(
                     // AI 摘要
                     AiSummaryText(
                         summary = ad.aiSummary.ifBlank { ad.subtitle },
-                        maxLines = 2
+                        maxLines = 1
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
 
                     // 智能标签
                     AdTagRow(
@@ -156,7 +180,7 @@ fun SmallImageAdCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             // 互动按钮
             Row(
@@ -164,62 +188,18 @@ fun SmallImageAdCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // 点赞
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { onLikeClick() }
-                ) {
-                    Icon(
-                        imageVector = if (ad.liked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = "点赞",
-                        tint = if (ad.liked) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = formatCount(ad.likeCount),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                LikeActionButton(
+                    liked = ad.liked,
+                    likeCount = ad.likeCount,
+                    onClick = onLikeClick
+                )
 
-                // 收藏
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { onFavoriteClick() }
-                ) {
-                    Icon(
-                        imageVector = if (ad.favorited) Icons.Default.Star else Icons.Default.StarBorder,
-                        contentDescription = "收藏",
-                        tint = if (ad.favorited) Color(0xFFFFB800) else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "收藏",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                FavoriteActionButton(
+                    favorited = ad.favorited,
+                    onClick = onFavoriteClick
+                )
 
-                // 分享
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { onShareClick() }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Share,
-                        contentDescription = "分享",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "分享",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                ShareActionButton(onClick = onShareClick)
             }
         }
     }
