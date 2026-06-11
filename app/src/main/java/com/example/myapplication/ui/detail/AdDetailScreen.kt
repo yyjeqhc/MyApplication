@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -194,8 +195,16 @@ fun AdDetailScreen(
                     tags = ad.tags,
                     onTagClick = onTagClick
                 )
+                Spacer(modifier = Modifier.height(18.dp))
 
-                Spacer(modifier = Modifier.height(20.dp))
+                // 推荐理由：优先解释为什么推荐，而不是先堆字段
+                if (reasonText.isNotEmpty()) {
+                    RecommendationReasonSection(
+                        title = detailCopy.reasonTitle,
+                        text = reasonText
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
                 // AI 摘要区域
                 if (ad.aiSummary.isNotEmpty()) {
@@ -203,16 +212,7 @@ fun AdDetailScreen(
                         ad = ad,
                         title = detailCopy.aiSummaryTitle
                     )
-                    Spacer(modifier = Modifier.height(18.dp))
-                }
-
-                // 推荐理由
-                if (reasonText.isNotEmpty()) {
-                    RecommendationReasonSection(
-                        title = detailCopy.reasonTitle,
-                        text = reasonText
-                    )
-                    Spacer(modifier = Modifier.height(18.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
 
                 // AI 洞察
@@ -222,26 +222,16 @@ fun AdDetailScreen(
                         title = detailCopy.insightTitle,
                         audienceLabel = detailCopy.audienceLabel
                     )
-                    Spacer(modifier = Modifier.height(18.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
 
                 // 广告摘要
-                Text(
-                    text = detailCopy.descriptionTitle,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
+                DescriptionSection(
+                    title = detailCopy.descriptionTitle,
+                    text = ad.summary
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = ad.summary,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 23.sp
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(18.dp))
 
                 // 互动数据区域
                 StatisticsSection(ad = ad)
@@ -518,6 +508,41 @@ private fun InsightRow(
             lineHeight = 22.sp,
             modifier = Modifier.weight(1f)
         )
+    }
+}
+
+@Composable
+private fun DescriptionSection(
+    title: String,
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.94f)
+        ),
+        shape = RoundedCornerShape(14.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                lineHeight = 23.sp
+            )
+        }
     }
 }
 
@@ -895,30 +920,6 @@ private fun VideoDetailHero(
             }
         }
 
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(16.dp)
-                .padding(end = 84.dp)
-        ) {
-            Text(
-                text = ad.title,
-                color = Color.White,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = ad.aiSummary.ifBlank { ad.subtitle },
-                color = Color.White.copy(alpha = 0.76f),
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-
         if (durationLabel.isNotBlank()) {
             DetailHeroBadge(
                 text = durationLabel,
@@ -961,7 +962,7 @@ private fun LargeImageDetailHero(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(320.dp)
+            .height(286.dp)
     ) {
         AssetImage(
             assetPath = ad.imageAsset,
@@ -998,49 +999,12 @@ private fun LargeImageDetailHero(
             }
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp)
-                .align(Alignment.BottomCenter)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            Color.Black.copy(alpha = 0.62f)
-                        )
-                    )
-                )
-        )
-
         DetailHeroBadge(
             text = "图文广告",
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(16.dp)
         )
-
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(16.dp)
-        ) {
-            Text(
-                text = ad.brandName.ifBlank { ad.category },
-                color = Color.White.copy(alpha = 0.78f),
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Medium
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = ad.subtitle,
-                color = Color.White,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
     }
 }
 
@@ -1052,69 +1016,36 @@ private fun SmallImageDetailHero(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(230.dp)
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        Color(0xFF059669),
-                        Color(0xFF14B8A6),
-                        Color(0xFF0EA5E9)
-                    )
-                )
-            )
-            .padding(20.dp)
+            .height(260.dp)
+            .clipToBounds()
     ) {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically
+        AssetImage(
+            assetPath = ad.imageAsset,
+            contentDescription = ad.title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.matchParentSize()
         ) {
-            AssetImage(
-                assetPath = ad.imageAsset,
-                contentDescription = ad.title,
+            Box(
                 modifier = Modifier
-                    .size(92.dp)
-                    .clip(RoundedCornerShape(18.dp))
-            ) {
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .background(Color.White.copy(alpha = 0.22f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Image,
-                        contentDescription = "图文图片",
-                        tint = Color.White,
-                        modifier = Modifier.size(46.dp)
+                    .matchParentSize()
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color(0xFF059669),
+                                Color(0xFF14B8A6),
+                                Color(0xFF0EA5E9)
+                            )
+                        )
                     )
-                }
-            }
-
-            Spacer(modifier = Modifier.width(18.dp))
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                DetailHeroBadge(text = "图文广告")
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    text = ad.title,
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = ad.aiSummary.ifBlank { ad.subtitle },
-                    color = Color.White.copy(alpha = 0.78f),
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
+            )
         }
+
+        DetailHeroBadge(
+            text = "图文广告",
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(16.dp)
+        )
     }
 }
 

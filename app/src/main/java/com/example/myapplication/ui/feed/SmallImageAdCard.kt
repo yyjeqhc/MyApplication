@@ -81,8 +81,8 @@ fun SmallImageAdCard(
                 // 左侧小图媒体
                 Box(
                     modifier = Modifier
-                        .width(112.dp)
-                        .height(118.dp)
+                        .width(116.dp)
+                        .height(132.dp)
                         .clip(RoundedCornerShape(14.dp)),
                     contentAlignment = Alignment.Center
                 ) {
@@ -180,7 +180,7 @@ fun SmallImageAdCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // 互动按钮
             Row(

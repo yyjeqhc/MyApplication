@@ -305,7 +305,7 @@ fun VideoAdCard(
 
             // 内容区域
             Column(
-                modifier = Modifier.padding(start = 14.dp, top = 12.dp, end = 14.dp, bottom = 10.dp)
+                modifier = Modifier.padding(start = 14.dp, top = 12.dp, end = 14.dp, bottom = 12.dp)
             ) {
                 // 品牌名称
                 if (ad.brandName.isNotEmpty()) {

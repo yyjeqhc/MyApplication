@@ -259,15 +259,16 @@ fun FeedScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.22f))
     ) {
-        // 顶部标题栏：压缩高度，强化首页入口感
+        // 顶部标题栏：避开系统状态栏，保持标题、副标题与 Tab 的稳定间距
         Surface(
+            modifier = Modifier.statusBarsPadding(),
             color = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.onSurface
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(60.dp)
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -277,10 +278,10 @@ fun FeedScreen(
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
-                    Spacer(modifier = Modifier.height(1.dp))
+                    Spacer(modifier = Modifier.height(3.dp))
                     Text(
                         text = "精选可互动广告内容",
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -579,6 +580,7 @@ private fun FeedPageContent(
     onRetry: () -> Unit
 ) {
     val context = LocalContext.current
+    val bottomContentPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 24.dp
 
     when (listStateStatus) {
         is FeedListState.Loading -> {
@@ -614,7 +616,7 @@ private fun FeedPageContent(
                         start = 12.dp,
                         top = 8.dp,
                         end = 12.dp,
-                        bottom = 18.dp
+                        bottom = bottomContentPadding
                     ),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
@@ -712,7 +714,7 @@ private fun SearchEntry(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
-            .padding(start = 12.dp, end = 12.dp, top = 3.dp, bottom = 5.dp)
+            .padding(start = 12.dp, end = 12.dp, top = 6.dp, bottom = 8.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(14.dp),
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.36f),
@@ -720,7 +722,7 @@ private fun SearchEntry(
     ) {
         Row(
             modifier = Modifier
-                .height(34.dp)
+                .height(40.dp)
                 .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

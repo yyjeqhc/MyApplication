@@ -53,13 +53,13 @@ fun AdTagChip(
         label = {
             Text(
                 text = tag,
-                fontSize = 12.sp,
+                fontSize = 12.5.sp,
                 fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         },
-        modifier = modifier.height(28.dp),
+        modifier = modifier.height(30.dp),
         shape = RoundedCornerShape(13.dp),
         colors = AssistChipDefaults.assistChipColors(
             containerColor = if (selected) {
@@ -113,7 +113,7 @@ private fun TagOverflowChip(
 ) {
     Box(
         modifier = modifier
-            .height(28.dp)
+            .height(30.dp)
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
                 shape = RoundedCornerShape(13.dp)
