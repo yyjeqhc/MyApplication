@@ -1,6 +1,7 @@
 package com.example.myapplication.ui.search
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,11 +26,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.myapplication.model.AdCardType
 import com.example.myapplication.model.AdItem
 import com.example.myapplication.ui.common.showSingleToast
 import com.example.myapplication.ui.feed.AdFeedCard
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,6 +41,10 @@ fun SearchScreen(
     query: String,
     results: List<AdItem>,
     hasSearched: Boolean,
+    isAiSearchLoading: Boolean,
+    aiSearchMessage: String,
+    aiSuggestedRefinements: List<String>,
+    aiClarifyQuestion: String,
     searchResultListState: LazyListState,
     videoPlaybackPositions: Map<String, Long>,
     videoDurations: Map<String, Long>,
@@ -44,6 +52,7 @@ fun SearchScreen(
     videoSeekRequestIds: Map<String, Long>,
     onQueryChange: (String) -> Unit,
     onSearch: (String) -> Unit,
+    onRefinementClick: (String) -> Unit,
     onBack: () -> Unit,
     onAdClick: (String, Boolean) -> Unit,
     onLikeClick: (String) -> Unit,
@@ -101,20 +110,41 @@ fun SearchScreen(
         ) {
             SearchInputBar(
                 query = query,
+                isLoading = isAiSearchLoading,
                 onQueryChange = onQueryChange,
                 onSearch = ::submitSearch
             )
 
             when {
+                isAiSearchLoading -> SearchLoadingState()
                 !hasSearched -> SearchStartState(
+                    query = query,
                     onSuggestionClick = { suggestion ->
                         onQueryChange(suggestion)
                         onSearch(suggestion)
                     }
                 )
-                results.isEmpty() -> SearchEmptyState(query = query)
+                aiClarifyQuestion.isNotBlank() -> SearchClarifyState(
+                    question = aiClarifyQuestion,
+                    options = aiSuggestedRefinements,
+                    onOptionClick = { option ->
+                        onQueryChange(option)
+                        onRefinementClick(option)
+                    }
+                )
+                results.isEmpty() -> SearchEmptyState(
+                    query = query,
+                    message = aiSearchMessage,
+                    refinements = aiSuggestedRefinements,
+                    onRefinementClick = { refinement ->
+                        onQueryChange(refinement)
+                        onRefinementClick(refinement)
+                    }
+                )
                 else -> SearchResultList(
                     results = results,
+                    aiSearchMessage = aiSearchMessage,
+                    aiSuggestedRefinements = aiSuggestedRefinements,
                     listState = searchResultListState,
                     videoPlaybackPositions = videoPlaybackPositions,
                     videoDurations = videoDurations,
@@ -124,6 +154,10 @@ fun SearchScreen(
                     onLikeClick = onLikeClick,
                     onFavoriteClick = onFavoriteClick,
                     onTagClick = onTagClick,
+                    onRefinementClick = { refinement ->
+                        onQueryChange(refinement)
+                        onRefinementClick(refinement)
+                    },
                     onShareClick = { adId ->
                         onShareClick(adId)
                         showSingleToast(context, "已记录分享")
@@ -140,6 +174,7 @@ fun SearchScreen(
 @Composable
 private fun SearchInputBar(
     query: String,
+    isLoading: Boolean,
     onQueryChange: (String) -> Unit,
     onSearch: () -> Unit
 ) {
@@ -168,18 +203,20 @@ private fun SearchInputBar(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(
                 onSearch = {
-                    onSearch()
+                    if (!isLoading) {
+                        onSearch()
+                    }
                 }
             )
         )
 
         Button(
             onClick = onSearch,
-            enabled = query.isNotBlank(),
+            enabled = query.isNotBlank() && !isLoading,
             modifier = Modifier.height(52.dp),
             shape = RoundedCornerShape(14.dp)
         ) {
-            Text("搜索")
+            Text(if (isLoading) "搜索中" else "搜索")
         }
     }
 }
@@ -187,6 +224,7 @@ private fun SearchInputBar(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun SearchStartState(
+    query: String,
     onSuggestionClick: (String) -> Unit
 ) {
     Column(
@@ -202,40 +240,33 @@ private fun SearchStartState(
             color = MaterialTheme.colorScheme.onSurface
         )
         Text(
-            text = "可以输入标签、频道、品牌或一句自然语言需求。",
+            text = if (query.isBlank()) {
+                "可以输入标签、频道、品牌或一句自然语言需求。"
+            } else {
+                "点击搜索开始 AI 搜索。"
+            },
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            listOf(
+        SearchRefinementChips(
+            refinements = listOf(
                 "学生党 运动",
                 "本地 咖啡 优惠",
                 "数码 游戏",
                 "亲子旅游活动",
                 "性价比 通勤用品"
-            ).forEach { suggestion ->
-                AssistChip(
-                    onClick = { onSuggestionClick(suggestion) },
-                    label = {
-                        Text(
-                            text = suggestion,
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    },
-                    shape = RoundedCornerShape(16.dp),
-                    border = null
-                )
-            }
-        }
+            ),
+            onRefinementClick = onSuggestionClick
+        )
     }
 }
 
 @Composable
 private fun SearchEmptyState(
-    query: String
+    query: String,
+    message: String,
+    refinements: List<String>,
+    onRefinementClick: (String) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -244,17 +275,59 @@ private fun SearchEmptyState(
         contentAlignment = Alignment.Center
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
                 text = "没有找到相关广告",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            SearchMessageCard(message = message.ifBlank { "换个关键词试试：$query" })
+            if (refinements.isNotEmpty()) {
+                SearchRefinementChips(
+                    refinements = refinements,
+                    onRefinementClick = onRefinementClick
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SearchLoadingState() {
+    val loadingMessages = remember {
+        listOf(
+            "AI 正在理解你的需求...",
+            "正在调用搜索工具...",
+            "正在匹配本地广告池...",
+            "正在排序相关广告..."
+        )
+    }
+    var messageIndex by remember { mutableStateOf(0) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(700)
+            messageIndex = (messageIndex + 1) % loadingMessages.size
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            CircularProgressIndicator()
             Text(
-                text = "换个关键词试试：$query",
-                style = MaterialTheme.typography.bodySmall,
+                text = loadingMessages[messageIndex],
+                fontSize = 15.sp,
+                lineHeight = 22.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -262,8 +335,135 @@ private fun SearchEmptyState(
 }
 
 @Composable
+private fun SearchClarifyState(
+    question: String,
+    options: List<String>,
+    onOptionClick: (String) -> Unit
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 24.dp),
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 1.dp,
+        shadowElevation = 0.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "AI 需要再确认一下",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = question,
+                fontSize = 15.sp,
+                lineHeight = 22.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            SearchRefinementChips(
+                refinements = options,
+                onRefinementClick = onOptionClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun AiSearchSummaryCard(
+    message: String
+) {
+    if (message.isBlank()) return
+
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.36f),
+        tonalElevation = 0.dp,
+        shadowElevation = 0.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = "筛选摘要",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                lineHeight = 20.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = message,
+                fontSize = 14.sp,
+                lineHeight = 21.sp,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun SearchResultHeader(
+    resultCount: Int,
+    aiSearchMessage: String,
+    aiSuggestedRefinements: List<String>,
+    onRefinementClick: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            text = "找到 $resultCount 条相关广告",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        AiSearchSummaryCard(message = aiSearchMessage)
+        if (aiSuggestedRefinements.isNotEmpty()) {
+            SearchRefinementChips(
+                refinements = aiSuggestedRefinements,
+                onRefinementClick = onRefinementClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun SearchMessageCard(
+    message: String
+) {
+    if (message.isBlank()) return
+
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 1.dp,
+        shadowElevation = 0.dp
+    ) {
+        Text(
+            text = message,
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+            fontSize = 15.sp,
+            lineHeight = 22.sp,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
 private fun SearchResultList(
     results: List<AdItem>,
+    aiSearchMessage: String,
+    aiSuggestedRefinements: List<String>,
     listState: LazyListState,
     videoPlaybackPositions: Map<String, Long>,
     videoDurations: Map<String, Long>,
@@ -273,6 +473,7 @@ private fun SearchResultList(
     onLikeClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
+    onRefinementClick: (String) -> Unit,
     onShareClick: (String) -> Unit,
     onVideoPlaybackUpdate: (String, Long, Long) -> Unit,
     onVideoPlaybackEnded: (String) -> Unit,
@@ -314,11 +515,11 @@ private fun SearchResultList(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item(key = "search_result_count") {
-            Text(
-                text = "找到 ${results.size} 条相关广告",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+            SearchResultHeader(
+                resultCount = results.size,
+                aiSearchMessage = aiSearchMessage,
+                aiSuggestedRefinements = aiSuggestedRefinements,
+                onRefinementClick = onRefinementClick
             )
         }
 
@@ -365,6 +566,36 @@ private fun SearchResultList(
                     }
                 }
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun SearchRefinementChips(
+    refinements: List<String>,
+    onRefinementClick: (String) -> Unit
+) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        refinements.forEach { refinement ->
+            Surface(
+                modifier = Modifier.clickable { onRefinementClick(refinement) },
+                shape = RoundedCornerShape(18.dp),
+                color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f),
+                tonalElevation = 0.dp,
+                shadowElevation = 0.dp
+            ) {
+                Text(
+                    text = refinement,
+                    modifier = Modifier.padding(horizontal = 13.dp, vertical = 8.dp),
+                    fontSize = 14.sp,
+                    lineHeight = 18.sp,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
         }
     }
 }

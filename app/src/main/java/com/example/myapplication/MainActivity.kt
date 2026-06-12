@@ -12,6 +12,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.data.AiSearchRepository
 import com.example.myapplication.model.AdChannel
 import com.example.myapplication.model.AdItem
 import com.example.myapplication.ui.detail.AdDetailScreen
@@ -67,7 +68,14 @@ fun AdApp(
     var isSearchVisible by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var searchResults by remember { mutableStateOf(emptyList<AdItem>()) }
+    var searchResultAdIds by remember { mutableStateOf(emptyList<String>()) }
     var hasSearched by remember { mutableStateOf(false) }
+    var isAiSearchLoading by remember { mutableStateOf(false) }
+    var aiSearchMessage by remember { mutableStateOf("") }
+    var aiSuggestedRefinements by remember { mutableStateOf(emptyList<String>()) }
+    var aiClarifyQuestion by remember { mutableStateOf("") }
+    var completedSearchQuery by remember { mutableStateOf("") }
+    var latestSearchRequestId by remember { mutableStateOf(0L) }
     var detailRefreshKey by remember { mutableIntStateOf(0) }
 
     // Video state is intentionally kept at the app level so feed, search, and detail share one timeline per ad.
@@ -100,6 +108,49 @@ fun AdApp(
 
     val coroutineScope = rememberCoroutineScope()
 
+    fun clearSearchState(clearQuery: Boolean = false) {
+        latestSearchRequestId++
+        if (clearQuery) {
+            searchQuery = ""
+        }
+        searchResults = emptyList()
+        searchResultAdIds = emptyList()
+        hasSearched = false
+        isAiSearchLoading = false
+        aiSearchMessage = ""
+        aiSuggestedRefinements = emptyList()
+        aiClarifyQuestion = ""
+        completedSearchQuery = ""
+    }
+
+    fun updateSearchQuery(newQuery: String) {
+        val previousQuery = searchQuery.trim()
+        searchQuery = newQuery
+        if (isAiSearchLoading && newQuery.trim() != previousQuery) {
+            latestSearchRequestId++
+            searchResults = emptyList()
+            searchResultAdIds = emptyList()
+            hasSearched = false
+            isAiSearchLoading = false
+            aiSearchMessage = ""
+            aiSuggestedRefinements = emptyList()
+            aiClarifyQuestion = ""
+            completedSearchQuery = ""
+            return
+        }
+
+        val hasDirtyCompletedSearch = completedSearchQuery.isNotBlank() &&
+            newQuery.trim() != completedSearchQuery
+        if (hasDirtyCompletedSearch && !isAiSearchLoading) {
+            searchResults = emptyList()
+            searchResultAdIds = emptyList()
+            hasSearched = false
+            aiSearchMessage = ""
+            aiSuggestedRefinements = emptyList()
+            aiClarifyQuestion = ""
+        }
+    }
+
     fun saveTagFilterReturnPosition() {
         val adIds = uiState.ads.mapTo(mutableSetOf()) { it.id }
         val anchorItem = currentListState.layoutInfo.visibleItemsInfo
@@ -120,19 +171,72 @@ fun AdApp(
         val trimmedQuery = query.trim()
         searchQuery = query
         hasSearched = true
-        searchResults = if (trimmedQuery.isBlank()) {
-            emptyList()
-        } else {
-            viewModel.searchAds(trimmedQuery)
+        searchResults = emptyList()
+        searchResultAdIds = emptyList()
+        aiSearchMessage = ""
+        aiSuggestedRefinements = emptyList()
+        aiClarifyQuestion = ""
+        completedSearchQuery = ""
+
+        if (trimmedQuery.isBlank()) {
+            clearSearchState(clearQuery = false)
+            return
         }
+
+        val requestId = latestSearchRequestId + 1L
+        latestSearchRequestId = requestId
+        isAiSearchLoading = true
+
         coroutineScope.launch {
-            searchResultListState.scrollToItem(0)
+            val aiResult = AiSearchRepository.aiSearch(
+                query = trimmedQuery,
+                currentChannel = uiState.selectedChannel,
+                limit = 12
+            )
+            if (latestSearchRequestId != requestId) return@launch
+
+            aiResult
+                .onSuccess { response ->
+                    if (response.type == "clarify") {
+                        searchResultAdIds = emptyList()
+                        searchResults = emptyList()
+                        aiClarifyQuestion = response.question
+                        aiSuggestedRefinements = response.suggestedRefinements
+                        completedSearchQuery = trimmedQuery
+                    } else {
+                        searchResultAdIds = response.matchedAdIds
+                        searchResults = response.matchedAdIds.mapNotNull { adId ->
+                            viewModel.getAdById(adId)
+                        }
+                        aiSearchMessage = response.explanation
+                        aiSuggestedRefinements = response.suggestedRefinements
+                        completedSearchQuery = trimmedQuery
+                    }
+                }
+                .onFailure {
+                    val fallbackResults = viewModel.searchAds(trimmedQuery)
+                    searchResults = fallbackResults
+                    searchResultAdIds = fallbackResults.map { ad -> ad.id }
+                    aiSearchMessage = "AI 搜索暂时不可用，已使用本地搜索结果。"
+                    aiSuggestedRefinements = emptyList()
+                    aiClarifyQuestion = ""
+                    completedSearchQuery = trimmedQuery
+                }
+
+            isAiSearchLoading = false
+            coroutineScope.launch {
+                searchResultListState.scrollToItem(0)
+            }
         }
     }
 
     fun refreshSearchResults() {
         if (hasSearched && searchQuery.isNotBlank()) {
-            searchResults = viewModel.searchAds(searchQuery.trim())
+            searchResults = if (searchResultAdIds.isEmpty()) {
+                emptyList()
+            } else {
+                searchResultAdIds.mapNotNull { adId -> viewModel.getAdById(adId) }
+            }
         }
     }
 
@@ -275,14 +379,22 @@ fun AdApp(
             query = searchQuery,
             results = searchResults,
             hasSearched = hasSearched,
+            isAiSearchLoading = isAiSearchLoading,
+            aiSearchMessage = aiSearchMessage,
+            aiSuggestedRefinements = aiSuggestedRefinements,
+            aiClarifyQuestion = aiClarifyQuestion,
             searchResultListState = searchResultListState,
             videoPlaybackPositions = videoPlaybackPositions,
             videoDurations = videoDurations,
             videoSeekPositions = videoSeekPositions,
             videoSeekRequestIds = videoSeekRequestIds,
-            onQueryChange = { searchQuery = it },
+            onQueryChange = { updateSearchQuery(it) },
             onSearch = { runSearch(it) },
-            onBack = { isSearchVisible = false },
+            onRefinementClick = { runSearch(it) },
+            onBack = {
+                isSearchVisible = false
+                clearSearchState(clearQuery = true)
+            },
             // Search videos do not autoplay in the results list, but they share global position/duration/seek state
             // with feed and detail. The Boolean records whether the user was actively playing before navigation.
             onAdClick = { adId, shouldAutoPlayInDetail ->
