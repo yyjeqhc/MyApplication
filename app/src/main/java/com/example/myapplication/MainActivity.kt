@@ -12,6 +12,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.data.AiSearchResponse
 import com.example.myapplication.data.AiSearchRepository
 import com.example.myapplication.model.AdChannel
 import com.example.myapplication.model.AdItem
@@ -151,6 +152,36 @@ fun AdApp(
         }
     }
 
+    fun buildSearchDisplayMessage(response: AiSearchResponse): String {
+        val filterText = response.suggestedRefinements
+            .take(3)
+            .joinToString("、")
+
+        return when (response.matchLevel.lowercase()) {
+            "related" -> {
+                if (filterText.isBlank()) {
+                    "当前暂无直接匹配，已展示相关广告"
+                } else {
+                    "当前暂无直接匹配，已展示${filterText}相关内容"
+                }
+            }
+            "fallback" -> {
+                if (filterText.isBlank()) {
+                    "当前暂无直接匹配，已展示少量相关广告"
+                } else {
+                    "当前暂无直接匹配，已展示${filterText}等相关内容"
+                }
+            }
+            else -> {
+                if (filterText.isBlank()) {
+                    "已优先展示相关广告"
+                } else {
+                    "已优先展示${filterText}相关广告"
+                }
+            }
+        }
+    }
+
     fun saveTagFilterReturnPosition() {
         val adIds = uiState.ads.mapTo(mutableSetOf()) { it.id }
         val anchorItem = currentListState.layoutInfo.visibleItemsInfo
@@ -208,7 +239,7 @@ fun AdApp(
                         searchResults = response.matchedAdIds.mapNotNull { adId ->
                             viewModel.getAdById(adId)
                         }
-                        aiSearchMessage = response.explanation
+                        aiSearchMessage = buildSearchDisplayMessage(response)
                         aiSuggestedRefinements = response.suggestedRefinements
                         completedSearchQuery = trimmedQuery
                     }

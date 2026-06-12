@@ -13,6 +13,7 @@ import java.net.URL
 data class AiSearchResponse(
     val type: String,
     val explanation: String = "",
+    val matchLevel: String = "",
     val matchedAdIds: List<String> = emptyList(),
     val suggestedRefinements: List<String> = emptyList(),
     val question: String = "",
@@ -78,6 +79,7 @@ object AiSearchRepository {
         return AiSearchResponse(
             type = type,
             explanation = optString("explanation"),
+            matchLevel = optString("matchLevel"),
             matchedAdIds = optJSONArray("matchedAdIds").toStringList(),
             suggestedRefinements = when (type) {
                 "clarify" -> optJSONArray("suggestedOptions").toStringList()

@@ -354,7 +354,7 @@ private fun SearchClarifyState(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "AI 需要再确认一下",
+                text = "需要再确认一下",
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -382,16 +382,16 @@ private fun AiSearchSummaryCard(
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
-        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.36f),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.26f),
         tonalElevation = 0.dp,
         shadowElevation = 0.dp
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             Text(
-                text = "筛选摘要",
+                text = "智能筛选",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 lineHeight = 20.sp,
@@ -400,8 +400,8 @@ private fun AiSearchSummaryCard(
             Text(
                 text = message,
                 fontSize = 14.sp,
-                lineHeight = 21.sp,
-                maxLines = 3,
+                lineHeight = 20.sp,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
