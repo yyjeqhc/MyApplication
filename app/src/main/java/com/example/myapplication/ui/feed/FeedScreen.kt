@@ -123,7 +123,9 @@ fun FeedScreen(
     var refreshFeedbackMessage by remember { mutableStateOf<String?>(null) }
     var refreshFeedbackToken by remember { mutableIntStateOf(0) }
 
-    val visibleAds = remember(uiState.ads, uiState.selectedTag) { uiState.filteredAds }
+    val visibleAds = remember(uiState.ads, uiState.tagFilteredAds, uiState.selectedTag) {
+        uiState.filteredAds
+    }
     val visibleAdIds = remember(visibleAds) { visibleAds.map { it.id } }
     val visibleAdIdSet = remember(visibleAdIds) { visibleAdIds.toSet() }
     val adsById = remember(visibleAds) { visibleAds.associateBy { it.id } }
@@ -135,6 +137,7 @@ fun FeedScreen(
         uiState.isRefreshing,
         uiState.isLoadingMore,
         uiState.hasMore,
+        uiState.selectedTag,
         visibleAds.size
     ) {
         derivedStateOf {
@@ -142,6 +145,7 @@ fun FeedScreen(
             val totalItems = selectedListState.layoutInfo.totalItemsCount
             uiState.listState is FeedListState.Success &&
                 !uiState.isRefreshing &&
+                uiState.selectedTag == null &&
                 totalItems > 0 &&
                 visibleAds.isNotEmpty() &&
                 lastVisibleItem >= totalItems - 3 &&
@@ -356,8 +360,8 @@ fun FeedScreen(
                     visibleAds = visibleAds,
                     selectedTag = uiState.selectedTag,
                     isRefreshing = uiState.isRefreshing,
-                    isLoadingMore = uiState.isLoadingMore,
-                    hasMore = uiState.hasMore,
+                    isLoadingMore = uiState.selectedTag == null && uiState.isLoadingMore,
+                    hasMore = uiState.selectedTag == null && uiState.hasMore,
                     listState = listStateForChannel(pageChannel),
                     onAdClick = onAdClick,
                     onLikeClick = onLikeClick,

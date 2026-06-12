@@ -146,6 +146,7 @@ class FeedViewModel(
                 it.copy(
                     selectedChannel = channel,
                     selectedTag = null,
+                    tagFilteredAds = emptyList(),
                     listState = FeedListState.Loading,
                     errorMessage = null,
                     isRefreshing = false,
@@ -160,6 +161,7 @@ class FeedViewModel(
                 it.copy(
                     selectedChannel = channel,
                     selectedTag = null,
+                    tagFilteredAds = emptyList(),
                     listState = FeedListState.Error("加载失败，请重试"),
                     errorMessage = "加载失败，请重试",
                     isRefreshing = false,
@@ -175,6 +177,7 @@ class FeedViewModel(
                 it.copy(
                     selectedChannel = channel,
                     selectedTag = null,
+                    tagFilteredAds = emptyList(),
                     ads = cached.ads,
                     currentPage = cached.currentPage,
                     hasMore = cached.hasMore,
@@ -196,6 +199,7 @@ class FeedViewModel(
             it.copy(
                 selectedChannel = channel,
                 selectedTag = null,
+                tagFilteredAds = emptyList(),
                 ads = page.ads,
                 currentPage = page.currentPage,
                 hasMore = page.hasMore,
@@ -210,11 +214,18 @@ class FeedViewModel(
     }
 
     /**
-     * 按智能标签筛选当前频道广告
+     * 按智能标签筛选当前频道完整广告池，不依赖普通分页已加载列表。
      */
     fun selectTag(tag: String) {
+        if (!repositoryReady) return
+        val channel = _uiState.value.selectedChannel
+        val filteredAds = getTagFilteredAds(channel, tag)
         _uiState.update {
-            it.copy(selectedTag = tag)
+            it.copy(
+                selectedTag = tag,
+                tagFilteredAds = filteredAds,
+                listState = FeedListState.Success
+            )
         }
     }
 
@@ -223,7 +234,11 @@ class FeedViewModel(
      */
     fun clearTagFilter() {
         _uiState.update {
-            it.copy(selectedTag = null)
+            it.copy(
+                selectedTag = null,
+                tagFilteredAds = emptyList(),
+                listState = if (it.ads.isEmpty()) FeedListState.Empty else FeedListState.Success
+            )
         }
     }
 
@@ -250,11 +265,26 @@ class FeedViewModel(
                 return@launch
             }
 
+            val selectedTag = _uiState.value.selectedTag
+            if (!selectedTag.isNullOrBlank()) {
+                val filteredAds = getTagFilteredAds(channel, selectedTag)
+                _uiState.update {
+                    it.copy(
+                        tagFilteredAds = filteredAds,
+                        isRefreshing = false,
+                        listState = FeedListState.Success,
+                        errorMessage = null,
+                        feedbackMessage = if (filteredAds.isEmpty()) null else "已刷新筛选结果",
+                        refreshCompletedEventId = it.refreshCompletedEventId + 1,
+                        channelSnapshots = currentChannelSnapshots(),
+                        statsOverview = currentStatsOverview()
+                    )
+                }
+                return@launch
+            }
+
             advanceRefreshRound(channel)
-            val page = loadFirstPageForRefresh(
-                channel = channel,
-                selectedTag = _uiState.value.selectedTag
-            )
+            val page = loadPage(channel, page = 1)
             saveChannelCache(channel, page.ads, currentPage = page.currentPage, hasMore = page.hasMore)
 
             _uiState.update {
@@ -282,11 +312,11 @@ class FeedViewModel(
         val currentState = _uiState.value
         val channel = currentState.selectedChannel
         if (
+            currentState.selectedTag != null ||
             channel in loadMoreInFlightChannels ||
             currentState.isLoadingMore ||
             currentState.isRefreshing ||
-            !currentState.hasMore ||
-            (currentState.selectedTag != null && currentState.filteredAds.isEmpty())
+            !currentState.hasMore
         ) {
             return
         }
@@ -452,7 +482,11 @@ class FeedViewModel(
         channelRefreshRounds.clear()
         hasPreloadedOtherChannels = false
         _uiState.update {
-            it.copy(channelSnapshots = emptyMap())
+            it.copy(
+                selectedTag = null,
+                tagFilteredAds = emptyList(),
+                channelSnapshots = emptyMap()
+            )
         }
         loadInitialData()
     }
@@ -468,6 +502,7 @@ class FeedViewModel(
             it.copy(
                 ads = emptyList(),
                 selectedTag = null,
+                tagFilteredAds = emptyList(),
                 listState = FeedListState.Empty,
                 currentPage = 1,
                 hasMore = false,
@@ -487,6 +522,7 @@ class FeedViewModel(
         _uiState.update {
             it.copy(
                 selectedTag = null,
+                tagFilteredAds = emptyList(),
                 listState = FeedListState.Error("模拟的加载错误"),
                 errorMessage = "模拟的加载错误"
             )
@@ -505,6 +541,8 @@ class FeedViewModel(
         hasPreloadedOtherChannels = false
         _uiState.update {
             it.copy(
+                selectedTag = null,
+                tagFilteredAds = emptyList(),
                 channelSnapshots = emptyMap(),
                 statsOverview = currentStatsOverview()
             )
@@ -524,6 +562,8 @@ class FeedViewModel(
         hasPreloadedOtherChannels = false
         _uiState.update {
             it.copy(
+                selectedTag = null,
+                tagFilteredAds = emptyList(),
                 channelSnapshots = emptyMap(),
                 statsOverview = currentStatsOverview()
             )
@@ -562,6 +602,14 @@ class FeedViewModel(
         }
     }
 
+    private fun getTagFilteredAds(channel: AdChannel, tag: String): List<AdItem> {
+        return if (simulateEmpty) {
+            emptyList()
+        } else {
+            MockAdRepository.getAdsByChannelAndTag(channel, tag)
+        }
+    }
+
     private fun preloadOtherChannelsAfterFirstPage(currentChannel: AdChannel) {
         if (hasPreloadedOtherChannels || simulateError || simulateEmpty) return
         hasPreloadedOtherChannels = true
@@ -588,24 +636,6 @@ class FeedViewModel(
                 )
             }
         }
-    }
-
-    private fun loadFirstPageForRefresh(
-        channel: AdChannel,
-        selectedTag: String?
-    ): MockAdRepository.PagedAds {
-        var loadedPage = loadPage(channel, page = 1)
-        if (selectedTag.isNullOrBlank() || loadedPage.ads.any { selectedTag in it.tags }) {
-            return loadedPage
-        }
-
-        var loadedAds = loadedPage.ads
-        while (loadedPage.hasMore && loadedAds.none { selectedTag in it.tags }) {
-            loadedPage = loadPage(channel, page = loadedPage.currentPage + 1)
-            loadedAds = mergeAdsById(loadedAds, loadedPage.ads)
-        }
-
-        return loadedPage.copy(ads = loadedAds)
     }
 
     private fun advanceRefreshRound(channel: AdChannel) {
@@ -657,6 +687,11 @@ class FeedViewModel(
         _uiState.update { state ->
             state.copy(
                 ads = if (updatedById.isEmpty()) state.ads else state.ads.replaceAds(updatedById),
+                tagFilteredAds = if (updatedById.isEmpty()) {
+                    state.tagFilteredAds
+                } else {
+                    state.tagFilteredAds.replaceAds(updatedById)
+                },
                 channelSnapshots = currentChannelSnapshots(),
                 statsOverview = currentStatsOverview()
             )

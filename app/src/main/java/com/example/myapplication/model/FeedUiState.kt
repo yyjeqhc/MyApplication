@@ -11,6 +11,9 @@ data class FeedUiState(
     /** 当前选中的标签筛选条件 */
     val selectedTag: String? = null,
 
+    /** 当前标签在完整频道广告池中的筛选结果，独立于普通分页列表 */
+    val tagFilteredAds: List<AdItem> = emptyList(),
+
     /** 当前选中的频道 */
     val selectedChannel: AdChannel = AdChannel.FEATURED,
 
@@ -47,7 +50,7 @@ data class FeedUiState(
     /** 当前筛选后实际展示的广告列表 */
     val filteredAds: List<AdItem>
         get() = selectedTag?.let { tag ->
-            ads.filter { ad -> tag in ad.tags }
+            tagFilteredAds.filter { ad -> tag in ad.tags }
         } ?: ads
 }
 

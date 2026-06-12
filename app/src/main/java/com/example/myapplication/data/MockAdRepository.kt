@@ -94,6 +94,21 @@ object MockAdRepository {
     }
 
     /**
+     * 从完整频道广告池按标签筛选，不依赖当前 UI 已分页加载的数据。
+     */
+    fun getAdsByChannelAndTag(
+        channel: AdChannel,
+        tag: String
+    ): List<AdItem> {
+        ensureInitialized()
+        if (tag.isBlank()) return emptyList()
+
+        return _ads.filter { ad ->
+            ad.channel == channel && tag in ad.tags
+        }
+    }
+
+    /**
      * 根据 ID 获取广告（返回最新状态）。
      */
     fun getAdById(id: String): AdItem? {

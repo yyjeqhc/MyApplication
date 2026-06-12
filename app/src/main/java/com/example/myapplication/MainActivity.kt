@@ -576,10 +576,9 @@ fun AdApp(
                 }
             },
             onClearTagFilter = {
+                pendingTagFilterRestorePosition = tagFilterReturnPosition
+                tagFilterReturnPosition = null
                 viewModel.clearTagFilter()
-                coroutineScope.launch {
-                    currentListState.animateScrollToItem(0)
-                }
             },
             onChannelSelect = { viewModel.selectChannel(it) },
             onRefresh = { viewModel.refresh() },
