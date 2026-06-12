@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -114,6 +115,7 @@ fun VideoAdCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .testTag("ad_card_${ad.id}")
             .graphicsLayer { alpha = cardAlpha }
             .clickable(
                 interactionSource = cardInteractionSource,
@@ -380,15 +382,20 @@ fun VideoAdCard(
                     LikeActionButton(
                         liked = ad.liked,
                         likeCount = ad.likeCount,
-                        onClick = onLikeClick
+                        onClick = onLikeClick,
+                        modifier = Modifier.testTag("like_button_${ad.id}")
                     )
 
                     FavoriteActionButton(
                         favorited = ad.favorited,
-                        onClick = onFavoriteClick
+                        onClick = onFavoriteClick,
+                        modifier = Modifier.testTag("favorite_button_${ad.id}")
                     )
 
-                    ShareActionButton(onClick = onShareClick)
+                    ShareActionButton(
+                        onClick = onShareClick,
+                        modifier = Modifier.testTag("share_button_${ad.id}")
+                    )
                 }
             }
         }
